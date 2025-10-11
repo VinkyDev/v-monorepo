@@ -1,0 +1,32 @@
+{
+  "name": "bridge",
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    },
+    "./types": {
+      "types": "./src/types/global.d.ts",
+      "default": "./src/types/global.d.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": ["./src/types/global.d.ts"]
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@electron-toolkit/preload": "^3.0.2",
+    "types": "workspace:*",
+    "typescript": "^5.9.3",
+    "utils": "workspace:*"
+  }
+}

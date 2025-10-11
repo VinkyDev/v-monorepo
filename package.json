@@ -1,0 +1,53 @@
+{
+  "name": "v-monorepo",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "husky install && node ./apps/electron/node_modules/electron/install.js",
+    "dev": "pnpm --filter \"./apps/*\" dev",
+    "dev:react": "pnpm --filter react dev",
+    "dev:electron": "pnpm --filter electron dev",
+    "dev:api": "pnpm --filter api dev",
+    "build": "pnpm run clean && pnpm run build:packages && pnpm run build:react && pnpm run build:electron && pnpm run build:api",
+    "build:packages": "pnpm --filter types build && pnpm --filter utils build && pnpm --filter bridge build",
+    "build:react": "pnpm --filter react build",
+    "build:api": "pnpm --filter api build",
+    "build:electron": "pnpm --filter electron build",
+    "build:desktop": "pnpm run build && rm -rf apps/electron/out/renderer && cp -r apps/react/dist apps/electron/out/renderer",
+    "build:win": "pnpm run build:desktop && pnpm --filter electron build:win",
+    "build:mac": "pnpm run build:desktop && pnpm --filter electron build:mac",
+    "build:linux": "pnpm run build:desktop && pnpm --filter electron build:linux",
+    "start:api": "pnpm --filter api start",
+    "clean": "rm -rf apps/*/dist apps/*/out packages/*/dist",
+    "clean:all": "pnpm run clean && rm -rf node_modules apps/*/node_modules packages/*/node_modules",
+    "setup": "pnpm run clean:all && pnpm install --ignore-scripts && pnpm build:packages && pnpm install",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^5.4.1",
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "eslint": "^9.18.0",
+    "eslint-plugin-format": "^1.0.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.23",
+    "husky": "^9.1.7",
+    "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "^19.2.0",
+      "react-dom": "^19.2.0",
+      "@types/react": "^19.2.2",
+      "@types/react-dom": "^19.2.1",
+      "typescript": "^5.9.3",
+      "eslint": "^9.37.0",
+      "@types/node": "^24.7.1",
+      "hono": "^4.9.10"
+    }
+  }
+}
