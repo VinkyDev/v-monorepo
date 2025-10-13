@@ -2,7 +2,6 @@
   "name": "react",
   "type": "module",
   "version": "0.0.0",
-  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,7 +12,6 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
-    "bridge": "workspace:*",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "tailwindcss": "^4.1.14",
@@ -26,11 +24,6 @@
     "@vitejs/plugin-react": "^5.0.4",
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "typescript": "~5.9.3",
-    "vite": "npm:rolldown-vite@7.1.14"
-  },
-  "pnpm": {
-    "overrides": {
-      "vite": "npm:rolldown-vite@7.1.14"
-    }
+    "vite": "^7.1.6"
   }
 }

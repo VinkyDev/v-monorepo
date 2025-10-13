@@ -1,29 +1,24 @@
 {
   "name": "utils",
   "type": "module",
-  "version": "0.0.0",
   "exports": {
-    ".": "./dist/index.js",
-    "./cn": "./dist/cn.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
+    }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "types": "./src/index.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch"
+    "clean": "rm -rf ./{*.tsbuildinfo,build,dist,.hash}",
+    "build": "vite build",
+    "watch": "vite build --watch --mode development"
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.3.1",
-    "types": "workspace:*"
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
-  },
-  "publishConfig": {
-    "directory": "dist"
   }
 }
