@@ -5,8 +5,7 @@
   ],
   "extends": "config/tsconfig.options.json",
   "include": [
-    "src/**/*",
-    "src/**/*.json"
+    "src/**/*"
   ],
   "references": [
     {
@@ -14,7 +13,7 @@
     }
   ],
   "compilerOptions": {
-    "outDir": "./build",
+    "outDir": "./dist",
     "paths": {
       "@/components/*": [
         "./src/components/*"

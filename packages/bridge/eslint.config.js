@@ -8,6 +8,7 @@ export default antfu(
     ignores: [
       '**/node_modules/**',
       '**/dist/**',
+      '*.md',
     ],
   },
 )

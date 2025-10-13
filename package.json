@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "scripts": {
-    "postinstall": "node ./apps/electron/node_modules/electron/install.js",
+    "postinstall": "node ./node_modules/electron/install.js",
     "preinstall": "npx only-allow pnpm ",
     "clean:all": "pnpm run clean:dist && pnpm run clean:modules",
     "clean:modules": "pnpm -rc exec rm -rf node_modules && pnpm -c exec rm -rf ./node_modules",
@@ -40,7 +40,6 @@
     "eslint-plugin-react-refresh": "^0.4.23",
     "husky": "^9.1.7",
     "typescript": "^5.9.3",
-    "electron": "^38.2.2",
     "config": "workspace:*"
   },
   "lint-staged": {

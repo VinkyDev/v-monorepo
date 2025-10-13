@@ -5,7 +5,7 @@
 ## 🏗️ 项目架构
 
 - **桌面端**: Electron + Vite + TypeScript
-- **Web端**: React 19 + Vite + TypeScript  
+- **Web端**: React 19 + Vite + TypeScript
 - **API服务**: Hono + Node.js + TypeScript
 - **UI组件**: shadcn/ui + Tailwind CSS v4
 - **包管理**: pnpm workspace
@@ -22,25 +22,18 @@
 pnpm run setup
 ```
 
-### 开发模式
+### 开发
 ```bash
-# 启动所有应用
-pnpm dev
-
-# 单独启动
 pnpm dev:react      # React Web应用
-pnpm dev:electron   # Electron桌面应用  
+pnpm dev:electron   # Electron桌面应用
 pnpm dev:api        # API服务
 ```
 
 ## 📦 构建部署
 
 ```bash
-# 构建所有应用
-pnpm build
-
 # 构建桌面端应用
-pnpm build:desktop  # 通用构建
+pnpm build:unpkg  # 通用构建
 pnpm build:win      # Windows安装包
 pnpm build:mac      # macOS安装包
 pnpm build:linux    # Linux安装包
@@ -50,26 +43,10 @@ pnpm build:linux    # Linux安装包
 
 ```bash
 # 代码检查
-pnpm lint           # 检查所有项目
-pnpm lint:fix       # 自动修复问题
+pnpm lint
 
-# 类型检查  
-pnpm typecheck      # 检查所有项目
-```
-
-## 📁 项目结构
-
-```
-v-monorepo/
-├── apps/
-│   ├── electron/     # Electron桌面应用
-│   ├── react/        # React Web应用
-│   └── api/          # Hono API服务
-├── packages/
-│   ├── ui/           # 共享UI组件
-│   └── utils/        # 工具函数
-├── build/            # Electron构建资源
-└── resources/        # 应用资源文件
+# 类型检查
+pnpm typecheck
 ```
 
 ## 📄 许可证

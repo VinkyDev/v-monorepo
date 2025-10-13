@@ -10,7 +10,11 @@
     "./hooks/*": "./src/hooks/*.ts",
     "./components": "./src/components/index.ts"
   },
+  "scripts": {
+    "adc": "node add-component.js"
+  },
   "dependencies": {
+    "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
