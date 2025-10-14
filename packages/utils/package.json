@@ -10,7 +10,8 @@
   "scripts": {
     "clean": "rm -rf ./{*.tsbuildinfo,build,dist,.hash}",
     "build": "vite build",
-    "watch": "vite build --watch --mode development"
+    "watch": "vite build --watch --mode development",
+    "lint": "eslint . --ext .ts,.tsx --fix"
   },
   "dependencies": {
     "clsx": "^2.1.1",

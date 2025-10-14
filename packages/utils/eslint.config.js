@@ -7,7 +7,9 @@ export default antfu(
     formatters: true,
     ignores: [
       '**/node_modules/**',
+      '**/*.tsbuildinfo',
       '**/dist/**',
+      '*.md',
     ],
   },
 )

@@ -1,12 +1,10 @@
 {
   "name": "electron",
+  "type": "module",
   "version": "0.0.0",
-  "description": "VinkyDev's Electron App",
-  "author": "VinkyDev",
   "main": "./out/main/index.js",
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint . --ext .ts,.tsx --fix",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck": "pnpm run typecheck:node",
     "start": "electron-vite preview",
