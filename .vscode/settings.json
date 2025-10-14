@@ -18,11 +18,14 @@
   ],
   "eslint.useFlatConfig": true,
   "cSpell.words": [
+    "ahooks",
     "asar",
+    "hono",
     "laynezh",
     "nsis",
     "Shadcn",
     "Vinky",
-    "vite"
+    "vite",
+    "vitejs"
   ]
 }

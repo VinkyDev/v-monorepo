@@ -33,13 +33,13 @@
     "@antfu/eslint-config": "^5.4.1",
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
-    "eslint": "^9.18.0",
+    "eslint": "catalog:",
     "eslint-plugin-format": "^1.0.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.23",
     "husky": "^9.1.7",
-    "typescript": "^5.9.3",
+    "typescript": "catalog:",
     "config": "workspace:*"
   },
   "lint-staged": {
@@ -55,18 +55,5 @@
     "npm": "only-allow-pnpm",
     "yarn": "only-allow-pnpm",
     "node": ">= 18"
-  },
-  "pnpm": {
-    "overrides": {
-      "react": "^19.2.0",
-      "react-dom": "^19.2.0",
-      "electron": "^38.2.2",
-      "@types/react": "^19.2.2",
-      "@types/react-dom": "^19.2.1",
-      "typescript": "^5.9.3",
-      "eslint": "^9.37.0",
-      "@types/node": "^24.7.1",
-      "hono": "^4.9.10"
-    }
   }
 }

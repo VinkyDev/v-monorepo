@@ -2,11 +2,9 @@
   "name": "utils",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./src/index.ts",
-      "require": "./src/index.ts"
-    }
+    ".": "./src/index.ts",
+    "./src/*": "./src/*",
+    "./*": "./src/*"
   },
   "types": "./src/index.ts",
   "scripts": {
@@ -16,9 +14,10 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "query-string": "catalog:",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "catalog:"
   }
 }
