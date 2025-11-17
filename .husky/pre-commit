@@ -1,4 +1,22 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
 
-pnpm lint
+echo "Running typecheck..."
+if ! pnpm typecheck; then
+  echo "❌ Type check failed. Please fix the errors before committing."
+  exit 1
+fi
+
+echo "Running knip..."
+if ! pnpm knip; then
+  echo "❌ Knip check failed. Please fix the issues before committing."
+  exit 1
+fi
+
+# set NODE_OPTIONS if not set
+if [ -z "$NODE_OPTIONS" ]; then
+  export NODE_OPTIONS="--max-old-space-size=16384"
+fi
+
+# lint staged
+pnpm exec lint-staged --verbose

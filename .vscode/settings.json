@@ -19,13 +19,19 @@
   "eslint.useFlatConfig": true,
   "cSpell.words": [
     "ahooks",
+    "aptabase",
     "asar",
+    "axios",
     "hono",
     "laynezh",
+    "lucide",
     "nsis",
+    "rsbuild",
+    "rslib",
     "Shadcn",
     "Vinky",
     "vite",
-    "vitejs"
+    "vitejs",
+    "vitest"
   ]
 }

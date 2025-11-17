@@ -8,12 +8,12 @@ let mainWindow: BrowserWindow | null = null
 /**
  * 获取主窗口
  */
-export function getMainWindow() {
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    return mainWindow
-  }
-  return null
-}
+// export function getMainWindow() {
+//   if (mainWindow && !mainWindow.isDestroyed()) {
+//     return mainWindow
+//   }
+//   return null
+// }
 
 /**
  * 创建主窗口
@@ -26,7 +26,7 @@ export function createWindow(): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false,
       contextIsolation: true,
       nodeIntegration: false,

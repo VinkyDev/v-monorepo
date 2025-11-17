@@ -1,15 +1,5 @@
 {
-  "extends": "config/tsconfig.options.json",
-  "compilerOptions": {
-    "paths": {},
-    "outDir": "./dist"
-  },
-  "include": [
-    "src/**/*",
-    "types/**/*"
-  ],
-  "exclude": [
-    "dist",
-    "tests"
-  ]
+  "extends": "config/tsconfig.lib.json",
+  "include": ["src/**/*"],
+  "exclude": ["dist"]
 }

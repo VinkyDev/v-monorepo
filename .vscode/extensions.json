@@ -1,0 +1,17 @@
+{
+  "recommendations": [
+    "cpylua.language-postcss",
+    "EditorConfig.editorconfig",
+    "dbaeumer.vscode-eslint",
+    "drKnoxy.eslint-disable-snippets",
+    "htmlhint.vscode-htmlhint",
+    "streetsidesoftware.code-spell-checker",
+    "codezombiech.gitignore",
+    "aaron-bond.better-comments",
+    "jasonnutter.search-node-modules",
+    "jock.svg",
+    "mikestead.dotenv",
+    "vscode-icons-team.vscode-icons",
+    "bradlc.vscode-tailwindcss"
+  ]
+}

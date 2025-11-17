@@ -1,11 +1,12 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { logger } from 'hono/logger'
+import { logger as HonoLogger } from 'hono/logger'
+import logger from 'logger'
 
 const app = new Hono()
 
-app.use('*', logger())
+app.use('*', HonoLogger())
 app.use('*', cors())
 
 app.get('/', (c) => {
@@ -28,16 +29,11 @@ api.get('/users', (c) => {
   })
 })
 
-api.get('/users/:id', (c) => {
-  const id = c.req.param('id')
-  return c.json({ id, name: `User ${id}` })
-})
-
 app.route('/api', api)
 
 const port = Number(process.env.PORT) || 3000
 
-console.log(`Server is running on http://localhost:${port}`)
+logger.info(`Server is running on http://localhost:${port}`)
 
 serve({
   fetch: app.fetch,
