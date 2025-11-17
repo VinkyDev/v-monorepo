@@ -14,9 +14,12 @@
     "bridge": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "ui": "workspace:*"
+    "react-helper": "workspace:*",
+    "ui": "workspace:*",
+    "utils": "workspace:*"
   },
   "devDependencies": {
+    "@eslint-react/eslint-plugin": "catalog:",
     "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
@@ -24,6 +27,8 @@
     "@vitejs/plugin-react": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
     "eslint-plugin-react": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "eslint-plugin-react-refresh": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"

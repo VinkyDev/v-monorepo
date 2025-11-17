@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow } from 'electron'
 import { ipcInit } from './ipc/index'
