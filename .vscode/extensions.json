@@ -1,17 +1,26 @@
 {
   "recommendations": [
-    "cpylua.language-postcss",
-    "EditorConfig.editorconfig",
+    "antfu.browse-lite",
+    "antfu.iconify",
+    "antfu.where-am-i",
+    "antfu.open-in-github-button",
+    "lokalise.i18n-ally",
+    "antfu.icons-carbon",
+    "file-icons.file-icons",
+    "sainnhe.gruvbox-material",
+    "Catppuccin.catppuccin-vsc-icons",
     "dbaeumer.vscode-eslint",
-    "drKnoxy.eslint-disable-snippets",
-    "htmlhint.vscode-htmlhint",
+    "GitHub.copilot",
+    "usernamehw.errorlens",
     "streetsidesoftware.code-spell-checker",
-    "codezombiech.gitignore",
-    "aaron-bond.better-comments",
-    "jasonnutter.search-node-modules",
-    "jock.svg",
-    "mikestead.dotenv",
-    "vscode-icons-team.vscode-icons",
-    "bradlc.vscode-tailwindcss"
+    "eamodio.gitlens",
+    "EditorConfig.EditorConfig",
+    "github.vscode-github-actions",
+    "GitHub.vscode-pull-request-github",
+    "johnsoncodehk.vscode-tsconfig-helper",
+    "mpontus.tab-cycle",
+    "naumovs.color-highlight",
+    "WakaTime.vscode-wakatime",
+    "znck.grammarly"
   ]
 }
