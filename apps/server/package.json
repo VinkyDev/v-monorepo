@@ -1,0 +1,35 @@
+{
+  "name": "@v-monorepo/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./app": "./src/api.ts"
+  },
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp build",
+    "start": "node --env-file-if-exists=.env dist/server.mjs",
+    "test": "vp test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "catalog:",
+    "@hono/standard-validator": "catalog:",
+    "@hono/swagger-ui": "catalog:",
+    "@t3-oss/env-core": "catalog:",
+    "@v-monorepo/shared": "workspace:*",
+    "hono": "catalog:",
+    "hono-openapi": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@hono/vite-dev-server": "catalog:",
+    "@types/node": "catalog:",
+    "@v-monorepo/config": "workspace:*",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

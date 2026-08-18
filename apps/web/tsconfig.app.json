@@ -1,0 +1,11 @@
+{
+  "extends": "@v-monorepo/config/typescript/react-app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@v-monorepo/ui/*": ["../../packages/ui/src/*"]
+    }
+  },
+  "include": ["src", "tests"]
+}

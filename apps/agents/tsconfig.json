@@ -1,0 +1,5 @@
+{
+  "extends": "@v-monorepo/config/typescript/node.json",
+  "include": ["src", "vite.config.ts", "flue.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@v-monorepo/config",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    "./typescript/base.json": "./typescript/base.json",
+    "./typescript/library.json": "./typescript/library.json",
+    "./typescript/node.json": "./typescript/node.json",
+    "./typescript/react-library.json": "./typescript/react-library.json",
+    "./typescript/react-app.json": "./typescript/react-app.json"
+  }
+}

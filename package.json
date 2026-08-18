@@ -1,0 +1,33 @@
+{
+  "name": "v-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ready": "vp check && vp run -r test && vp run -r build",
+    "dev:web": "vp run --filter @v-monorepo/web dev",
+    "dev:server": "vp run --filter @v-monorepo/server dev",
+    "dev:agents": "vp run --filter @v-monorepo/agents dev",
+    "dev:all": "vp run --filter \"./apps/*\" --parallel dev",
+    "prepare": "vp config"
+  },
+  "devDependencies": {
+    "@oxlint/plugins": "catalog:",
+    "@types/node": "catalog:",
+    "@v-monorepo/config": "workspace:*",
+    "oxlint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.22.0",
+      "onFail": "download"
+    }
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

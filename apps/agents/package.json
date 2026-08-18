@@ -1,0 +1,27 @@
+{
+  "name": "@v-monorepo/agents",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp build",
+    "start": "node --env-file-if-exists=.env dist/server.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flue/runtime": "catalog:",
+    "@t3-oss/env-core": "catalog:",
+    "hono": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@flue/cli": "catalog:",
+    "@flue/vite": "catalog:",
+    "@types/node": "catalog:",
+    "@v-monorepo/config": "workspace:*",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
