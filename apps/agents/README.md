@@ -38,7 +38,3 @@ Conversations are durable — pass `--id <id>` to continue one.
 pnpm run build
 node dist/server.mjs
 ```
-
-## Learn more
-
-- [Flue docs](https://flueframework.com/docs/) — or `pnpm exec flue docs` from the terminal.

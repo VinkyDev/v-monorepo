@@ -1,6 +1,6 @@
 # `@v-monorepo/config`
 
-Shared tsconfig presets. New packages extend a leaf preset; local `compilerOptions` only for that package's exceptions (paths, extra libs).
+Shared tsconfig presets. New packages extend a leaf preset; local `compilerOptions` only for that package's exceptions (paths, extra libs). Packages with `src` set `"@/*": ["./src/*"]` and the matching Vite `resolve.alias`.
 
 - `library` — packages
 - `node` — Node apps and scripts
