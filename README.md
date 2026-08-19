@@ -96,6 +96,7 @@ pnpm dev:agents       # http://localhost:5174
 vp check              # 格式化、Lint、类型检查
 vp test
 vp run ready          # check + 全仓测试 + 构建
+vp update -r --latest # 更新所有依赖到最新版本
 ```
 
 ## 常用约定
