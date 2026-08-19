@@ -4,10 +4,10 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { RequestIdVariables } from "hono/request-id";
 import { z } from "zod";
-import { createApp } from "../src/app.ts";
-import { handleAppError } from "../src/problem.ts";
-import { assignRequestId } from "../src/request-id.ts";
-import { validateJson } from "../src/validate.ts";
+import { createApp } from "@/app.ts";
+import { handleAppError } from "@/problem.ts";
+import { assignRequestId } from "@/request-id.ts";
+import { validateJson } from "@/validate.ts";
 
 type AppEnv = {
   Variables: RequestIdVariables;

@@ -7,7 +7,7 @@ import {
   healthStatusSchema,
   isValidRequestId,
 } from "@v-monorepo/shared";
-import { createApiClient } from "../src/index.ts";
+import { createApiClient } from "@/index.ts";
 
 function clientFor(app: ReturnType<typeof createApp>, baseUrl: string) {
   return createApiClient(baseUrl, {

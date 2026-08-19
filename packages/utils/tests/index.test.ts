@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { chunk, cn, sum } from "../src/index.ts";
+import { chunk, cn, sum } from "@/index.ts";
 
 test("re-exports es-toolkit", () => {
   expect(sum([1, 2, 3])).toBe(6);

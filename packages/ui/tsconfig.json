@@ -2,6 +2,7 @@
   "extends": "@v-monorepo/config/typescript/react-library.json",
   "compilerOptions": {
     "paths": {
+      "@/*": ["./src/*"],
       "@v-monorepo/ui/*": ["./src/*"]
     }
   },

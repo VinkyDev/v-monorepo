@@ -1,7 +1,10 @@
 {
   "extends": "@v-monorepo/config/typescript/node.json",
   "compilerOptions": {
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src", "tests", "vite.config.ts"],
   "exclude": ["node_modules", "dist"]

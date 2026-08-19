@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import { createRequestId } from "../src/http.ts";
-import { AppError, errorCatalog, PROBLEM_CONTENT_TYPE, REQUEST_ID_HEADER } from "../src/index.ts";
+import { AppError, errorCatalog, PROBLEM_CONTENT_TYPE, REQUEST_ID_HEADER } from "@/index.ts";
+import { createRequestId } from "@/http.ts";
 
 async function readProblem(error: AppError, requestId?: string) {
   return error.toResponse(requestId).json();

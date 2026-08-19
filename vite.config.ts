@@ -1,6 +1,15 @@
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
+  test: {
+    projects: [
+      "apps/web",
+      "apps/server",
+      "packages/api-client",
+      "packages/shared",
+      "packages/utils",
+    ],
+  },
   staged: {
     "*": "vp check --fix",
   },

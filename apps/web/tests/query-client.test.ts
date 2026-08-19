@@ -1,7 +1,7 @@
 import { MutationObserver } from "@tanstack/react-query";
 import { expect, test } from "vite-plus/test";
 import { AppError, errorCatalog } from "@v-monorepo/shared";
-import { createQueryClient } from "../src/lib/query-client.ts";
+import { createQueryClient } from "@/lib/query-client.ts";
 
 function queryClientWithNotices() {
   const notices: { title: string; description: string | undefined }[] = [];
