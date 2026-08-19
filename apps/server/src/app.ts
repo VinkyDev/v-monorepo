@@ -1,5 +1,5 @@
 import { swaggerUI } from "@hono/swagger-ui";
-import { REQUEST_ID_HEADER } from "@v-monorepo/shared";
+import { BODY_LIMIT_BYTES, REQUEST_ID_HEADER } from "@v-monorepo/shared";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { compress } from "hono/compress";
@@ -8,16 +8,18 @@ import type { RequestIdVariables } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import { timeout } from "hono/timeout";
 import { openAPIRouteHandler } from "hono-openapi";
-import { api } from "./api.ts";
 import { env } from "./env.ts";
 import { handleAppError, notFoundProblem, payloadTooLargeProblem } from "./problem.ts";
 import { assignRequestId, requestLogger } from "./request-id.ts";
+import { healthRoutes } from "./routes/health/index.ts";
 
 type AppEnv = {
   Variables: RequestIdVariables;
 };
 
-export type { AppType } from "./api.ts";
+const api = new Hono().route("/health", healthRoutes);
+
+export type AppType = typeof api;
 
 export function createApp() {
   const app = new Hono<AppEnv>()
@@ -32,7 +34,7 @@ export function createApp() {
     .use(compress())
     .use(
       bodyLimit({
-        maxSize: 1024 * 1024,
+        maxSize: BODY_LIMIT_BYTES,
         onError: (c) => payloadTooLargeProblem(c),
       }),
     )

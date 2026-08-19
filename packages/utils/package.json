@@ -1,6 +1,7 @@
 {
   "name": "@v-monorepo/utils",
   "version": "0.0.0",
+  "private": true,
   "description": "Shared utilities: es-toolkit re-exports plus local helpers such as cn.",
   "files": [
     "dist"
@@ -8,34 +9,14 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.mjs",
-    "./array": "./dist/array.mjs",
-    "./bigint": "./dist/bigint.mjs",
-    "./cn": "./dist/cn.mjs",
     "./compat": "./dist/compat.mjs",
-    "./error": "./dist/error.mjs",
-    "./fp": "./dist/fp.mjs",
-    "./function": "./dist/function.mjs",
-    "./map": "./dist/map.mjs",
-    "./math": "./dist/math.mjs",
-    "./object": "./dist/object.mjs",
-    "./predicate": "./dist/predicate.mjs",
-    "./promise": "./dist/promise.mjs",
-    "./server": "./dist/server.mjs",
-    "./set": "./dist/set.mjs",
-    "./string": "./dist/string.mjs",
-    "./types": "./dist/types.mjs",
-    "./util": "./dist/util.mjs",
     "./package.json": "./package.json"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "scripts": {
     "build": "vp pack",
     "watch": "vp pack --watch",
     "test": "vp test",
-    "check": "vp check",
-    "prepublishOnly": "vp run build"
+    "check": "vp check"
   },
   "dependencies": {
     "clsx": "catalog:",
@@ -45,7 +26,6 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "@v-monorepo/config": "workspace:*",
-    "bumpp": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"

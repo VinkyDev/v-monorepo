@@ -5,7 +5,12 @@ export {
   getResponseRequestId,
   isValidRequestId,
 } from "./http.ts";
-export { type ErrorCode, type ErrorDefinition, errorCatalog } from "./error-catalog.ts";
+export {
+  BODY_LIMIT_BYTES,
+  type ErrorCode,
+  type ErrorDefinition,
+  errorCatalog,
+} from "./error-catalog.ts";
 export {
   AppError,
   type AppErrorOptions,

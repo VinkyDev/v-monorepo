@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { AppError, PROBLEM_CONTENT_TYPE, errorCatalog } from "@v-monorepo/shared";
+import { AppError, BODY_LIMIT_BYTES, PROBLEM_CONTENT_TYPE, errorCatalog } from "@v-monorepo/shared";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { RequestIdVariables } from "hono/request-id";
@@ -26,10 +26,10 @@ test("unknown routes include a request instance", async () => {
   expect(body.instance.startsWith("urn:uuid:")).toBe(true);
 });
 
-test("payload over 1MB returns a 413 problem", async () => {
+test("payload over the body limit returns a 413 problem", async () => {
   const response = await createApp().request("/api/health", {
     method: "POST",
-    body: "x".repeat(1024 * 1024 + 1),
+    body: "x".repeat(BODY_LIMIT_BYTES + 1),
   });
   expect(response.status).toBe(413);
   const error = await readAppError(response);

@@ -1,7 +1,14 @@
-import { healthStatusSchema } from "@v-monorepo/shared";
+import { type HealthStatus, healthStatusSchema } from "@v-monorepo/shared";
 import { Hono } from "hono";
 import { describeRoute, resolver } from "hono-openapi";
-import { getHealthStatus } from "./service.ts";
+
+function getHealthStatus(): HealthStatus {
+  return {
+    status: "ok",
+    service: "v-monorepo-server",
+    timestamp: new Date().toISOString(),
+  };
+}
 
 export const healthRoutes = new Hono().get(
   "/",

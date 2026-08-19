@@ -45,6 +45,7 @@ test("createApiClient throws AppError when the server returns a problem", async 
   expect(error.code).toBe("NOT_FOUND");
   expect(error.title).toBe(errorCatalog.NOT_FOUND.title);
   expect(error.message).toBe(errorCatalog.NOT_FOUND.detail);
+  expect(error.requestId !== undefined && isValidRequestId(error.requestId)).toBe(true);
 });
 
 test("createApiClient wraps network failures as AppError", async () => {

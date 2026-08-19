@@ -60,6 +60,40 @@ test("AppError.fromResponse reads application/problem+json", async () => {
   expect(error.message).toBe(errorCatalog.PAYLOAD_TOO_LARGE.detail);
 });
 
+test("AppError round-trips the request id through a response", async () => {
+  const requestId = createRequestId();
+  const error = await AppError.fromResponse(new AppError("NOT_FOUND").toResponse(requestId));
+  expect(error.requestId).toBe(requestId);
+});
+
+test("AppError.fromResponse recovers the request id from the instance urn", async () => {
+  const requestId = createRequestId();
+  const response = new Response(
+    JSON.stringify({
+      type: "https://httpproblems.com/http-status/404",
+      title: errorCatalog.NOT_FOUND.title,
+      status: 404,
+      detail: errorCatalog.NOT_FOUND.detail,
+      code: "NOT_FOUND",
+      instance: `urn:uuid:${requestId}`,
+    }),
+    { status: 404, headers: { "Content-Type": PROBLEM_CONTENT_TYPE } },
+  );
+  const error = await AppError.fromResponse(response);
+  expect(error.requestId).toBe(requestId);
+});
+
+test("AppError.fromResponse keeps the request id when mapping ad-hoc envelopes", async () => {
+  const requestId = createRequestId();
+  const response = new Response(JSON.stringify({ error: "boom" }), {
+    status: 500,
+    headers: { "Content-Type": "application/json", [REQUEST_ID_HEADER]: requestId },
+  });
+  const error = await AppError.fromResponse(response);
+  expect(error.code).toBe("INTERNAL_ERROR");
+  expect(error.requestId).toBe(requestId);
+});
+
 test("AppError.fromResponse maps ad-hoc envelopes from status", async () => {
   const error = await AppError.fromResponse(
     new Response(JSON.stringify({ error: "Not Found" }), {

@@ -6,6 +6,11 @@ export type ErrorDefinition = {
   readonly detail: string;
 };
 
+// Single owner of the body limit: server middleware enforces it, catalog copy derives from it.
+export const BODY_LIMIT_BYTES = 1024 * 1024;
+
+const bodyLimitMb = BODY_LIMIT_BYTES / (1024 * 1024);
+
 export const protocolErrors = {
   BAD_REQUEST: {
     status: 400,
@@ -25,7 +30,7 @@ export const protocolErrors = {
   PAYLOAD_TOO_LARGE: {
     status: 413,
     title: "请求体过大",
-    detail: "请求体超过 1MB 限制",
+    detail: `请求体超过 ${bodyLimitMb}MB 限制`,
   },
   TIMEOUT: {
     status: 504,

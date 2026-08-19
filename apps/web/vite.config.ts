@@ -4,18 +4,15 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { loadEnv } from "vite-plus";
 import { defineConfig, lazyPlugins } from "vite-plus";
+import { z } from "zod";
 
-function readDevApiOrigin(value: string | undefined): string {
-  const origin = value === undefined || value === "" ? "http://localhost:3001" : value;
-  if (!URL.canParse(origin)) {
-    throw new Error(`Invalid DEV_API_ORIGIN: ${origin}`);
-  }
-  return origin;
-}
+const devEnvSchema = z.object({
+  DEV_API_ORIGIN: z.url().default("http://localhost:3001"),
+});
 
 export default defineConfig(({ mode }) => {
   const loaded = loadEnv(mode, import.meta.dirname, "");
-  const devApiOrigin = readDevApiOrigin(loaded.DEV_API_ORIGIN);
+  const { DEV_API_ORIGIN: devApiOrigin } = devEnvSchema.parse(loaded);
 
   return {
     resolve: {

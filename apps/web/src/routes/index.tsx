@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { getResponseRequestId } from "@v-monorepo/api-client";
-import { type HealthStatus, healthStatusSchema } from "@v-monorepo/shared";
+import { getResponseRequestId, type HealthStatus, healthStatusSchema } from "@v-monorepo/shared";
 import { Button } from "@v-monorepo/ui/components/button";
 import { ArrowRight, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";

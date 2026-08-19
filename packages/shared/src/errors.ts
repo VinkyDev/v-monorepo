@@ -1,5 +1,5 @@
 import { type ErrorCode, errorCatalog, errorCodeSchema } from "./error-catalog.ts";
-import { isValidRequestId, REQUEST_ID_HEADER } from "./http.ts";
+import { getResponseRequestId, isValidRequestId, REQUEST_ID_HEADER } from "./http.ts";
 import { z } from "zod";
 
 export const PROBLEM_CONTENT_TYPE = "application/problem+json";
@@ -82,10 +82,20 @@ async function readProblemDetails(response: Response): Promise<ProblemDetails | 
   }
 }
 
+function requestIdFromInstance(instance: string | undefined): string | undefined {
+  const prefix = "urn:uuid:";
+  if (instance === undefined || !instance.startsWith(prefix)) {
+    return undefined;
+  }
+  const id = instance.slice(prefix.length);
+  return isValidRequestId(id) ? id : undefined;
+}
+
 export type AppErrorOptions = {
   message?: string;
   errors?: readonly ProblemInvalidParam[];
   cause?: unknown;
+  requestId?: string;
 };
 
 export class AppError extends Error {
@@ -93,6 +103,7 @@ export class AppError extends Error {
   readonly status: number;
   readonly title: string;
   readonly errors: readonly ProblemInvalidParam[] | undefined;
+  readonly requestId: string | undefined;
 
   constructor(code: ErrorCode, options: AppErrorOptions = {}) {
     const definition = errorCatalog[code];
@@ -102,12 +113,13 @@ export class AppError extends Error {
     this.status = definition.status;
     this.title = definition.title;
     this.errors = options.errors;
+    this.requestId = options.requestId;
   }
 
   static fromHttpStatus(status: number, options: AppErrorOptions = {}): AppError {
     const code = problemCodeForStatus(status);
     if (hidesInternalMessage(status)) {
-      return new AppError(code, { cause: options.cause });
+      return new AppError(code, { cause: options.cause, requestId: options.requestId });
     }
     return new AppError(code, options);
   }
@@ -120,14 +132,16 @@ export class AppError extends Error {
   }
 
   static async fromResponse(response: Response): Promise<AppError> {
+    const requestId = getResponseRequestId(response) ?? undefined;
     const problem = await readProblemDetails(response);
     if (problem) {
       return new AppError(problem.code, {
         message: problem.detail,
         errors: problem.errors,
+        requestId: requestId ?? requestIdFromInstance(problem.instance),
       });
     }
-    return AppError.fromHttpStatus(response.status);
+    return AppError.fromHttpStatus(response.status, { requestId });
   }
 
   toResponse(requestId?: string): Response {

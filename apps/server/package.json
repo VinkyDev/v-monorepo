@@ -5,7 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./app": "./src/api.ts"
+    "./app": "./src/app.ts"
   },
   "scripts": {
     "dev": "vp dev",

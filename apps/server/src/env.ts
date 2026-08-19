@@ -12,11 +12,17 @@ const corsOriginsSchema = z
   )
   .pipe(z.array(z.url()).min(1));
 
-export const env = createEnv({
-  server: {
-    PORT: z.coerce.number().int().min(1).max(65535).default(3001),
-    CORS_ORIGINS: corsOriginsSchema,
-  },
-  runtimeEnv: process.env,
-  emptyStringAsUndefined: true,
-});
+const serverSchema = {
+  PORT: z.coerce.number().int().min(1).max(65535).default(3001),
+  CORS_ORIGINS: corsOriginsSchema,
+};
+
+export function parseEnv(runtimeEnv: Record<string, string | undefined>) {
+  return createEnv({
+    server: serverSchema,
+    runtimeEnv,
+    emptyStringAsUndefined: true,
+  });
+}
+
+export const env = parseEnv(process.env);

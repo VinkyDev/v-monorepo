@@ -1,13 +1,7 @@
 import type { AppType } from "@v-monorepo/server/app";
-import {
-  AppError,
-  createRequestId,
-  getResponseRequestId,
-  REQUEST_ID_HEADER,
-} from "@v-monorepo/shared";
+import { AppError, createRequestId, REQUEST_ID_HEADER } from "@v-monorepo/shared";
 import { hc } from "hono/client";
 
-export { AppError, getResponseRequestId, REQUEST_ID_HEADER };
 export type { AppType };
 
 export type ApiClient = ReturnType<typeof createApiClient>;
@@ -51,9 +45,4 @@ export function createApiClient(baseUrl: string, options: CreateApiClientOptions
     headers: options.headers,
     fetch: withClientFetch(options.fetch ?? globalThis.fetch.bind(globalThis)),
   });
-}
-
-/** Same-origin Vite `/api` proxy client. Injects `x-request-id` and surfaces failures as `AppError`. */
-export function createBrowserApiClient(baseUrl = "/api", options: CreateApiClientOptions = {}) {
-  return createApiClient(baseUrl, options);
 }
