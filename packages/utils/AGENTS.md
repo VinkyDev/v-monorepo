@@ -1,6 +1,6 @@
 # `@v-monorepo/utils`
 
-Import from `@v-monorepo/utils`. Lodash-compat from `@v-monorepo/utils/compat`. Prefer an [es-toolkit](https://es-toolkit.dev) export; add a local helper only when none exists.
+Import from `@v-monorepo/utils`. Prefer an [es-toolkit](https://es-toolkit.dev) export; add a local helper only when none exists.
 
 Fetch docs before picking, wrapping, or inventing a utility:
 

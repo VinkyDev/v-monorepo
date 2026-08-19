@@ -10,7 +10,6 @@ export default defineConfig({
   pack: {
     entry: {
       index: "src/index.ts",
-      compat: "src/compat.ts",
     },
     dts: {
       tsgo: true,

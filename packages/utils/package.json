@@ -9,7 +9,6 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.mjs",
-    "./compat": "./dist/compat.mjs",
     "./package.json": "./package.json"
   },
   "scripts": {
