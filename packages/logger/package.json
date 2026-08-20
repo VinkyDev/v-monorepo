@@ -1,0 +1,23 @@
+{
+  "name": "@v-monorepo/logger",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vp test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "tslog": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@v-monorepo/config": "workspace:*",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

@@ -6,6 +6,7 @@ export default defineConfig({
       "apps/web",
       "apps/server",
       "packages/api-client",
+      "packages/logger",
       "packages/shared",
       "packages/utils",
     ],

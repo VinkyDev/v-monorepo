@@ -67,6 +67,7 @@ apps/
   agents/       Flue Agent
 packages/
   shared/       前后端契约：Zod、错误码、AppError
+  logger/       tslog 封装：测试静音、请求关联
   api-client/   Hono RPC 客户端
   ui/           shadcn 组件（生成物，避免手改）
   utils/        es-toolkit 再导出 + cn

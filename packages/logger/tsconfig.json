@@ -1,0 +1,11 @@
+{
+  "extends": "@v-monorepo/config/typescript/library.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "tests", "vite.config.ts"],
+  "exclude": ["node_modules"]
+}

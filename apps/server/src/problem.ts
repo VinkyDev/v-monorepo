@@ -1,3 +1,4 @@
+import { log } from "@v-monorepo/logger";
 import { AppError, PROBLEM_CONTENT_TYPE } from "@v-monorepo/shared";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
@@ -28,8 +29,7 @@ export function handleAppError(err: Error, c: Context<AppEnv>): Response {
     }
     return respond(c, AppError.fromHttpStatus(err.status, { message: err.message }));
   }
-  const requestId = c.var.requestId;
-  console.error(requestId ? `[${requestId}]` : "Internal Server Error", err);
+  log.error("Internal Server Error", err);
   return respond(c, AppError.fromCause(err));
 }
 
