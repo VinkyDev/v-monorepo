@@ -1,0 +1,22 @@
+appId: com.v-monorepo.desktop
+productName: v-monorepo
+asar: true
+npmRebuild: false
+nodeGypRebuild: false
+directories:
+  output: release
+files:
+  - dist/main/**/*
+  - dist/preload/**/*
+  - dist/renderer/**/*
+mac:
+  category: public.app-category.developer-tools
+  target:
+    - dmg
+    - zip
+win:
+  target:
+    - nsis
+linux:
+  target:
+    - AppImage

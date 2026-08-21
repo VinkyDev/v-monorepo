@@ -1,6 +1,6 @@
 # v-monorepo
 
-基于 [Vite+](https://viteplus.dev/guide/) 的全栈 TypeScript 模板。一套工具链覆盖 Web、API 和 Agent，前后端共享类型、错误码与校验。
+基于 [Vite+](https://viteplus.dev/guide/) 的全栈 TypeScript 模板。一套工具链覆盖 Web、API、Agent 和 Electron 桌面壳，前后端共享类型、错误码与校验。
 
 工作区包名跟随目录：`@v-monorepo/<directory-name>`
 
@@ -46,6 +46,15 @@
 
 与 Web/Server 的错误契约相互独立；在 Agent 调用本仓库 API 之前不必强行对齐。
 
+### 桌面 `apps/desktop`
+
+| 层     | 选型                                                                  |
+| ------ | --------------------------------------------------------------------- |
+| 运行时 | Electron（main / preload 与渲染进程隔离，sandbox + contextIsolation） |
+| 渲染   | 直接加载 `@v-monorepo/web`，不复制前端                                |
+| 构建   | `vp` 打 main / preload；小脚本编排开发服与热重启                      |
+| 打包   | electron-builder；窗口始终 `app://bundle/`，`/api` 由主进程转发       |
+
 ### 契约与数据
 
 | 层          | 选型                                                                    | 说明                                                              |
@@ -62,16 +71,17 @@
 
 ```
 apps/
-  web/          React 应用
+  web/          React 应用（浏览器与 Electron 共用）
   server/       Hono API
   agents/       Flue Agent
+  desktop/      Electron 壳：main + preload
 packages/
-  shared/       前后端契约：Zod、错误码、AppError
-  logger/       tslog 封装：测试静音、请求关联
-  api-client/   Hono RPC 客户端
-  ui/           shadcn 组件（生成物，避免手改）
-  utils/        es-toolkit 再导出 + cn
-  config/       TypeScript presets
+  shared/            契约：Zod、错误码、AppError、Electron IPC 类型
+  logger/            tslog 封装：测试静音、请求关联
+  api-client/        Hono RPC 客户端
+  ui/                shadcn 组件（生成物，避免手改）
+  utils/             es-toolkit 再导出 + cn + isDesktop / shellApi
+  config/            TypeScript presets
 ```
 
 数据流：页面 → `@v-monorepo/api-client`（Hono RPC）→ `apps/server`；类型来自 `AppType`，错误与 payload 来自 `@v-monorepo/shared`。
@@ -84,13 +94,15 @@ packages/
 vp install
 ```
 
-每个 app 把 `.env.example` 复制为 `.env`。
+每个 app 的默认环境变量已能跑通。要覆盖时把对应 `.env.example` 复制为 `.env`。
 
 ```sh
-pnpm dev:all          # 同时启动 web / server / agents
+pnpm dev:all          # 同时启动 web / server / agents（不含 Electron）
 pnpm dev:web          # http://localhost:5173
-pnpm dev:server       # http://localhost:3001，文档 /docs
+pnpm dev:server       # http://127.0.0.1:3001，文档 /docs
 pnpm dev:agents       # http://localhost:5174
+pnpm dev:desktop      # Electron 壳 + web 开发服
+pnpm package:desktop  # 打当前平台安装包；/api 默认转到 127.0.0.1:3001
 ```
 
 ```sh
@@ -103,6 +115,7 @@ vp update -r --latest # 更新所有依赖到最新版本
 ## 常用约定
 
 - 命令用 `vp`。`vp <name>` 是内置命令，`vp run <name>` 才跑 `package.json` / `vite.config.ts` 里的脚本。
-- 新的 API 路由挂到 `AppType`（`apps/server/src/api.ts`），客户端自动拿到类型。
+- 新的 API 路由挂到 `AppType`（`@v-monorepo/server/api`），客户端自动拿到类型。
 - 新的共享 payload：在 `@v-monorepo/shared` 加 Zod schema，服务端路由和 Web 调用共用。
+- 桌面能力：按域加文件（今天是 shell）：shared 通道、main `ipc/` handler、preload 模块；在 `ipcInit` 里组合。页面从 `@v-monorepo/utils` 调对应域 API（`shellApi()`）。测试打 utils 的 desktop lookup、IPC 域策略、renderer 路由。页面始终 `/api`；换真实后端设 `API_ORIGIN`。
 - UI 组件用 shadcn CLI 加到 `packages/ui`，不要为了 Lint 去改生成文件。

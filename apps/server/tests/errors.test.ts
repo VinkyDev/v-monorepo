@@ -19,6 +19,14 @@ async function readAppError(response: Response) {
   return AppError.fromResponse(response);
 }
 
+test("api responses allow any origin", async () => {
+  const response = await createApp().request("/api/health", {
+    headers: { Origin: "https://example.com" },
+  });
+  expect(response.status).toBe(200);
+  expect(response.headers.get("access-control-allow-origin")).toBe("*");
+});
+
 test("unknown routes include a request instance", async () => {
   const response = await createApp().request("/api/missing");
   expect(response.status).toBe(404);
@@ -50,31 +58,22 @@ test("unhandled errors return a generic 500 problem", async () => {
   expect(error.message).toBe(errorCatalog.INTERNAL_ERROR.detail);
 });
 
-test("HTTPException 4xx keeps the exception message", async () => {
-  const app = new Hono<AppEnv>()
-    .use(assignRequestId())
-    .get("/gone", () => {
-      throw new HTTPException(404, { message: "Widget not found" });
-    })
-    .onError(handleAppError);
-  const response = await app.request("/gone");
-  const error = await readAppError(response);
-  expect(error.code).toBe("NOT_FOUND");
-  expect(error.message).toBe("Widget not found");
-});
+test("HTTPException keeps 4xx messages and hides 5xx messages", async () => {
+  const app = new Hono<AppEnv>().use(assignRequestId()).onError(handleAppError);
+  app.get("/gone", () => {
+    throw new HTTPException(404, { message: "Widget not found" });
+  });
+  app.get("/boom", () => {
+    throw new HTTPException(500, { message: "secret internals" });
+  });
 
-test("HTTPException 5xx uses catalog detail", async () => {
-  const app = new Hono<AppEnv>()
-    .use(assignRequestId())
-    .get("/boom", () => {
-      throw new HTTPException(500, { message: "secret internals" });
-    })
-    .onError(handleAppError);
-  const response = await app.request("/boom");
-  expect(response.status).toBe(500);
-  const error = await readAppError(response);
-  expect(error.code).toBe("INTERNAL_ERROR");
-  expect(error.message).toBe(errorCatalog.INTERNAL_ERROR.detail);
+  const gone = await readAppError(await app.request("/gone"));
+  expect(gone.code).toBe("NOT_FOUND");
+  expect(gone.message).toBe("Widget not found");
+
+  const boom = await readAppError(await app.request("/boom"));
+  expect(boom.code).toBe("INTERNAL_ERROR");
+  expect(boom.message).toBe(errorCatalog.INTERNAL_ERROR.detail);
 });
 
 test("json validation failures return field errors", async () => {

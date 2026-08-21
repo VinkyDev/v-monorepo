@@ -1,0 +1,30 @@
+{
+  "name": "@v-monorepo/desktop",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/main/index.js",
+  "scripts": {
+    "dev": "node --experimental-strip-types ./scripts/dev.ts",
+    "build": "vp build --config vite.main.config.ts && vp build --config vite.preload.config.ts",
+    "copy-renderer": "node --experimental-strip-types ./scripts/copy-renderer.ts",
+    "package": "pnpm --filter @v-monorepo/web build && pnpm copy-renderer && pnpm build && electron-builder --config electron-builder.yml",
+    "package:dir": "pnpm --filter @v-monorepo/web build && pnpm copy-renderer && pnpm build && electron-builder --dir --config electron-builder.yml",
+    "test": "vp test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@v-monorepo/logger": "workspace:*",
+    "@v-monorepo/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@v-monorepo/config": "workspace:*",
+    "electron": "catalog:",
+    "electron-builder": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "zod": "catalog:"
+  }
+}

@@ -8,7 +8,8 @@
     "dev:web": "vp run --filter @v-monorepo/web dev",
     "dev:server": "vp run --filter @v-monorepo/server dev",
     "dev:agents": "vp run --filter @v-monorepo/agents dev",
-    "dev:all": "vp run --filter \"./apps/*\" --parallel dev",
+    "dev:desktop": "pnpm --filter @v-monorepo/desktop dev",
+    "package:desktop": "vp run --filter @v-monorepo/desktop package",
     "prepare": "vp config"
   },
   "devDependencies": {

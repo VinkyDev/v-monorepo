@@ -35,3 +35,4 @@ dist-ssr
 !.vscode/extensions.json
 
 tmp
+release

@@ -5,6 +5,7 @@ export default defineConfig({
     projects: [
       "apps/web",
       "apps/server",
+      "apps/desktop",
       "packages/api-client",
       "packages/logger",
       "packages/shared",

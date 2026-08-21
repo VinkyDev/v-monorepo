@@ -1,4 +1,4 @@
-import type { AppType } from "@v-monorepo/server/app";
+import type { AppType } from "@v-monorepo/server/api";
 import { AppError, createRequestId, REQUEST_ID_HEADER } from "@v-monorepo/shared";
 import { hc } from "hono/client";
 

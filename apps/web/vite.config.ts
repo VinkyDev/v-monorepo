@@ -7,12 +7,12 @@ import { defineConfig, lazyPlugins } from "vite-plus";
 import { z } from "zod";
 
 const devEnvSchema = z.object({
-  DEV_API_ORIGIN: z.url().default("http://localhost:3001"),
+  API_ORIGIN: z.url().default("http://127.0.0.1:3001"),
 });
 
 export default defineConfig(({ mode }) => {
   const loaded = loadEnv(mode, import.meta.dirname, "");
-  const { DEV_API_ORIGIN: devApiOrigin } = devEnvSchema.parse(loaded);
+  const { API_ORIGIN: apiOrigin } = devEnvSchema.parse(loaded);
 
   return {
     resolve: {
@@ -21,9 +21,16 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      host: "127.0.0.1",
+      port: 5173,
+      hmr: {
+        host: "127.0.0.1",
+        protocol: "ws",
+        clientPort: 5173,
+      },
       proxy: {
         "/api": {
-          target: devApiOrigin,
+          target: apiOrigin,
           changeOrigin: true,
         },
       },

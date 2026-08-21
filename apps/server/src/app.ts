@@ -10,18 +10,13 @@ import type { RequestIdVariables } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import { timeout } from "hono/timeout";
 import { openAPIRouteHandler } from "hono-openapi";
-import { env } from "./env.ts";
 import { handleAppError, notFoundProblem, payloadTooLargeProblem } from "./problem.ts";
 import { assignRequestId } from "./request-id.ts";
-import { healthRoutes } from "./routes/health/index.ts";
+import { api } from "./api.ts";
 
 type AppEnv = {
   Variables: RequestIdVariables;
 };
-
-const api = new Hono().route("/health", healthRoutes);
-
-export type AppType = typeof api;
 
 export function createApp() {
   const app = new Hono<AppEnv>()
@@ -33,7 +28,6 @@ export function createApp() {
     )
     .use(
       secureHeaders({
-        // API is consumed cross-origin by the Vite app.
         crossOriginResourcePolicy: "cross-origin",
       }),
     )
@@ -48,7 +42,7 @@ export function createApp() {
     .use(
       "/api/*",
       cors({
-        origin: env.CORS_ORIGINS,
+        origin: "*",
         exposeHeaders: [REQUEST_ID_HEADER],
       }),
     )

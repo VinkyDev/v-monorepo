@@ -1,9 +1,10 @@
 import { expect, test } from "vite-plus/test";
 import { createLogger } from "@/index.ts";
 
-test("createLogger mutes the console under vitest", () => {
+test("createLogger mutes under vitest and uses local time", () => {
   const logger = createLogger({ name: "test" });
-  expect(logger.info("hello")).toBeDefined();
+  expect(logger.settings.type).toBe("hidden");
+  expect(logger.settings.pretty.timeZone).toBe("local");
 });
 
 test("runInContext attaches requestId to the record", () => {
@@ -14,9 +15,4 @@ test("runInContext attaches requestId to the record", () => {
   }));
   expect(seen.context).toEqual({ requestId: "req-1" });
   expect(JSON.stringify(seen.record)).toContain('"requestId":"req-1"');
-});
-
-test("pretty timestamps follow the process timezone", () => {
-  const logger = createLogger({ name: "test" });
-  expect(logger.settings.pretty.timeZone).toBe("local");
 });
