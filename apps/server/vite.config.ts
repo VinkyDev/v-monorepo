@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     ssr: {
-      noExternal: [/^@v-monorepo\//],
+      noExternal: true,
     },
   };
 });

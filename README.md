@@ -8,14 +8,15 @@
 
 ### 工具链
 
-| 层       | 选型                                        | 说明                                                  |
-| -------- | ------------------------------------------- | ----------------------------------------------------- |
-| 统一 CLI | [Vite+](https://viteplus.dev/guide/) (`vp`) | 开发、构建、测试、格式化、Lint 走同一套命令           |
-| 打包     | Vite + Rolldown                             | `vp dev` / `vp build`，Web 与 Server 都在 Vite 体系内 |
-| 包管理   | pnpm workspace + catalog                    | 版本集中在 `pnpm-workspace.yaml`                      |
-| 语言     | TypeScript 7                                | 严格模式；共享 tsconfig 在 `@v-monorepo/config`       |
-| 运行时   | Node.js ≥ 22.18                             | Server / Agents 生产入口是 Node                       |
-| 质量     | Oxlint、Oxfmt、Vitest                       | `vp check` 格式化 + Lint + 类型检查；`vp test` 跑测试 |
+| 层       | 选型                                        | 说明                                                    |
+| -------- | ------------------------------------------- | ------------------------------------------------------- |
+| 统一 CLI | [Vite+](https://viteplus.dev/guide/) (`vp`) | 开发、构建、测试、格式化、Lint 走同一套命令             |
+| 打包     | Vite + Rolldown                             | `vp dev` / `vp build`                                   |
+| 包管理   | pnpm workspace + catalog                    | 版本集中在 `pnpm-workspace.yaml`                        |
+| 语言     | TypeScript 7                                | 严格模式；共享 tsconfig 在 `@v-monorepo/config`         |
+| 运行时   | Node.js ≥ 22.18                             |                                                         |
+| 质量     | Oxlint、Oxfmt、Vitest                       | `vp check` 格式化 + Lint + 类型检查；`vp test` 跑测试   |
+| CI       | GitHub Actions + setup-vp                   | `vp check` → 全仓测试 → 构建；Vite Task 结果跨 run 缓存 |
 
 ### 前端 `apps/web`
 
@@ -30,13 +31,13 @@
 
 ### 后端 `apps/server`
 
-| 层         | 选型                                                               |
-| ---------- | ------------------------------------------------------------------ |
-| 框架       | [Hono](https://hono.dev/)                                          |
-| 类型化调用 | [Hono RPC](https://hono.dev/docs/guides/rpc)，`AppType` 驱动客户端 |
-| 校验       | Zod + `@hono/standard-validator`                                   |
-| 文档       | hono-openapi + Swagger UI（`/docs`、`/openapi.json`）              |
-| 运行       | 开发用 `@hono/vite-dev-server`；生产 SSR 打成 `dist/server.mjs`    |
+| 层         | 选型                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------- |
+| 框架       | [Hono](https://hono.dev/)                                                                         |
+| 类型化调用 | [Hono RPC](https://hono.dev/docs/guides/rpc)，`AppType` 驱动客户端                                |
+| 校验       | Zod + `@hono/standard-validator`                                                                  |
+| 文档       | hono-openapi + Swagger UI（`/docs`、`/openapi.json`）                                             |
+| 运行       | 开发用 `@hono/vite-dev-server`；生产打成自包含 `dist/server.mjs`（依赖全内联，无需 node_modules） |
 
 ### Agent `apps/agents`
 
@@ -88,34 +89,23 @@ packages/
 
 ## 快速开始
 
-需要 Node.js ≥ 22.18 与 pnpm 11。
-
 ```sh
 vp install
 ```
 
 每个 app 的默认环境变量已能跑通。要覆盖时把对应 `.env.example` 复制为 `.env`。
 
-```sh
-pnpm dev:all          # 同时启动 web / server / agents（不含 Electron）
+````sh
 pnpm dev:web          # http://localhost:5173
 pnpm dev:server       # http://127.0.0.1:3001，文档 /docs
 pnpm dev:agents       # http://localhost:5174
 pnpm dev:desktop      # Electron 壳 + web 开发服
 pnpm package:desktop  # 打当前平台安装包；/api 默认转到 127.0.0.1:3001
-```
+```s
 
 ```sh
 vp check              # 格式化、Lint、类型检查
 vp test
 vp run ready          # check + 全仓测试 + 构建
 vp update -r --latest # 更新所有依赖到最新版本
-```
-
-## 常用约定
-
-- 命令用 `vp`。`vp <name>` 是内置命令，`vp run <name>` 才跑 `package.json` / `vite.config.ts` 里的脚本。
-- 新的 API 路由挂到 `AppType`（`@v-monorepo/server/api`），客户端自动拿到类型。
-- 新的共享 payload：在 `@v-monorepo/shared` 加 Zod schema，服务端路由和 Web 调用共用。
-- 桌面能力：按域加文件（今天是 shell）：shared 通道、main `ipc/` handler、preload 模块；在 `ipcInit` 里组合。页面从 `@v-monorepo/utils` 调对应域 API（`shellApi()`）。测试打 utils 的 desktop lookup、IPC 域策略、renderer 路由。页面始终 `/api`；换真实后端设 `API_ORIGIN`。
-- UI 组件用 shadcn CLI 加到 `packages/ui`，不要为了 Lint 去改生成文件。
+````
