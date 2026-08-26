@@ -14,7 +14,7 @@
 | 打包     | Vite + Rolldown                             | `vp dev` / `vp build`                                   |
 | 包管理   | pnpm workspace + catalog                    | 版本集中在 `pnpm-workspace.yaml`                        |
 | 语言     | TypeScript 7                                | 严格模式；共享 tsconfig 在 `@v-monorepo/config`         |
-| 运行时   | Node.js ≥ 22.18                             |                                                         |
+| 运行时   | Node.js 24.19.0 (LTS)                       | `.node-version` 固定；`vp env` 按此解析                 |
 | 质量     | Oxlint、Oxfmt、Vitest                       | `vp check` 格式化 + Lint + 类型检查；`vp test` 跑测试   |
 | CI       | GitHub Actions + setup-vp                   | `vp check` → 全仓测试 → 构建；Vite Task 结果跨 run 缓存 |
 
