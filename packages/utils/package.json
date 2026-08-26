@@ -15,7 +15,8 @@
     "build": "vp pack",
     "watch": "vp pack --watch",
     "test": "vp test",
-    "check": "vp check"
+    "check": "vp check",
+    "postinstall": "vp run build"
   },
   "dependencies": {
     "@v-monorepo/shared": "workspace:*",
