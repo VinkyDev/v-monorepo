@@ -11,8 +11,8 @@ export function setupShellHandlers(): void {
   handle(shellCapabilities.getElectronVersion.channel, () => electronVersion());
   handle(shellCapabilities.openExternal.channel, (_event, url) => openExternal(url));
   handle(shellCapabilities.readClipboardText.channel, () => clipboard.readText());
-  handle(shellCapabilities.writeClipboardText.channel, (_event, text) => {
-    clipboard.writeText(parseClipboardText(text));
+  handle(shellCapabilities.writeClipboardText.channel, async (_event, text) => {
+    await clipboard.writeText(parseClipboardText(text));
   });
 }
 
