@@ -3,8 +3,8 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "@v-monorepo/ui/globals.css";
-import "@/env.ts";
-import { createQueryClient } from "@/lib/query-client.ts";
+import "#/env.ts";
+import { createQueryClient } from "#/lib/query-client.ts";
 import { routeTree } from "./routeTree.gen";
 
 const queryClient = createQueryClient();

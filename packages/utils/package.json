@@ -7,6 +7,9 @@
     "dist"
   ],
   "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
   "exports": {
     ".": "./dist/index.mjs",
     "./package.json": "./package.json"

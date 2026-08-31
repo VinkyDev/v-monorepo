@@ -1,8 +1,8 @@
 import { BrowserWindow } from "electron";
 import { createLogger } from "@v-monorepo/logger";
 import { productionRendererUrl } from "@v-monorepo/shared/electron";
-import { setupCorsBypass } from "@/main/cors.ts";
-import { isTrustedRendererUrl } from "@/main/urls.ts";
+import { setupCorsBypass } from "#/main/cors.ts";
+import { isTrustedRendererUrl } from "#/main/urls.ts";
 
 const log = createLogger({ name: "desktop" });
 

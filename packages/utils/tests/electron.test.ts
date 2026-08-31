@@ -1,6 +1,6 @@
 import { desktopBridgeGlobal, type DesktopApi, type ShellApi } from "@v-monorepo/shared/electron";
 import { expect, test } from "vite-plus/test";
-import { isDesktop, shellApi } from "@/electron.ts";
+import { isDesktop, shellApi } from "#/electron.ts";
 
 type DesktopGlobalThis = typeof globalThis & {
   desktop?: DesktopApi;

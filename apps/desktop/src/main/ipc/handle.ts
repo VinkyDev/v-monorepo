@@ -1,6 +1,6 @@
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import { z } from "zod";
-import { isTrustedRendererUrl } from "@/main/urls.ts";
+import { isTrustedRendererUrl } from "#/main/urls.ts";
 
 const ipcArgListSchema = z.array(z.string());
 

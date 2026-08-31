@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { createLogger } from "@/index.ts";
+import { createLogger } from "#/index.ts";
 
 test("createLogger mutes under vitest and uses local time", () => {
   const logger = createLogger({ name: "test" });

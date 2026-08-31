@@ -1,4 +1,3 @@
-import { join } from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
@@ -15,11 +14,6 @@ export default defineConfig(({ mode }) => {
   const { API_ORIGIN: apiOrigin } = devEnvSchema.parse(loaded);
 
   return {
-    resolve: {
-      alias: {
-        "@": join(import.meta.dirname, "src"),
-      },
-    },
     server: {
       host: "127.0.0.1",
       port: 5173,

@@ -4,8 +4,8 @@ import { getResponseRequestId, type HealthStatus, healthStatusSchema } from "@v-
 import { Button } from "@v-monorepo/ui/components/button";
 import { ArrowRight, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { DesktopDemo } from "@/components/desktop-demo.tsx";
-import { apiClient } from "@/lib/api.ts";
+import { DesktopDemo } from "#/components/desktop-demo.tsx";
+import { apiClient } from "#/lib/api.ts";
 
 export const Route = createFileRoute("/")({
   component: Home,

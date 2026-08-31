@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "main": "./dist/main/index.js",
+  "imports": {
+    "#/*": "./src/*"
+  },
   "scripts": {
     "dev": "node --experimental-strip-types ./scripts/dev.ts",
     "build": "vp build --config vite.main.config.ts && vp build --config vite.preload.config.ts",

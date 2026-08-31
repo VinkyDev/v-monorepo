@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import { AppError, errorCatalog, PROBLEM_CONTENT_TYPE, REQUEST_ID_HEADER } from "@/index.ts";
-import { createRequestId } from "@/http.ts";
+import { AppError, errorCatalog, PROBLEM_CONTENT_TYPE, REQUEST_ID_HEADER } from "#/index.ts";
+import { createRequestId } from "#/http.ts";
 
 test("AppError serializes RFC 9457 fields from the catalog", async () => {
   const requestId = createRequestId();

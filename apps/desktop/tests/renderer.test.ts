@@ -11,8 +11,8 @@ import {
   resolveHttpOrigin,
   resolveRendererFileFromRequest,
   rewriteToOrigin,
-} from "@/main/renderer-route.ts";
-import { isTrustedRendererUrl } from "@/main/urls.ts";
+} from "#/main/renderer-route.ts";
+import { isTrustedRendererUrl } from "#/main/urls.ts";
 
 const rendererRoot = mkdtempSync(join(tmpdir(), "v-desktop-renderer-"));
 writeFileSync(join(rendererRoot, "index.html"), "<html></html>");

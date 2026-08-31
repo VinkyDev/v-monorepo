@@ -3,11 +3,6 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig(({ mode }) => ({
   publicDir: false,
-  resolve: {
-    alias: {
-      "@": join(import.meta.dirname, "src"),
-    },
-  },
   build: {
     ssr: true,
     target: "node22",

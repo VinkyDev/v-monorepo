@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import { parseClipboardText, parseExternalUrl } from "@/main/ipc/shell.ts";
-import { assertSender } from "@/main/ipc/handle.ts";
+import { parseClipboardText, parseExternalUrl } from "#/main/ipc/shell.ts";
+import { assertSender } from "#/main/ipc/handle.ts";
 
 test("ipc sender must be the renderer origin", () => {
   expect(() => assertSender("https://evil.example/")).toThrow("untrusted ipc sender");

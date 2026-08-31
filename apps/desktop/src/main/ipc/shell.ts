@@ -1,7 +1,7 @@
 import { clipboard, shell } from "electron";
 import { z } from "zod";
 import { shellCapabilities } from "@v-monorepo/shared/electron";
-import { handle } from "@/main/ipc/handle.ts";
+import { handle } from "#/main/ipc/handle.ts";
 
 const clipboardTextSchema = z.string().max(1_048_576);
 const ipcUrlSchema = z.string().min(1);

@@ -10,7 +10,7 @@ import {
   resolveHttpOrigin,
   resolveRendererFileFromRequest,
   rewriteToOrigin,
-} from "@/main/renderer-route.ts";
+} from "#/main/renderer-route.ts";
 
 const log = createLogger({ name: "desktop" });
 

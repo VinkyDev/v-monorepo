@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
 import { AppError } from "@v-monorepo/shared";
-import { createQueryClient } from "@/lib/query-client.ts";
+import { createQueryClient } from "#/lib/query-client.ts";
 
 test("does not retry 4xx AppError", async () => {
   const queryClient = createQueryClient();

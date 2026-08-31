@@ -1,8 +1,8 @@
 import { app, BrowserWindow } from "electron";
 import { join } from "node:path";
-import { ipcInit } from "@/main/ipc/index.ts";
-import { registerRendererScheme, serveRenderer } from "@/main/renderer.ts";
-import { createMainWindow } from "@/main/window.ts";
+import { ipcInit } from "#/main/ipc/index.ts";
+import { registerRendererScheme, serveRenderer } from "#/main/renderer.ts";
+import { createMainWindow } from "#/main/window.ts";
 
 function preloadFile(): string {
   return join(import.meta.dirname, "../preload/index.cjs");
