@@ -54,6 +54,7 @@ catalog:
   "@flue/cli": ^2.0.3
   "@flue/vite": ^2.0.3
   "@flue/runtime": ^2.0.3
+  "@earendil-works/pi-ai": ^0.83.0
 
   # desktop
   electron: ^44.0.0

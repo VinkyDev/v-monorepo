@@ -10,9 +10,11 @@
     "dev": "vp dev",
     "build": "vp build",
     "start": "node --env-file-if-exists=.env dist/server.mjs",
+    "test": "vp test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@earendil-works/pi-ai": "catalog:",
     "@flue/runtime": "catalog:",
     "@t3-oss/env-core": "catalog:",
     "hono": "catalog:",

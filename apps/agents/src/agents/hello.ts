@@ -1,7 +1,9 @@
 "use agent";
 import { useModel } from "@flue/runtime";
 
+import { llmModel } from "#/llm.ts";
+
 export const Hello = () => {
-  useModel("kimi-coding/k3-256k");
+  useModel(llmModel);
   return "You are a helpful assistant. Keep replies short.";
 };

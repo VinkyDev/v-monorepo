@@ -63,6 +63,7 @@ export default defineConfig({
     projects: [
       "apps/web",
       "apps/server",
+      "apps/agents",
       "apps/desktop",
       "packages/api-client",
       "packages/logger",

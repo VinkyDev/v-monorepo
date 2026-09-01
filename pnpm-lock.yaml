@@ -208,6 +208,9 @@ catalogs:
     '@base-ui/react':
       specifier: ^1.7.0
       version: 1.7.0
+    '@earendil-works/pi-ai':
+      specifier: ^0.83.0
+      version: 0.83.0
     '@flue/cli':
       specifier: ^2.0.3
       version: 2.0.3
@@ -357,6 +360,9 @@ importers:
 
   apps/agents:
     dependencies:
+      '@earendil-works/pi-ai':
+        specifier: 'catalog:'
+        version: 0.83.0(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@7.2.0)(zod@4.5.4))(supports-color@7.2.0)(ws@8.21.3)(zod@4.5.4)
       '@flue/runtime':
         specifier: 'catalog:'
         version: 2.0.3(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@7.2.0)(zod@4.5.4))(supports-color@7.2.0)(typescript@7.0.2)(ws@8.21.3)(zod@4.5.4)

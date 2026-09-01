@@ -8,7 +8,7 @@ A [Flue](https://flueframework.com) agent project, served locally with Vite.
 pnpm install
 ```
 
-Then add a model provider API key to `.env` (any [provider Pi supports](https://pi.dev/docs/latest/providers#api-keys)).
+Copy `.env.example` to `.env` and set `PROVIDER_ID`, `MODEL_ID`, and `API_KEY` (any [provider Pi supports](https://pi.dev/docs/latest/providers#api-keys)). For `openai-compat` or `anthropic-compat`, also set `BASE_URL`.
 
 ## Develop
 
