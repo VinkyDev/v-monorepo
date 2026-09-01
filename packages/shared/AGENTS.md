@@ -1,9 +1,9 @@
 # `@v-monorepo/shared`
 
-Contracts both sides import: Zod schemas, HTTP helpers, `AppError`. A type belongs here only when more than one package uses it.
+Cross-package contracts: Zod schemas, HTTP helpers, `AppError`. Put a type here when two or more packages import it.
 
-Electron: each domain owns a file in `src/electron` (today `shell.ts`). Import `@v-monorepo/shared/electron`. To add a desktop domain, add that file, a main `ipc/` handler, and a preload module. Renderer code calls that domain's function on `@v-monorepo/utils` (`shellApi()` today), never `window.desktop` or a merged `desktopApi`.
+**Payloads** — add a Zod schema and inferred type; use them in the Hono route and OpenAPI.
 
-Payloads: add a Zod schema and inferred type, then use them in the Hono route and the web caller.
+**Errors** — add codes to `businessErrors` in `src/error-catalog.ts`. Throw `new AppError("CODE")` (optional `{ message }`). Reconstruct with `AppError.fromResponse`.
 
-Errors: add domain codes to `businessErrors` in `src/error-catalog.ts`. Throw `new AppError("CODE")` (optional `{ message }`). Reconstruct with `AppError.fromResponse`. `AppError` is the only error type on both sides.
+**Electron** — each domain owns a file in `src/electron` (`shell.ts` today). Import `@v-monorepo/shared/electron`. Adding a domain: that file, a main `ipc/` handler, a preload module, and `xApi()` on `@v-monorepo/utils`. Renderer calls `shellApi()` (or the new accessor).

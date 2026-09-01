@@ -79,13 +79,13 @@ apps/
 packages/
   shared/            契约：Zod、错误码、AppError、Electron IPC 类型
   logger/            tslog 封装：测试静音、请求关联
-  api-client/        Hono RPC 客户端
+  api-client/        Hono RPC 传输工厂（`hc<AppType>`，不列请求函数）
   ui/                ui 组件（基于 Shadcn + Base UI）
   utils/             本地工具（如 cn）
   config/            TypeScript presets
 ```
 
-数据流：页面 → `@v-monorepo/api-client`（Hono RPC）→ `apps/server`；类型来自 `AppType`，错误与 payload 来自 `@v-monorepo/shared`。
+数据流：页面 `useQuery(queryOptions)` → `apps/web/src/lib/queries` → `apiClient`（`@v-monorepo/api-client` 传输工厂）→ `apps/server`。路由与响应类型来自 `AppType`；错误来自 `AppError`。
 
 ## 代码规范
 

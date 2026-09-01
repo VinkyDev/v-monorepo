@@ -1,9 +1,7 @@
 # `@v-monorepo/api-client`
 
-Typed Hono RPC client. Types come from `AppType` on `@v-monorepo/server/api`.
+Hono RPC transport. `createApiClient(baseUrl)` returns `hc<AppType>`; types come from `@v-monorepo/server/api`. New server routes on `AppType` show up as `client.<path>.$method()`.
 
-Use `createApiClient(env.VITE_API_BASE_URL)` in the web app (same-origin `/api`). Failed requests throw `AppError`; error and request-id helpers come from `@v-monorepo/shared`.
-
-New server routes: export them on `AppType`; the client picks them up.
+Web: `createApiClient(env.VITE_API_BASE_URL)` (same-origin `/api`). Failed requests throw `AppError`. The custom `fetch` injects `x-request-id`.
 
 **RPC** — [Hono RPC](https://hono.dev/docs/guides/rpc)

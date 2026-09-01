@@ -1,7 +1,7 @@
 # `@v-monorepo/logger`
 
-[tslog](https://tslog.js.org) with repo defaults. Import `log` or `createLogger({ name: "server" })`.
+Process logging via [tslog](https://tslog.js.org). Import `log` or `createLogger({ name: "server" })`.
 
-- Tests mute console output (`type: "hidden"` when `VITEST` is set).
-- Pretty timestamps follow the process timezone (`pretty.timeZone: "local"`). Pin a zone with `TZ`.
-- Correlate a request with `await log.runInContext({ requestId }, fn)`.
+- Tests: `type: "hidden"` when `VITEST` is set
+- Timestamps: process timezone (`pretty.timeZone: "local"`); pin with `TZ`
+- Request correlation: `await log.runInContext({ requestId }, fn)`
