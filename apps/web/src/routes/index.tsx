@@ -1,13 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { getResponseRequestId, healthStatusSchema } from "@v-monorepo/shared";
-import type { HealthStatus } from "@v-monorepo/shared";
 import { Button } from "@v-monorepo/ui/components/button";
 import { ArrowRight, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { DesktopDemo } from "#/components/desktop-demo.tsx";
-import { apiClient } from "#/lib/api.ts";
+import { healthQueryOptions } from "#/lib/queries/health.ts";
 
 const variants = [
   "default",
@@ -20,18 +18,9 @@ const variants = [
 
 const sizes = ["xs", "sm", "default", "lg"] as const;
 
-type HealthResult = HealthStatus & { requestId: string | null };
-
-const fetchHealth = async (): Promise<HealthResult> => {
-  const response = await apiClient.health.$get();
-  const payload = healthStatusSchema.parse(await response.json());
-  return { ...payload, requestId: getResponseRequestId(response) };
-};
-
 const HealthDemo = () => {
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ["health"],
-    queryFn: fetchHealth,
+    ...healthQueryOptions(),
     enabled: false,
   });
 
