@@ -2,52 +2,69 @@ import type { Session } from "electron";
 
 type ElectronResponseHeaders = Record<string, string[]>;
 
-function setResponseHeader(
+const withResponseHeader = (
   headers: ElectronResponseHeaders,
   name: string,
-  value: string | string[],
-): void {
-  for (const key of Object.keys(headers)) {
-    if (key.toLowerCase() === name.toLowerCase()) {
-      delete headers[key];
-    }
-  }
-  headers[name] = Array.isArray(value) ? value : [value];
-}
+  value: string | string[]
+): ElectronResponseHeaders => {
+  const next = Object.fromEntries(
+    Object.entries(headers).filter(
+      ([key]) => key.toLowerCase() !== name.toLowerCase()
+    )
+  );
+  next[name] = Array.isArray(value) ? value : [value];
+  return next;
+};
 
-export function setupCorsBypass(session: Session): void {
+export const setupCorsBypass = (session: Session): void => {
   const originMap = new Map<number, string>();
 
-  session.webRequest.onBeforeSendHeaders((details, callback) => {
+  session.webRequest.onBeforeSendHeaders((details, respond) => {
     const requestHeaders = { ...details.requestHeaders };
     if (requestHeaders.Origin !== undefined) {
       originMap.set(details.id, requestHeaders.Origin);
       delete requestHeaders.Origin;
     }
-    callback({ requestHeaders });
+    respond({ requestHeaders });
   });
 
-  session.webRequest.onHeadersReceived((details, callback) => {
-    const responseHeaders = details.responseHeaders ?? {};
+  session.webRequest.onHeadersReceived((details, respond) => {
+    let responseHeaders = details.responseHeaders ?? {};
     const origin = originMap.get(details.id) ?? "*";
 
-    setResponseHeader(responseHeaders, "Access-Control-Allow-Origin", origin);
-    setResponseHeader(
+    responseHeaders = withResponseHeader(
+      responseHeaders,
+      "Access-Control-Allow-Origin",
+      origin
+    );
+    responseHeaders = withResponseHeader(
       responseHeaders,
       "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+      "GET, POST, PUT, DELETE, OPTIONS, PATCH"
     );
-    setResponseHeader(responseHeaders, "Access-Control-Allow-Headers", "*");
-    setResponseHeader(responseHeaders, "Access-Control-Allow-Credentials", "true");
+    responseHeaders = withResponseHeader(
+      responseHeaders,
+      "Access-Control-Allow-Headers",
+      "*"
+    );
+    responseHeaders = withResponseHeader(
+      responseHeaders,
+      "Access-Control-Allow-Credentials",
+      "true"
+    );
 
     originMap.delete(details.id);
 
     if (details.method === "OPTIONS") {
-      setResponseHeader(responseHeaders, "Access-Control-Max-Age", "86400");
-      callback({ responseHeaders, statusLine: "HTTP/1.1 200 OK" });
+      responseHeaders = withResponseHeader(
+        responseHeaders,
+        "Access-Control-Max-Age",
+        "86400"
+      );
+      respond({ responseHeaders, statusLine: "HTTP/1.1 200 OK" });
       return;
     }
 
-    callback({ responseHeaders });
+    respond({ responseHeaders });
   });
-}
+};

@@ -1,9 +1,9 @@
-import { Logger, type ILogObj, type ISettingsParam } from "tslog";
+import { Logger } from "tslog";
+import type { ILogObj, ISettingsParam } from "tslog";
 
-export { Logger, LogLevel } from "tslog";
-export type { ILogObj, ISettingsParam } from "tslog";
-
-export function createLogger(settings?: ISettingsParam<ILogObj>): Logger<ILogObj> {
+export const createLogger = (
+  settings?: ISettingsParam<ILogObj>
+): Logger<ILogObj> => {
   const resolved: ISettingsParam<ILogObj> = {
     ...settings,
     pretty: {
@@ -16,6 +16,6 @@ export function createLogger(settings?: ISettingsParam<ILogObj>): Logger<ILogObj
     return Logger.fromEnv({ ...resolved, type: "hidden" });
   }
   return Logger.fromEnv(resolved);
-}
+};
 
 export const log = createLogger();

@@ -2,16 +2,18 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+
 import "@v-monorepo/ui/globals.css";
 import "#/env.ts";
 import { createQueryClient } from "#/lib/query-client.ts";
+
 import { routeTree } from "./routeTree.gen";
 
 const queryClient = createQueryClient();
 
 const router = createRouter({
-  routeTree,
   defaultPreload: "intent",
+  routeTree,
   scrollRestoration: true,
 });
 
@@ -21,10 +23,15 @@ declare module "@tanstack/react-router" {
   }
 }
 
-createRoot(document.getElementById("root")!).render(
+const rootElement = document.querySelector("#root");
+if (rootElement === null) {
+  throw new Error("missing #root element");
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
     </QueryClientProvider>
-  </StrictMode>,
+  </StrictMode>
 );

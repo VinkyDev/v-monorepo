@@ -1,6 +1,6 @@
 # `@v-monorepo/utils`
 
-Import from `@v-monorepo/utils`. Prefer an [es-toolkit](https://es-toolkit.dev) export; add a local helper only when none exists.
+Import local helpers from `@v-monorepo/utils`. Prefer [es-toolkit](https://es-toolkit.dev) (import from `"es-toolkit"` directly); add a local helper only when none exists.
 
 Desktop: `isDesktop()` and per-domain accessors (`shellApi()` today) live in `src/electron.ts`. Pages import them from this package, never `window.desktop`.
 

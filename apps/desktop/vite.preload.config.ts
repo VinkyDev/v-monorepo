@@ -1,22 +1,23 @@
-import { join } from "node:path";
+import path from "node:path";
+
 import { defineConfig } from "vite-plus";
 
 export default defineConfig(({ mode }) => ({
-  publicDir: false,
   build: {
-    ssr: true,
-    target: "node22",
-    outDir: "dist/preload",
     emptyOutDir: mode !== "development",
-    minify: mode !== "development",
-    sourcemap: mode === "development",
     lib: {
-      entry: join(import.meta.dirname, "src/preload/index.ts"),
-      formats: ["cjs"],
+      entry: path.join(import.meta.dirname, "src/preload/index.ts"),
       fileName: () => "index.cjs",
+      formats: ["cjs"],
     },
-    rollupOptions: {
+    minify: mode !== "development",
+    outDir: "dist/preload",
+    rolldownOptions: {
       external: ["electron"],
     },
+    sourcemap: mode === "development",
+    ssr: true,
+    target: "node22",
   },
+  publicDir: false,
 }));

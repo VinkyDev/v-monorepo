@@ -1,8 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
-import { loadEnv } from "vite-plus";
-import { defineConfig, lazyPlugins } from "vite-plus";
+import { loadEnv, defineConfig, lazyPlugins } from "vite-plus";
 import { z } from "zod";
 
 const devEnvSchema = z.object({
@@ -14,29 +13,29 @@ export default defineConfig(({ mode }) => {
   const { API_ORIGIN: apiOrigin } = devEnvSchema.parse(loaded);
 
   return {
+    plugins: lazyPlugins(() => [
+      tanstackRouter({
+        autoCodeSplitting: true,
+        quoteStyle: "double",
+        target: "react",
+      }),
+      tailwindcss(),
+      react({ compiler: true }),
+    ]),
     server: {
-      host: "127.0.0.1",
-      port: 5173,
       hmr: {
+        clientPort: 5173,
         host: "127.0.0.1",
         protocol: "ws",
-        clientPort: 5173,
       },
+      host: "127.0.0.1",
+      port: 5173,
       proxy: {
         "/api": {
-          target: apiOrigin,
           changeOrigin: true,
+          target: apiOrigin,
         },
       },
     },
-    plugins: lazyPlugins(() => [
-      tanstackRouter({
-        target: "react",
-        autoCodeSplitting: true,
-        quoteStyle: "double",
-      }),
-      tailwindcss(),
-      react(),
-    ]),
   };
 });

@@ -1,5 +1,6 @@
-import { AppError, type ProblemInvalidParam } from "@v-monorepo/shared";
 import { sValidator } from "@hono/standard-validator";
+import { AppError } from "@v-monorepo/shared";
+import type { ProblemInvalidParam } from "@v-monorepo/shared";
 import { z } from "zod";
 
 const keyedPathSchema = z.object({
@@ -13,7 +14,7 @@ const issueSchema = z.object({
   path: z.array(pathSegmentSchema).optional(),
 });
 
-function pathKey(segment: z.infer<typeof pathSegmentSchema>): string {
+const pathKey = (segment: z.infer<typeof pathSegmentSchema>): string => {
   const keyed = keyedPathSchema.safeParse(segment);
   if (keyed.success) {
     return String(keyed.data.key);
@@ -23,28 +24,31 @@ function pathKey(segment: z.infer<typeof pathSegmentSchema>): string {
     return String(primitive.data);
   }
   return "request";
-}
+};
 
-function invalidParamFromIssue(issue: z.infer<typeof issueSchema>): ProblemInvalidParam {
+const invalidParamFromIssue = (
+  issue: z.infer<typeof issueSchema>
+): ProblemInvalidParam => {
   const keys = (issue.path ?? []).map(pathKey);
   if (keys.length === 0) {
     return { name: "request", reason: issue.message };
   }
   return {
     name: keys.join("."),
-    reason: issue.message,
     pointer: `/${keys.join("/")}`,
+    reason: issue.message,
   };
-}
+};
 
-export function validateJson<Schema extends z.ZodType>(schema: Schema) {
-  return sValidator("json", schema, (result) => {
+export const validateJson = <Schema extends z.ZodType>(schema: Schema) =>
+  sValidator("json", schema, (result) => {
     if (result.success) {
       return;
     }
     const issues = z.array(issueSchema).safeParse(result.error);
     throw new AppError("VALIDATION_ERROR", {
-      errors: issues.success ? issues.data.map(invalidParamFromIssue) : undefined,
+      errors: issues.success
+        ? issues.data.map(invalidParamFromIssue)
+        : undefined,
     });
   });
-}

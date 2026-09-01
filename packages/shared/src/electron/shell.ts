@@ -7,7 +7,7 @@ export const shellCapabilities = {
 
 export type ShellCapabilityName = keyof typeof shellCapabilities;
 
-export type ShellCapability = {
+export interface ShellCapability {
   getElectronVersion: {
     channel: (typeof shellCapabilities)["getElectronVersion"]["channel"];
     args: [];
@@ -16,7 +16,7 @@ export type ShellCapability = {
   openExternal: {
     channel: (typeof shellCapabilities)["openExternal"]["channel"];
     args: [url: string];
-    result: void;
+    result: undefined;
   };
   readClipboardText: {
     channel: (typeof shellCapabilities)["readClipboardText"]["channel"];
@@ -26,9 +26,9 @@ export type ShellCapability = {
   writeClipboardText: {
     channel: (typeof shellCapabilities)["writeClipboardText"]["channel"];
     args: [text: string];
-    result: void;
+    result: undefined;
   };
-};
+}
 
 export type ShellApi = {
   [K in ShellCapabilityName]: (

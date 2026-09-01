@@ -1,18 +1,21 @@
 import type { AppType } from "@v-monorepo/server/api";
-import { AppError, createRequestId, REQUEST_ID_HEADER } from "@v-monorepo/shared";
+import {
+  AppError,
+  createRequestId,
+  REQUEST_ID_HEADER,
+} from "@v-monorepo/shared";
 import { hc } from "hono/client";
-
-export type { AppType };
 
 export type ApiClient = ReturnType<typeof createApiClient>;
 
-export type CreateApiClientOptions = {
+export interface CreateApiClientOptions {
   headers?: Record<string, string>;
   fetch?: typeof fetch;
-};
+}
 
-function withClientFetch(fetchFn: typeof fetch): typeof fetch {
-  return async (input, init) => {
+const withClientFetch =
+  (fetchFn: typeof fetch): typeof fetch =>
+  async (input, init) => {
     const headers = new Headers(init?.headers);
     if (input instanceof Request) {
       for (const [key, value] of input.headers.entries()) {
@@ -34,15 +37,16 @@ function withClientFetch(fetchFn: typeof fetch): typeof fetch {
         return response;
       }
       throw await AppError.fromResponse(response);
-    } catch (cause) {
-      throw AppError.fromCause(cause);
+    } catch (error) {
+      throw AppError.fromCause(error);
     }
   };
-}
 
-export function createApiClient(baseUrl: string, options: CreateApiClientOptions = {}) {
-  return hc<AppType>(baseUrl, {
-    headers: options.headers,
+export const createApiClient = (
+  baseUrl: string,
+  options: CreateApiClientOptions = {}
+) =>
+  hc<AppType>(baseUrl, {
     fetch: withClientFetch(options.fetch ?? globalThis.fetch.bind(globalThis)),
+    headers: options.headers,
   });
-}

@@ -11,6 +11,6 @@ export {
 
 export const desktopBridgeGlobal = "desktop";
 
-export type DesktopApi = {
+export interface DesktopApi {
   shell: ShellApi;
-};
+}

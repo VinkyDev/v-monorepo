@@ -1,7 +1,9 @@
 # @v-monorepo/utils
 
-es-toolkit 再导出，以及本地工具（如 `cn`、`shellApi`）。
+本地工具（如 `cn`）。es-toolkit 直接从 `"es-toolkit"` 导入。
 
 ```ts
-import { chunk, cn, isDesktop, shellApi, sum } from "@v-monorepo/utils";
+import { chunk, sum } from "es-toolkit";
+
+import { cn } from "@v-monorepo/utils";
 ```

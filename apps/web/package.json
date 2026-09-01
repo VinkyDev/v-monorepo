@@ -35,6 +35,7 @@
     "@types/react-dom": "catalog:",
     "@v-monorepo/config": "workspace:*",
     "@vitejs/plugin-react": "catalog:",
+    "oxc-transform-react": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

@@ -1,22 +1,23 @@
-import { join } from "node:path";
+import path from "node:path";
+
 import { defineConfig } from "vite-plus";
 
 export default defineConfig(({ mode }) => ({
-  publicDir: false,
   build: {
-    ssr: true,
-    target: "node22",
-    outDir: "dist/main",
     emptyOutDir: mode !== "development",
-    minify: mode !== "development",
-    sourcemap: mode === "development",
     lib: {
-      entry: join(import.meta.dirname, "src/main/index.ts"),
-      formats: ["es"],
+      entry: path.join(import.meta.dirname, "src/main/index.ts"),
       fileName: () => "index.js",
+      formats: ["es"],
     },
-    rollupOptions: {
+    minify: mode !== "development",
+    outDir: "dist/main",
+    rolldownOptions: {
       external: ["electron"],
     },
+    sourcemap: mode === "development",
+    ssr: true,
+    target: "node22",
   },
+  publicDir: false,
 }));

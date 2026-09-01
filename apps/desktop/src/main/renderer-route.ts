@@ -1,14 +1,14 @@
-import { isAbsolute, join, relative, resolve } from "node:path";
 import { existsSync, statSync } from "node:fs";
+import path from "node:path";
+
 import { rendererHost, rendererProtocol } from "@v-monorepo/shared/electron";
 
 export const defaultApiOrigin = "http://127.0.0.1:3001";
 
-export function isApiPathname(pathname: string): boolean {
-  return pathname === "/api" || pathname.startsWith("/api/");
-}
+export const isApiPathname = (pathname: string): boolean =>
+  pathname === "/api" || pathname.startsWith("/api/");
 
-export function resolveHttpOrigin(value: string | undefined): string | undefined {
+export const resolveHttpOrigin = (value?: string): string | undefined => {
   if (value === undefined || value === "") {
     return undefined;
   }
@@ -22,14 +22,14 @@ export function resolveHttpOrigin(value: string | undefined): string | undefined
     return undefined;
   }
   return parsed.origin;
-}
+};
 
-function parseLoopbackOrigin(value: string | undefined): string | undefined {
+const parseLoopbackOrigin = (value: string | undefined): string | undefined => {
   const origin = resolveHttpOrigin(value);
   if (origin === undefined) {
     return undefined;
   }
-  const hostname = new URL(origin).hostname;
+  const { hostname } = new URL(origin);
   if (
     hostname !== "127.0.0.1" &&
     hostname !== "localhost" &&
@@ -39,9 +39,9 @@ function parseLoopbackOrigin(value: string | undefined): string | undefined {
     return undefined;
   }
   return origin;
-}
+};
 
-export function requireLoopbackOrigin(value: string | undefined): string | undefined {
+export const requireLoopbackOrigin = (value?: string): string | undefined => {
   if (value === undefined || value === "") {
     return undefined;
   }
@@ -50,9 +50,9 @@ export function requireLoopbackOrigin(value: string | undefined): string | undef
     throw new Error("invalid ELECTRON_RENDERER_URL");
   }
   return origin;
-}
+};
 
-export function parseRendererUrl(requestUrl: string): URL | undefined {
+export const parseRendererUrl = (requestUrl: string): URL | undefined => {
   let url: URL;
   try {
     url = new URL(requestUrl);
@@ -63,24 +63,23 @@ export function parseRendererUrl(requestUrl: string): URL | undefined {
     return undefined;
   }
   return url;
-}
+};
 
-export function rewriteToOrigin(url: URL, origin: string): string {
-  return new URL(`${url.pathname}${url.search}`, origin).href;
-}
+export const rewriteToOrigin = (url: URL, origin: string): string =>
+  new URL(`${url.pathname}${url.search}`, origin).href;
 
-export function resolveRendererFileFromRequest(
-  requestUrl: string,
-  rendererRoot: string,
-): string | undefined {
-  const url = parseRendererUrl(requestUrl);
-  if (url === undefined) {
-    return undefined;
-  }
-  return resolveRendererFile(url, rendererRoot);
-}
+const isPathInside = (root: string, candidate: string): boolean => {
+  const rel = path.relative(path.resolve(root), path.resolve(candidate));
+  return rel !== "" && !rel.startsWith("..") && !path.isAbsolute(rel);
+};
 
-function resolveRendererFile(url: URL, rendererRoot: string): string | undefined {
+const isExistingFile = (filePath: string): boolean =>
+  existsSync(filePath) && statSync(filePath).isFile();
+
+const resolveRendererFile = (
+  url: URL,
+  rendererRoot: string
+): string | undefined => {
   let pathname: string;
   try {
     pathname = decodeURIComponent(url.pathname);
@@ -93,7 +92,7 @@ function resolveRendererFile(url: URL, rendererRoot: string): string | undefined
 
   const trimmed = pathname.replace(/^\/+/u, "").replace(/\/+$/u, "");
   const relativePath = trimmed === "" ? "index.html" : trimmed;
-  const mapped = resolve(rendererRoot, relativePath);
+  const mapped = path.resolve(rendererRoot, relativePath);
   if (!isPathInside(rendererRoot, mapped)) {
     return undefined;
   }
@@ -102,18 +101,23 @@ function resolveRendererFile(url: URL, rendererRoot: string): string | undefined
   }
 
   const lastSegment = pathname.split("/").pop() ?? "";
-  const fallback = join(rendererRoot, "index.html");
-  if ((lastSegment === "" || !lastSegment.includes(".")) && isExistingFile(fallback)) {
+  const fallback = path.join(rendererRoot, "index.html");
+  if (
+    (lastSegment === "" || !lastSegment.includes(".")) &&
+    isExistingFile(fallback)
+  ) {
     return fallback;
   }
   return undefined;
-}
+};
 
-function isPathInside(root: string, candidate: string): boolean {
-  const rel = relative(resolve(root), resolve(candidate));
-  return rel !== "" && !rel.startsWith("..") && !isAbsolute(rel);
-}
-
-function isExistingFile(path: string): boolean {
-  return existsSync(path) && statSync(path).isFile();
-}
+export const resolveRendererFileFromRequest = (
+  requestUrl: string,
+  rendererRoot: string
+): string | undefined => {
+  const url = parseRendererUrl(requestUrl);
+  if (url === undefined) {
+    return undefined;
+  }
+  return resolveRendererFile(url, rendererRoot);
+};

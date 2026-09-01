@@ -2,7 +2,7 @@
   "name": "@v-monorepo/utils",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared utilities: es-toolkit re-exports plus local helpers such as cn and shellApi.",
+  "description": "Shared local helpers such as cn.",
   "files": [
     "dist"
   ],
@@ -24,7 +24,6 @@
   "dependencies": {
     "@v-monorepo/shared": "workspace:*",
     "clsx": "catalog:",
-    "es-toolkit": "catalog:",
     "tailwind-merge": "catalog:"
   },
   "devDependencies": {
