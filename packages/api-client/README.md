@@ -10,4 +10,4 @@ const response = await api.health.$get();
 const data = await response.json();
 ```
 
-新路由加在服务端并导出到 `AppType` 即可。Web 的 TanStack Query 工厂放在 `apps/web/src/lib/queries`。
+新路由加在服务端并导出到 `AppType` 即可。

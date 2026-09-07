@@ -86,7 +86,7 @@ packages/
   config/            TypeScript presets
 ```
 
-数据流：页面 `useQuery(queryOptions)` → `apps/web/src/lib/queries` → `apiClient`（`@v-monorepo/api-client` 传输工厂）→ `apps/server`。路由与响应类型来自 `AppType`；错误来自 `AppError`。
+数据流：页面 `useQuery` → `apiClient`（`@v-monorepo/api-client` 传输工厂）→ `apps/server`。路由与响应类型来自 `AppType`；错误来自 `AppError`。
 
 ## 代码规范
 

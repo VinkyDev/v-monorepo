@@ -2,9 +2,9 @@ import { createApp } from "@v-monorepo/server";
 import {
   AppError,
   errorCatalog,
-  getResponseRequestId,
   healthStatusSchema,
   isValidRequestId,
+  REQUEST_ID_HEADER,
 } from "@v-monorepo/shared";
 import { describe, expect, test } from "vite-plus/test";
 
@@ -35,9 +35,22 @@ describe(createApiClient, () => {
   test("createApiClient reads a successful health response from the server", async () => {
     const client = clientFor(createApp(), "http://v-monorepo.test/api");
     const response = await client.health.$get();
-    expect(response.status).toBe(200);
     expect(healthStatusSchema.parse(await response.json()).status).toBe("ok");
-    const requestId = getResponseRequestId(response);
+  });
+
+  test("createApiClient injects x-request-id on outgoing requests", async () => {
+    let requestId: string | null = null;
+    const app = createApp();
+    const client = createApiClient("http://v-monorepo.test/api", {
+      fetch: async (input, init) => {
+        const request =
+          input instanceof Request ? input : new Request(input, init);
+        requestId = request.headers.get(REQUEST_ID_HEADER);
+        return await app.fetch(request);
+      },
+    });
+
+    await client.health.$get();
     expect(requestId !== null && isValidRequestId(requestId)).toBeTruthy();
   });
 

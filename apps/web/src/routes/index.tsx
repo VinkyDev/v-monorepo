@@ -5,8 +5,8 @@ import { Button } from "@v-monorepo/ui/components/button";
 import { ArrowRight, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
+import { apiClient } from "#/lib/api.ts";
 import { lazyComponent } from "#/lib/lazy-component.ts";
-import { healthQueryOptions } from "#/lib/queries/health.ts";
 import { withSuspense } from "#/lib/with-suspense.tsx";
 
 const DesktopDemo = withSuspense(
@@ -26,8 +26,12 @@ const sizes = ["xs", "sm", "default", "lg"] as const;
 
 const HealthDemo = () => {
   const { data, isFetching, refetch } = useQuery({
-    ...healthQueryOptions(),
     enabled: false,
+    queryFn: async () => {
+      const response = await apiClient.health.$get();
+      return await response.json();
+    },
+    queryKey: ["health"],
   });
 
   return (
@@ -64,8 +68,6 @@ const HealthDemo = () => {
             <dd>{data.service}</dd>
             <dt className="text-muted-foreground">timestamp</dt>
             <dd className="break-all">{data.timestamp}</dd>
-            <dt className="text-muted-foreground">x-request-id</dt>
-            <dd className="break-all">{data.requestId ?? "（响应头缺失）"}</dd>
           </dl>
         ) : null}
       </div>
