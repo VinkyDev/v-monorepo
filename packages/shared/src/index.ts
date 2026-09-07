@@ -1,4 +1,5 @@
 export { type HealthStatus, healthStatusSchema } from "./health.ts";
+export { type Item, itemSchema } from "./item.ts";
 export {
   BODY_LIMIT_BYTES,
   type ErrorCode,

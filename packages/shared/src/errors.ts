@@ -49,11 +49,24 @@ const problemCodeForStatus = (status: number): ErrorCode => {
 const hidesInternalMessage = (status: number): boolean =>
   status === 408 || status === 504 || status >= 500;
 
+const joinedErrorReasons = (
+  errors: readonly ProblemInvalidParam[] | undefined
+): string | undefined => {
+  if (errors === undefined || errors.length === 0) {
+    return undefined;
+  }
+  return errors.map((param) => param.reason).join("；");
+};
+
 const resolvedMessage = (
   definition: (typeof errorCatalog)[ErrorCode],
-  message: string | undefined
-): string =>
-  message !== undefined && message.length > 0 ? message : definition.detail;
+  options: AppErrorOptions
+): string => {
+  if (options.message !== undefined && options.message.length > 0) {
+    return options.message;
+  }
+  return joinedErrorReasons(options.errors) ?? definition.detail;
+};
 
 const serializeProblem = (error: AppError): ProblemDetails => {
   const problem: ProblemDetails = {
@@ -98,7 +111,7 @@ export class AppError extends Error {
 
   constructor(code: ErrorCode, options: AppErrorOptions = {}) {
     const definition = errorCatalog[code];
-    super(resolvedMessage(definition, options.message), {
+    super(resolvedMessage(definition, options), {
       cause: options.cause,
     });
     this.name = "AppError";

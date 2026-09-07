@@ -44,6 +44,31 @@ describe("app problem responses", () => {
     const error = await readAppError(response);
     expect(error.code).toBe("PAYLOAD_TOO_LARGE");
   });
+
+  test("creating an item with an empty name returns field errors", async () => {
+    const response = await createApp().request("/api/items", {
+      body: JSON.stringify({ name: "" }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    });
+    expect(response.status).toBe(400);
+    const error = await readAppError(response);
+    expect(error.code).toBe("VALIDATION_ERROR");
+    expect(error.message).toBe("名称不能为空");
+    expect(error.errors).toStrictEqual([
+      { name: "name", pointer: "/name", reason: "名称不能为空" },
+    ]);
+  });
+
+  test("creating an item echoes a valid name", async () => {
+    const response = await createApp().request("/api/items", {
+      body: JSON.stringify({ name: "demo" }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    });
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toStrictEqual({ name: "demo" });
+  });
 });
 
 describe(handleAppError, () => {

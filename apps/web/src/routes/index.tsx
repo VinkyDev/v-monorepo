@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { isDesktop } from "@v-monorepo/electron";
 import { Button } from "@v-monorepo/ui/components/button";
@@ -75,6 +75,36 @@ const HealthDemo = () => {
   );
 };
 
+const ValidationDemo = () => {
+  const mutation = useMutation({
+    mutationFn: async () => {
+      await apiClient.items.$post({ json: { name: "" } });
+    },
+  });
+
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="text-muted-foreground text-sm font-semibold tracking-widest uppercase">
+        Hono RPC · 参数校验
+      </h2>
+      <div className="border-border bg-card flex items-center justify-between gap-3 rounded-lg border p-6">
+        <p className="text-muted-foreground text-sm">
+          <code>useMutation</code> · POST /api/items
+        </p>
+        <Button
+          variant="destructive"
+          disabled={mutation.isPending}
+          onClick={() => {
+            mutation.mutate();
+          }}
+        >
+          {mutation.isPending ? "提交中…" : "提交空名称"}
+        </Button>
+      </div>
+    </section>
+  );
+};
+
 const ErrorBoundaryDemo = () => {
   const [shouldThrow, setShouldThrow] = useState(false);
 
@@ -124,6 +154,8 @@ const Home = () => {
       {isDesktop() ? <DesktopDemo /> : null}
 
       <HealthDemo />
+
+      <ValidationDemo />
 
       <ErrorBoundaryDemo />
 

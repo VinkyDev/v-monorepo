@@ -34,16 +34,18 @@ describe(AppError, () => {
     expect(internalProblem).toMatchObject({ detail: "数据库迁移中" });
   });
 
-  test("validation problems keep field errors", async () => {
-    const problem: unknown = await new AppError("VALIDATION_ERROR", {
-      errors: [{ name: "name", pointer: "/name", reason: "Too small" }],
-    })
-      .toResponse()
-      .json();
+  test("validation problems use field reasons as the detail", async () => {
+    const error = new AppError("VALIDATION_ERROR", {
+      errors: [{ name: "name", pointer: "/name", reason: "名称不能为空" }],
+    });
+    expect(error.message).toBe("名称不能为空");
 
+    const problem: unknown = await error.toResponse().json();
     expect(problem).toMatchObject({
       code: "VALIDATION_ERROR",
-      errors: [{ name: "name", pointer: "/name", reason: "Too small" }],
+      detail: "名称不能为空",
+      errors: [{ name: "name", pointer: "/name", reason: "名称不能为空" }],
+      title: errorCatalog.VALIDATION_ERROR.title,
     });
   });
 
