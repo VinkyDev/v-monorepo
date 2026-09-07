@@ -1,6 +1,6 @@
 import { Toast as ToastPrimitive } from "@base-ui/react/toast";
 import { Button } from "@v-monorepo/ui/components/button";
-import { cn } from "@v-monorepo/utils";
+import { cn } from "cn";
 import {
   CircleCheckIcon,
   InfoIcon,

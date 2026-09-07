@@ -81,7 +81,7 @@ packages/
   logger/            tslog 封装：测试静音、请求关联
   api-client/        Hono RPC 传输工厂（`hc<AppType>`，不列请求函数）
   ui/                ui 组件（基于 Shadcn + Base UI）
-  utils/             本地工具（如 cn）
+  utils/             本地工具（桌面访问器）
   config/            TypeScript presets
 ```
 

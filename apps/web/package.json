@@ -22,6 +22,7 @@
     "@v-monorepo/shared": "workspace:*",
     "@v-monorepo/ui": "workspace:*",
     "@v-monorepo/utils": "workspace:*",
+    "cn": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

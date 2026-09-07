@@ -1,6 +1,6 @@
 # `@v-monorepo/ui`
 
-Shared UI (shadcn + Base UI). Import by path (`@v-monorepo/ui/components/button`). Import `globals.css` once in the app entry. Mount `<Toaster />` once in the app shell. `cn` comes from `@v-monorepo/utils`.
+Shared UI (shadcn + Base UI). Import by path (`@v-monorepo/ui/components/button`). Import `globals.css` once in the app entry. Mount `<Toaster />` once in the app shell. `cn` comes from `"cn"`.
 
 Add primitives with the shadcn CLI from the repo root: `-c packages/ui`.
 

@@ -1,6 +1,6 @@
 # `@v-monorepo/utils`
 
-Local helpers (`cn`, desktop accessors). Import from `@v-monorepo/utils`. Prefer [es-toolkit](https://es-toolkit.dev) (`import { … } from "es-toolkit"`); add a helper here when none exists.
+Desktop accessors. Import from `@v-monorepo/utils`. Prefer [es-toolkit](https://es-toolkit.dev) (`import { … } from "es-toolkit"`); add a helper here when none exists.
 
 Desktop: `isDesktop()` and per-domain accessors live in `src/electron.ts`. Pages import them from this package.
 

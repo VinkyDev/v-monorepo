@@ -2,7 +2,7 @@
   "name": "@v-monorepo/utils",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared local helpers such as cn.",
+  "description": "Desktop accessors and other local helpers.",
   "files": [
     "dist"
   ],
@@ -22,9 +22,7 @@
     "postinstall": "vp run build"
   },
   "dependencies": {
-    "@v-monorepo/shared": "workspace:*",
-    "clsx": "catalog:",
-    "tailwind-merge": "catalog:"
+    "@v-monorepo/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",
