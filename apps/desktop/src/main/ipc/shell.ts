@@ -1,4 +1,4 @@
-import { shellCapabilities } from "@v-monorepo/shared/electron";
+import { shellCapabilities } from "@v-monorepo/electron";
 import { clipboard, shell } from "electron";
 import { z } from "zod";
 

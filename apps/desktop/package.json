@@ -17,8 +17,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@v-monorepo/logger": "workspace:*",
-    "@v-monorepo/shared": "workspace:*"
+    "@v-monorepo/electron": "workspace:*",
+    "@v-monorepo/logger": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

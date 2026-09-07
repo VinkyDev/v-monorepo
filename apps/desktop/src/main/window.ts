@@ -1,5 +1,5 @@
+import { productionRendererUrl } from "@v-monorepo/electron";
 import { createLogger } from "@v-monorepo/logger";
-import { productionRendererUrl } from "@v-monorepo/shared/electron";
 import { BrowserWindow } from "electron";
 
 import { setupCorsBypass } from "#/main/cors.ts";

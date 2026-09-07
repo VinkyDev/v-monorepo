@@ -1,25 +1,18 @@
 {
-  "name": "@v-monorepo/utils",
+  "name": "@v-monorepo/electron",
   "version": "0.0.0",
   "private": true,
-  "description": "Local helpers.",
-  "files": [
-    "dist"
-  ],
+  "description": "Desktop bridge: IPC catalog and renderer accessors.",
   "type": "module",
   "imports": {
     "#/*": "./src/*"
   },
   "exports": {
-    ".": "./dist/index.mjs",
-    "./package.json": "./package.json"
+    ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "vp pack",
-    "watch": "vp pack --watch",
     "test": "vp test",
-    "check": "vp check",
-    "postinstall": "vp run build"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "catalog:",

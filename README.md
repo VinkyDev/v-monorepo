@@ -1,6 +1,6 @@
 # v-monorepo
 
-基于 [Vite+](https://viteplus.dev/guide/) 的全栈 TypeScript 模板。一套工具链覆盖 Web、API、Agent 和 Electron 桌面壳，前后端共享类型、错误码与校验。
+基于 [Vite+](https://viteplus.dev/guide/) 的全栈 TypeScript 模板。一套工具链覆盖 Web、API、Agent；桌面端是可选的 Electron 壳。
 
 工作区包名跟随目录：`@v-monorepo/<directory-name>`
 
@@ -72,16 +72,17 @@
 
 ```
 apps/
-  web/          React 应用（浏览器与 Electron 共用）
+  web/          React 应用
   server/       Hono API
   agents/       Flue Agent
-  desktop/      Electron 壳：main + preload
+  desktop/      Electron 壳（可选）
 packages/
-  shared/            契约：Zod、错误码、AppError、Electron IPC 类型
+  shared/            契约：Zod、错误码、AppError
   logger/            tslog 封装：测试静音、请求关联
   api-client/        Hono RPC 传输工厂（`hc<AppType>`，不列请求函数）
-  ui/                ui 组件（基于 Shadcn + Base UI）
-  utils/             本地工具（桌面访问器）
+  ui/                UI 组件（shadcn + Base UI）
+  electron/          桌面桥：IPC 目录与渲染进程访问器（可选）
+  utils/             项目内 helper
   config/            TypeScript presets
 ```
 

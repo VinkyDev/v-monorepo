@@ -1,4 +1,4 @@
-import { rendererHost, rendererProtocol } from "@v-monorepo/shared/electron";
+import { rendererHost, rendererProtocol } from "@v-monorepo/electron";
 
 export const isTrustedRendererUrl = (frameUrl: string): boolean => {
   let parsed: URL;

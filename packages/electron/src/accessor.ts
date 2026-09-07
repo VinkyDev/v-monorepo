@@ -1,5 +1,6 @@
-import { desktopBridgeGlobal } from "@v-monorepo/shared/electron";
-import type { DesktopApi, ShellApi } from "@v-monorepo/shared/electron";
+import { desktopBridgeGlobal } from "./bridge.ts";
+import type { DesktopApi } from "./bridge.ts";
+import type { ShellApi } from "./shell.ts";
 
 type DesktopGlobalThis = typeof globalThis & {
   desktop?: DesktopApi;

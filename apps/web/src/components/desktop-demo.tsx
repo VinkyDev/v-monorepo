@@ -1,5 +1,5 @@
+import { isDesktop, shellApi } from "@v-monorepo/electron";
 import { Button } from "@v-monorepo/ui/components/button";
-import { isDesktop, shellApi } from "@v-monorepo/utils";
 import { useEffect, useState } from "react";
 
 const ElectronVersionDemo = () => {

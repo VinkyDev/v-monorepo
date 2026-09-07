@@ -1,5 +1,5 @@
-import { shellCapabilities } from "@v-monorepo/shared/electron";
-import type { ShellApi } from "@v-monorepo/shared/electron";
+import { shellCapabilities } from "@v-monorepo/electron";
+import type { ShellApi } from "@v-monorepo/electron";
 import { ipcRenderer } from "electron";
 import { z } from "zod";
 

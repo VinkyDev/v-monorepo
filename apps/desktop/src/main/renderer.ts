@@ -1,7 +1,7 @@
 import { pathToFileURL } from "node:url";
 
+import { rendererScheme } from "@v-monorepo/electron";
 import { createLogger } from "@v-monorepo/logger";
-import { rendererScheme } from "@v-monorepo/shared/electron";
 import { net, protocol } from "electron";
 
 import {

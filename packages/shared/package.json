@@ -7,8 +7,7 @@
     "#/*": "./src/*"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./electron": "./src/electron/index.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "test": "vp test",

@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { productionRendererUrl } from "@v-monorepo/shared/electron";
+import { productionRendererUrl } from "@v-monorepo/electron";
 import { describe, expect, test } from "vite-plus/test";
 
 import {

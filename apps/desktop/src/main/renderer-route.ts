@@ -1,7 +1,7 @@
 import { existsSync, statSync } from "node:fs";
 import path from "node:path";
 
-import { rendererHost, rendererProtocol } from "@v-monorepo/shared/electron";
+import { rendererHost, rendererProtocol } from "@v-monorepo/electron";
 
 export const defaultApiOrigin = "http://127.0.0.1:3001";
 

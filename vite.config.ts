@@ -66,6 +66,7 @@ export default defineConfig({
       "apps/agents",
       "apps/desktop",
       "packages/api-client",
+      "packages/electron",
       "packages/logger",
       "packages/shared",
       "packages/utils",

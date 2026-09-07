@@ -1,1 +1,3 @@
-export { isDesktop, shellApi } from "./electron.ts";
+export const assertNever = (value: never): never => {
+  throw new Error(`unexpected value: ${String(value)}`);
+};
