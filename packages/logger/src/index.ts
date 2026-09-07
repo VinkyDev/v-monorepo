@@ -12,7 +12,7 @@ export const createLogger = (
     },
   };
 
-  if (process.env.VITEST !== undefined) {
+  if (typeof process !== "undefined" && process.env.VITEST !== undefined) {
     return Logger.fromEnv({ ...resolved, type: "hidden" });
   }
   return Logger.fromEnv(resolved);

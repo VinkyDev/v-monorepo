@@ -67,6 +67,38 @@ const HealthDemo = () => {
   );
 };
 
+const ErrorBoundaryDemo = () => {
+  const [shouldThrow, setShouldThrow] = useState(false);
+
+  if (shouldThrow) {
+    throw new Error("演示：故意抛出的渲染错误");
+  }
+
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="text-muted-foreground text-sm font-semibold tracking-widest uppercase">
+        Router · 错误边界
+      </h2>
+      <div className="border-border bg-card flex flex-col gap-4 rounded-lg border p-6">
+        <p className="text-muted-foreground text-sm">
+          抛出渲染错误，由路由 <code>errorComponent</code> 捕获。重试会{" "}
+          <code>router.invalidate()</code> 并重置 Query 错误边界。
+        </p>
+        <div>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              setShouldThrow(true);
+            }}
+          >
+            触发错误边界
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const Home = () => {
   const [count, setCount] = useState(0);
 
@@ -84,6 +116,8 @@ const Home = () => {
       <DesktopDemo />
 
       <HealthDemo />
+
+      <ErrorBoundaryDemo />
 
       <section className="flex flex-col gap-4">
         <h2 className="text-muted-foreground text-sm font-semibold tracking-widest uppercase">

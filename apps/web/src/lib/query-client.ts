@@ -2,6 +2,8 @@ import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { AppError } from "@v-monorepo/shared";
 import { toast } from "@v-monorepo/ui/components/toast";
 
+import { env } from "#/env.ts";
+
 const toastQueryError = (title: string, description?: string) => {
   if (description === undefined) {
     toast.add({ priority: "high", title, type: "error" });
@@ -23,7 +25,7 @@ const shouldRetryQuery = (failureCount: number, error: Error) => {
   if (error instanceof AppError && error.status < 500) {
     return false;
   }
-  return failureCount < 3;
+  return failureCount < env.VITE_MAX_RETRY_COUNT;
 };
 
 export const createQueryClient = () =>

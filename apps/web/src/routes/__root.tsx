@@ -1,15 +1,38 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Toaster } from "@v-monorepo/ui/components/toast";
+import type { ReactNode } from "react";
 
-const RootComponent = () => (
+import {
+  DefaultErrorComponent,
+  DefaultNotFoundComponent,
+} from "#/components/default-error.tsx";
+import { logRouteError } from "#/lib/route-error.ts";
+
+const RootShell = ({ children }: { children: ReactNode }) => (
   <>
-    <Outlet />
+    {children}
     <Toaster />
     <TanStackRouterDevtools />
   </>
 );
 
+const RootComponent = () => (
+  <RootShell>
+    <Outlet />
+  </RootShell>
+);
+
+const RootErrorComponent = (props: ErrorComponentProps) => (
+  <RootShell>
+    <DefaultErrorComponent {...props} />
+  </RootShell>
+);
+
 export const Route = createRootRoute({
   component: RootComponent,
+  errorComponent: RootErrorComponent,
+  notFoundComponent: DefaultNotFoundComponent,
+  onCatch: logRouteError,
 });

@@ -4,5 +4,5 @@
 
 ```ts
 import { chunk, sum } from "es-toolkit";
-import { assertNever } from "@v-monorepo/utils";
+import { withRetry } from "@v-monorepo/utils";
 ```

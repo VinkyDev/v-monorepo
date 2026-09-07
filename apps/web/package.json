@@ -20,6 +20,7 @@
     "@tanstack/react-router-devtools": "catalog:",
     "@v-monorepo/api-client": "workspace:*",
     "@v-monorepo/electron": "workspace:*",
+    "@v-monorepo/logger": "workspace:*",
     "@v-monorepo/shared": "workspace:*",
     "@v-monorepo/ui": "workspace:*",
     "@v-monorepo/utils": "workspace:*",
