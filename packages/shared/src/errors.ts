@@ -2,11 +2,6 @@ import { z } from "zod";
 
 import { errorCatalog, errorCodeSchema } from "./error-catalog.ts";
 import type { ErrorCode } from "./error-catalog.ts";
-import {
-  getResponseRequestId,
-  isValidRequestId,
-  REQUEST_ID_HEADER,
-} from "./http.ts";
 
 export const PROBLEM_CONTENT_TYPE = "application/problem+json";
 
@@ -22,7 +17,6 @@ const problemDetailsSchema = z.object({
   code: errorCodeSchema,
   detail: z.string().min(1),
   errors: z.array(problemInvalidParamSchema).optional(),
-  instance: z.string().min(1).optional(),
   status: z.number().int().min(100).max(599),
   title: z.string().min(1),
   type: z.string().min(1),
@@ -61,10 +55,7 @@ const resolvedMessage = (
 ): string =>
   message !== undefined && message.length > 0 ? message : definition.detail;
 
-const serializeProblem = (
-  error: AppError,
-  requestId?: string
-): ProblemDetails => {
+const serializeProblem = (error: AppError): ProblemDetails => {
   const problem: ProblemDetails = {
     code: error.code,
     detail: error.message,
@@ -72,9 +63,6 @@ const serializeProblem = (
     title: error.title,
     type: `https://httpproblems.com/http-status/${error.status}`,
   };
-  if (requestId !== undefined && isValidRequestId(requestId)) {
-    problem.instance = `urn:uuid:${requestId}`;
-  }
   if (error.errors !== undefined && error.errors.length > 0) {
     problem.errors = [...error.errors];
   }
@@ -96,22 +84,10 @@ const readProblemDetails = async (
   }
 };
 
-const requestIdFromInstance = (
-  instance: string | undefined
-): string | undefined => {
-  const prefix = "urn:uuid:";
-  if (instance === undefined || !instance.startsWith(prefix)) {
-    return undefined;
-  }
-  const id = instance.slice(prefix.length);
-  return isValidRequestId(id) ? id : undefined;
-};
-
 export interface AppErrorOptions {
   message?: string;
   errors?: readonly ProblemInvalidParam[];
   cause?: unknown;
-  requestId?: string;
 }
 
 export class AppError extends Error {
@@ -119,7 +95,6 @@ export class AppError extends Error {
   readonly status: number;
   readonly title: string;
   readonly errors: readonly ProblemInvalidParam[] | undefined;
-  readonly requestId: string | undefined;
 
   constructor(code: ErrorCode, options: AppErrorOptions = {}) {
     const definition = errorCatalog[code];
@@ -131,7 +106,6 @@ export class AppError extends Error {
     this.status = definition.status;
     this.title = definition.title;
     this.errors = options.errors;
-    this.requestId = options.requestId;
   }
 
   static fromHttpStatus(
@@ -140,10 +114,7 @@ export class AppError extends Error {
   ): AppError {
     const code = problemCodeForStatus(status);
     if (hidesInternalMessage(status)) {
-      return new AppError(code, {
-        cause: options.cause,
-        requestId: options.requestId,
-      });
+      return new AppError(code, { cause: options.cause });
     }
     return new AppError(code, options);
   }
@@ -156,26 +127,20 @@ export class AppError extends Error {
   }
 
   static async fromResponse(response: Response): Promise<AppError> {
-    const requestId = getResponseRequestId(response) ?? undefined;
     const problem = await readProblemDetails(response);
     if (problem) {
       return new AppError(problem.code, {
         errors: problem.errors,
         message: problem.detail,
-        requestId: requestId ?? requestIdFromInstance(problem.instance),
       });
     }
-    return AppError.fromHttpStatus(response.status, { requestId });
+    return AppError.fromHttpStatus(response.status);
   }
 
-  toResponse(requestId?: string): Response {
-    const problem = serializeProblem(this, requestId);
-    const headers = new Headers({ "Content-Type": PROBLEM_CONTENT_TYPE });
-    if (requestId !== undefined && isValidRequestId(requestId)) {
-      headers.set(REQUEST_ID_HEADER, requestId);
-    }
+  toResponse(): Response {
+    const problem = serializeProblem(this);
     return Response.json(problem, {
-      headers,
+      headers: { "Content-Type": PROBLEM_CONTENT_TYPE },
       status: problem.status,
     });
   }

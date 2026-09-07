@@ -43,11 +43,6 @@ export const DefaultErrorComponent = ({ error }: ErrorComponentProps) => {
         )}
       </EmptyHeader>
       <EmptyContent>
-        {view.requestId === undefined ? null : (
-          <p className="text-muted-foreground font-mono text-xs break-all">
-            请求 ID {view.requestId}
-          </p>
-        )}
         {import.meta.env.DEV ? (
           <details className="text-muted-foreground w-full text-left text-sm">
             <summary>开发信息</summary>

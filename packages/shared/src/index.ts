@@ -1,11 +1,5 @@
 export { type HealthStatus, healthStatusSchema } from "./health.ts";
 export {
-  REQUEST_ID_HEADER,
-  createRequestId,
-  getResponseRequestId,
-  isValidRequestId,
-} from "./http.ts";
-export {
   BODY_LIMIT_BYTES,
   type ErrorCode,
   type ErrorDefinition,

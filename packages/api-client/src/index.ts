@@ -1,9 +1,5 @@
 import type { AppType } from "@v-monorepo/server/api";
-import {
-  AppError,
-  createRequestId,
-  REQUEST_ID_HEADER,
-} from "@v-monorepo/shared";
+import { AppError } from "@v-monorepo/shared";
 import { hc } from "hono/client";
 
 export type ApiClient = ReturnType<typeof createApiClient>;
@@ -16,23 +12,8 @@ export interface CreateApiClientOptions {
 const withClientFetch =
   (fetchFn: typeof fetch): typeof fetch =>
   async (input, init) => {
-    const headers = new Headers(init?.headers);
-    if (input instanceof Request) {
-      for (const [key, value] of input.headers.entries()) {
-        if (!headers.has(key)) {
-          headers.set(key, value);
-        }
-      }
-    }
-    if (!headers.has(REQUEST_ID_HEADER)) {
-      headers.set(REQUEST_ID_HEADER, createRequestId());
-    }
-
     try {
-      const response =
-        input instanceof Request
-          ? await fetchFn(new Request(input, { ...init, headers }))
-          : await fetchFn(input, { ...init, headers });
+      const response = await fetchFn(input, init);
       if (response.ok) {
         return response;
       }

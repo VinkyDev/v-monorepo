@@ -1,13 +1,12 @@
 import { swaggerUI } from "@hono/swagger-ui";
 import { log } from "@v-monorepo/logger";
-import { BODY_LIMIT_BYTES, REQUEST_ID_HEADER } from "@v-monorepo/shared";
+import { BODY_LIMIT_BYTES } from "@v-monorepo/shared";
 import { Hono } from "hono";
 import { openAPIRouteHandler } from "hono-openapi";
 import { bodyLimit } from "hono/body-limit";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import type { RequestIdVariables } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import { timeout } from "hono/timeout";
 
@@ -17,15 +16,9 @@ import {
   notFoundProblem,
   payloadTooLargeProblem,
 } from "./problem.ts";
-import { assignRequestId } from "./request-id.ts";
-
-interface AppEnv {
-  Variables: RequestIdVariables;
-}
 
 export const createApp = () => {
-  const app = new Hono<AppEnv>()
-    .use(assignRequestId())
+  const app = new Hono()
     .use(
       logger((message, ...rest) => {
         log.info(message, ...rest);
@@ -47,7 +40,6 @@ export const createApp = () => {
     .use(
       "/api/*",
       cors({
-        exposeHeaders: [REQUEST_ID_HEADER],
         origin: "*",
       })
     )

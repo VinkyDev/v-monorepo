@@ -2,23 +2,18 @@ import { log } from "@v-monorepo/logger";
 import { AppError, PROBLEM_CONTENT_TYPE } from "@v-monorepo/shared";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import type { RequestIdVariables } from "hono/request-id";
-
-interface AppEnv {
-  Variables: RequestIdVariables;
-}
 
 const isProblemResponse = (response: Response): boolean => {
   const contentType = response.headers.get("content-type") ?? "";
   return contentType.includes(PROBLEM_CONTENT_TYPE);
 };
 
-const respond = (c: Context<AppEnv>, error: AppError): Response => {
-  const response = error.toResponse(c.var.requestId);
+const respond = (c: Context, error: AppError): Response => {
+  const response = error.toResponse();
   return c.newResponse(response.body, response);
 };
 
-export const handleAppError = (err: Error, c: Context<AppEnv>): Response => {
+export const handleAppError = (err: Error, c: Context): Response => {
   if (err instanceof AppError) {
     return respond(c, err);
   }
@@ -36,8 +31,8 @@ export const handleAppError = (err: Error, c: Context<AppEnv>): Response => {
   return respond(c, AppError.fromCause(err));
 };
 
-export const notFoundProblem = (c: Context<AppEnv>): Response =>
+export const notFoundProblem = (c: Context): Response =>
   respond(c, new AppError("NOT_FOUND"));
 
-export const payloadTooLargeProblem = (c: Context<AppEnv>): Response =>
+export const payloadTooLargeProblem = (c: Context): Response =>
   respond(c, new AppError("PAYLOAD_TOO_LARGE"));

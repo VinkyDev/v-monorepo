@@ -22,7 +22,7 @@ describe(createQueryClient, () => {
     expect(attempts).toBe(1);
   });
 
-  test("retries 5xx AppError three times", async () => {
+  test("retries 5xx AppError up to VITE_MAX_RETRY_COUNT", async () => {
     const queryClient = createQueryClient();
     let attempts = 0;
 
@@ -37,6 +37,6 @@ describe(createQueryClient, () => {
       })
     ).rejects.toBeInstanceOf(AppError);
 
-    expect(attempts).toBe(4);
+    expect(attempts).toBe(2);
   });
 });

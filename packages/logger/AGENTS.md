@@ -4,4 +4,4 @@ Process logging via [tslog](https://tslog.js.org). Import `log` or `createLogger
 
 - Tests: `type: "hidden"` when `VITEST` is set
 - Timestamps: process timezone (`pretty.timeZone: "local"`); pin with `TZ`
-- Request correlation: `await log.runInContext({ requestId }, fn)`
+- Context: `await log.runInContext({ job: "sync" }, fn)`

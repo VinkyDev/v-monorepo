@@ -1,6 +1,6 @@
 # @v-monorepo/shared
 
-前后端共用契约：Zod schema、HTTP 约定、`errorCatalog`、`AppError`。
+前后端共用契约：Zod schema、`errorCatalog`、`AppError`。
 
 ```ts
 import { AppError, healthStatusSchema } from "@v-monorepo/shared";

@@ -9,7 +9,7 @@ log.info("ready");
 log.error("failed", err);
 
 const serverLog = createLogger({ name: "server" });
-await serverLog.runInContext({ requestId }, async () => {
+await serverLog.runInContext({ job: "sync" }, async () => {
   serverLog.info("handling request");
 });
 ```

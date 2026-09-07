@@ -1,11 +1,5 @@
 import { createApp } from "@v-monorepo/server";
-import {
-  AppError,
-  errorCatalog,
-  healthStatusSchema,
-  isValidRequestId,
-  REQUEST_ID_HEADER,
-} from "@v-monorepo/shared";
+import { AppError, errorCatalog, healthStatusSchema } from "@v-monorepo/shared";
 import { describe, expect, test } from "vite-plus/test";
 
 import { createApiClient } from "#/index.ts";
@@ -38,31 +32,12 @@ describe(createApiClient, () => {
     expect(healthStatusSchema.parse(await response.json()).status).toBe("ok");
   });
 
-  test("createApiClient injects x-request-id on outgoing requests", async () => {
-    let requestId: string | null = null;
-    const app = createApp();
-    const client = createApiClient("http://v-monorepo.test/api", {
-      fetch: async (input, init) => {
-        const request =
-          input instanceof Request ? input : new Request(input, init);
-        requestId = request.headers.get(REQUEST_ID_HEADER);
-        return await app.fetch(request);
-      },
-    });
-
-    await client.health.$get();
-    expect(requestId !== null && isValidRequestId(requestId)).toBeTruthy();
-  });
-
   test("createApiClient throws AppError when the server returns a problem", async () => {
     const client = clientFor(createApp(), "http://v-monorepo.test/api/missing");
     const error = await expectAppError(client.health.$get());
     expect(error.code).toBe("NOT_FOUND");
     expect(error.title).toBe(errorCatalog.NOT_FOUND.title);
     expect(error.message).toBe(errorCatalog.NOT_FOUND.detail);
-    expect(
-      error.requestId !== undefined && isValidRequestId(error.requestId)
-    ).toBeTruthy();
   });
 
   test("createApiClient wraps network failures as AppError", async () => {

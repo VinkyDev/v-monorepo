@@ -7,7 +7,6 @@ describe(routeErrorView, () => {
   test("keeps AppError catalog title and detail", () => {
     expect(routeErrorView(new AppError("NOT_FOUND"))).toStrictEqual({
       detail: errorCatalog.NOT_FOUND.detail,
-      requestId: undefined,
       title: errorCatalog.NOT_FOUND.title,
     });
   });
@@ -19,15 +18,7 @@ describe(routeErrorView, () => {
   test("wraps unknown errors as INTERNAL_ERROR without leaking the message", () => {
     expect(routeErrorView(new Error("secret internals"))).toStrictEqual({
       detail: errorCatalog.INTERNAL_ERROR.detail,
-      requestId: undefined,
       title: errorCatalog.INTERNAL_ERROR.title,
     });
-  });
-
-  test("keeps the request id from AppError", () => {
-    const requestId = "11111111-1111-4111-8111-111111111111";
-    expect(
-      routeErrorView(new AppError("TIMEOUT", { requestId })).requestId
-    ).toBe(requestId);
   });
 });

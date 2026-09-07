@@ -6,18 +6,12 @@ import {
 } from "@v-monorepo/shared";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import type { RequestIdVariables } from "hono/request-id";
 import { describe, expect, test } from "vite-plus/test";
 import { z } from "zod";
 
 import { createApp } from "#/app.ts";
 import { handleAppError } from "#/problem.ts";
-import { assignRequestId } from "#/request-id.ts";
 import { validateJson } from "#/validate.ts";
-
-interface AppEnv {
-  Variables: RequestIdVariables;
-}
 
 const readAppError = async (response: Response) => {
   const contentType = response.headers.get("content-type") ?? "";
@@ -34,13 +28,11 @@ describe("app problem responses", () => {
     expect(response.headers.get("access-control-allow-origin")).toBe("*");
   });
 
-  test("unknown routes include a request instance", async () => {
+  test("unknown routes return a 404 problem", async () => {
     const response = await createApp().request("/api/missing");
     expect(response.status).toBe(404);
-    const body = z
-      .object({ instance: z.string() })
-      .parse(await response.json());
-    expect(body.instance.startsWith("urn:uuid:")).toBeTruthy();
+    const error = await readAppError(response);
+    expect(error.code).toBe("NOT_FOUND");
   });
 
   test("payload over the body limit returns a 413 problem", async () => {
@@ -56,8 +48,7 @@ describe("app problem responses", () => {
 
 describe(handleAppError, () => {
   test("unhandled errors return a generic 500 problem", async () => {
-    const app = new Hono<AppEnv>()
-      .use(assignRequestId())
+    const app = new Hono()
       .get("/boom", () => {
         throw new Error("secret internals");
       })
@@ -70,9 +61,7 @@ describe(handleAppError, () => {
   });
 
   test("HTTPException keeps 4xx messages and hides 5xx messages", async () => {
-    const app = new Hono<AppEnv>()
-      .use(assignRequestId())
-      .onError(handleAppError);
+    const app = new Hono().onError(handleAppError);
     app.get("/gone", () => {
       throw new HTTPException(404, { message: "Widget not found" });
     });
@@ -90,8 +79,7 @@ describe(handleAppError, () => {
   });
 
   test("json validation failures return field errors", async () => {
-    const app = new Hono<AppEnv>()
-      .use(assignRequestId())
+    const app = new Hono()
       .post(
         "/items",
         validateJson(z.object({ name: z.string().min(1) })),
@@ -110,8 +98,7 @@ describe(handleAppError, () => {
   });
 
   test("thrown AppError serializes catalog code and override message", async () => {
-    const app = new Hono<AppEnv>()
-      .use(assignRequestId())
+    const app = new Hono()
       .get("/widget", () => {
         throw new AppError("NOT_FOUND", { message: "Widget not found" });
       })

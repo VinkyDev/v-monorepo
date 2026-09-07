@@ -64,7 +64,6 @@
 | 环境变量 | [T3 Env](https://env.t3.gg) (`@t3-oss/env-core`) | 进程启动时校验，缺了或类型不对直接失败 |
 | 错误 | `AppError` + `errorCatalog` | 服务端 throw、客户端还原，同一套码 |
 | HTTP 错误体 | [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) Problem Details | `application/problem+json`，由 `toResponse` / `fromResponse` 处理 |
-| 请求追踪 | `x-request-id` | 客户端注入，服务端回写 |
 
 业务错误加在 `packages/shared` 的 `businessErrors`；`throw new AppError("YOUR_CODE")` 即可，可选 `{ message }` 覆盖默认文案。
 
@@ -78,7 +77,7 @@ apps/
   desktop/      Electron 壳（可选）
 packages/
   shared/            契约：Zod、错误码、AppError
-  logger/            tslog 封装：测试静音、请求关联
+  logger/            tslog 封装：测试静音
   api-client/        Hono RPC 传输工厂（`hc<AppType>`，不列请求函数）
   ui/                UI 组件（shadcn + Base UI）
   electron/          桌面桥：IPC 目录与渲染进程访问器（可选）

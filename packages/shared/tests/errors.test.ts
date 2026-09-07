@@ -1,26 +1,17 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import { createRequestId } from "#/http.ts";
-import {
-  AppError,
-  errorCatalog,
-  PROBLEM_CONTENT_TYPE,
-  REQUEST_ID_HEADER,
-} from "#/index.ts";
+import { AppError, errorCatalog, PROBLEM_CONTENT_TYPE } from "#/index.ts";
 
 describe(AppError, () => {
   test("AppError serializes RFC 9457 fields from the catalog", async () => {
-    const requestId = createRequestId();
-    const response = new AppError("NOT_FOUND").toResponse(requestId);
+    const response = new AppError("NOT_FOUND").toResponse();
     const problem: unknown = await response.json();
 
     expect(response.status).toBe(404);
     expect(response.headers.get("content-type")).toBe(PROBLEM_CONTENT_TYPE);
-    expect(response.headers.get(REQUEST_ID_HEADER)).toBe(requestId);
     expect(problem).toStrictEqual({
       code: "NOT_FOUND",
       detail: errorCatalog.NOT_FOUND.detail,
-      instance: `urn:uuid:${requestId}`,
       status: 404,
       title: errorCatalog.NOT_FOUND.title,
       type: "https://httpproblems.com/http-status/404",
@@ -56,36 +47,16 @@ describe(AppError, () => {
     });
   });
 
-  test("fromResponse round-trips a problem body and request id", async () => {
-    const requestId = createRequestId();
+  test("fromResponse round-trips a problem body", async () => {
     const error = await AppError.fromResponse(
-      new AppError("NOT_FOUND").toResponse(requestId)
+      new AppError("NOT_FOUND").toResponse()
     );
     expect(error.code).toBe("NOT_FOUND");
     expect(error.status).toBe(404);
-    expect(error.requestId).toBe(requestId);
-  });
-
-  test("fromResponse recovers a request id from the instance urn", async () => {
-    const requestId = createRequestId();
-    const error = await AppError.fromResponse(
-      Response.json(
-        {
-          code: "NOT_FOUND",
-          detail: errorCatalog.NOT_FOUND.detail,
-          instance: `urn:uuid:${requestId}`,
-          status: 404,
-          title: errorCatalog.NOT_FOUND.title,
-          type: "https://httpproblems.com/http-status/404",
-        },
-        { headers: { "Content-Type": PROBLEM_CONTENT_TYPE }, status: 404 }
-      )
-    );
-    expect(error.requestId).toBe(requestId);
+    expect(error.message).toBe(errorCatalog.NOT_FOUND.detail);
   });
 
   test("fromResponse maps ad-hoc envelopes without leaking 5xx bodies", async () => {
-    const requestId = createRequestId();
     const notFound = await AppError.fromResponse(
       Response.json(
         { error: "Not Found" },
@@ -96,14 +67,10 @@ describe(AppError, () => {
     expect(notFound.message).toBe(errorCatalog.NOT_FOUND.detail);
 
     const internal = await AppError.fromResponse(
-      new Response("secret", {
-        headers: { [REQUEST_ID_HEADER]: requestId },
-        status: 500,
-      })
+      new Response("secret", { status: 500 })
     );
     expect(internal.code).toBe("INTERNAL_ERROR");
     expect(internal.message).toBe(errorCatalog.INTERNAL_ERROR.detail);
-    expect(internal.requestId).toBe(requestId);
   });
 
   test("fromHttpStatus keeps trusted 4xx messages", () => {
