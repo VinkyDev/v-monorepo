@@ -1,11 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { isDesktop } from "@v-monorepo/electron";
 import { Button } from "@v-monorepo/ui/components/button";
 import { ArrowRight, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-import { DesktopDemo } from "#/components/desktop-demo.tsx";
+import { lazyComponent } from "#/lib/lazy-component.ts";
 import { healthQueryOptions } from "#/lib/queries/health.ts";
+import { withSuspense } from "#/lib/with-suspense.tsx";
+
+const DesktopDemo = withSuspense(
+  lazyComponent(async () => await import("#/components/desktop-demo.tsx"))
+);
 
 const variants = [
   "default",
@@ -113,7 +119,7 @@ const Home = () => {
         </p>
       </header>
 
-      <DesktopDemo />
+      {isDesktop() ? <DesktopDemo /> : null}
 
       <HealthDemo />
 

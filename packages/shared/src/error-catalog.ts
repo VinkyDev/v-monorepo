@@ -11,7 +11,7 @@ export const BODY_LIMIT_BYTES = 1024 * 1024;
 
 const bodyLimitMb = BODY_LIMIT_BYTES / (1024 * 1024);
 
-export const protocolErrors = {
+const protocolErrors = {
   BAD_REQUEST: {
     detail: "请求无效",
     status: 400,
@@ -45,18 +45,13 @@ export const protocolErrors = {
 } as const satisfies Record<string, ErrorDefinition>;
 
 /** Domain codes. Add an entry here; both server and client pick it up. */
-export const businessErrors = {} as const satisfies Record<
-  string,
-  ErrorDefinition
->;
+const businessErrors = {} as const satisfies Record<string, ErrorDefinition>;
 
 export const errorCatalog = {
   ...protocolErrors,
   ...businessErrors,
 };
 
-export type ProtocolErrorCode = keyof typeof protocolErrors;
-export type BusinessErrorCode = keyof typeof businessErrors;
 export type ErrorCode = keyof typeof errorCatalog;
 
 export const errorCodeSchema = z

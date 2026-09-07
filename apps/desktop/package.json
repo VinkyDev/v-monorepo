@@ -26,7 +26,6 @@
     "electron": "catalog:",
     "electron-builder": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
     "vite-plus": "catalog:",
     "zod": "catalog:"
   }

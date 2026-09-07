@@ -52,7 +52,7 @@ export const applyNativeApiKey = (env: Env) => {
 const modelIdMatches = (entryId: string, modelId: string) =>
   entryId === modelId || entryId.endsWith(`/${modelId}`);
 
-export const catalogModelFor = (
+const catalogModelFor = (
   modelId: string,
   compatProviderId: CompatProviderId
 ): Model<Api> | undefined => {

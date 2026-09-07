@@ -7,7 +7,7 @@ import {
   modelSpecifier,
 } from "#/llm-provider.ts";
 
-export const env = parseEnv(process.env);
+const env = parseEnv(process.env);
 
 if (isCompatProvider(env.PROVIDER_ID)) {
   setProvider(createCompatProvider(env));

@@ -123,7 +123,7 @@ const ClipboardDemo = () => {
   );
 };
 
-export const DesktopDemo = () => {
+const DesktopDemo = () => {
   if (!isDesktop()) {
     return null;
   }
@@ -141,3 +141,5 @@ export const DesktopDemo = () => {
     </section>
   );
 };
+
+export default DesktopDemo;

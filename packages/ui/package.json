@@ -8,8 +8,7 @@
   },
   "exports": {
     "./globals.css": "./src/styles/globals.css",
-    "./components/*": "./src/components/*.tsx",
-    "./hooks/*": "./src/hooks/*.ts"
+    "./components/*": "./src/components/*.tsx"
   },
   "scripts": {
     "check": "vp check",
@@ -25,8 +24,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "shadcn": "catalog:",
-    "tw-animate-css": "catalog:",
-    "zod": "catalog:"
+    "tw-animate-css": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
@@ -35,7 +33,6 @@
     "@v-monorepo/config": "workspace:*",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
     "vite-plus": "catalog:"
   }
 }

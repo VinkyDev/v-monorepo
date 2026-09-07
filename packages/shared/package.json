@@ -20,7 +20,6 @@
     "@types/node": "catalog:",
     "@v-monorepo/config": "workspace:*",
     "typescript": "catalog:",
-    "vite": "catalog:",
     "vite-plus": "catalog:"
   }
 }

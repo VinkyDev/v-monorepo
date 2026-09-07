@@ -1,0 +1,36 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
+  "ignoreExportsUsedInFile": {
+    "interface": true,
+    "type": true,
+  },
+  "ignoreIssues": {
+    "**/*.gen.ts": ["exports", "types", "enumMembers"],
+  },
+  "tags": ["-lintignore"],
+  "treatConfigHintsAsErrors": true,
+  "workspaces": {
+    "apps/agents": {
+      "entry": [
+        "flue.config.ts",
+        "src/app.ts",
+        "src/db.ts",
+        "src/agents/**/*.ts",
+      ],
+      "ignoreDependencies": ["@flue/cli"],
+    },
+    "apps/desktop": {
+      "entry": ["src/main/index.ts", "src/preload/index.ts"],
+      "vite-plus": {
+        "config": [
+          "vite.config.ts",
+          "vite.main.config.ts",
+          "vite.preload.config.ts",
+        ],
+      },
+    },
+    "apps/server": {
+      "entry": ["src/node.ts"],
+    },
+  },
+}

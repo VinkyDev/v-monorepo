@@ -24,7 +24,6 @@
     "@v-monorepo/shared": "workspace:*",
     "@v-monorepo/ui": "workspace:*",
     "@v-monorepo/utils": "workspace:*",
-    "cn": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -39,7 +38,6 @@
     "@v-monorepo/config": "workspace:*",
     "@vitejs/plugin-react": "catalog:",
     "oxc-transform-react": "catalog:",
-    "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
