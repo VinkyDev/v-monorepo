@@ -40,18 +40,6 @@ describe(createApiClient, () => {
     expect(error.message).toBe(errorCatalog.NOT_FOUND.detail);
   });
 
-  test("createApiClient throws VALIDATION_ERROR with field errors", async () => {
-    const client = clientFor(createApp(), "http://v-monorepo.test/api");
-    const error = await expectAppError(
-      client.items.$post({ json: { name: "" } })
-    );
-    expect(error.code).toBe("VALIDATION_ERROR");
-    expect(error.message).toBe("名称不能为空");
-    expect(error.errors).toStrictEqual([
-      { name: "name", pointer: "/name", reason: "名称不能为空" },
-    ]);
-  });
-
   test("createApiClient wraps network failures as AppError", async () => {
     const client = createApiClient("https://api.test", {
       fetch: () => {

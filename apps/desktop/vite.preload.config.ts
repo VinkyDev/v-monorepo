@@ -20,4 +20,7 @@ export default defineConfig(({ mode }) => ({
     target: "node22",
   },
   publicDir: false,
+  ssr: {
+    noExternal: true,
+  },
 }));

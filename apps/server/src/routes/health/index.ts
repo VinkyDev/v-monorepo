@@ -14,8 +14,7 @@ export const healthRoutes = new Hono().get(
   describeRoute({
     tags: ["Health"],
     summary: "Health check",
-    description:
-      "Returns service health status for liveness probes and RPC demos.",
+    description: "Returns service health status for liveness probes.",
     responses: {
       200: {
         description: "Service is healthy",

@@ -47,6 +47,10 @@ export const createMainWindow = (preloadFile: string): BrowserWindow => {
   win.webContents.on("will-navigate", denyUntrusted);
   win.webContents.on("will-redirect", denyUntrusted);
 
+  win.webContents.on("preload-error", (_event, preloadPath, error) => {
+    log.error(`preload failed: ${preloadPath}`, error);
+  });
+
   win.webContents.on(
     "did-fail-load",
     (_event, errorCode, errorDescription, validatedURL) => {
