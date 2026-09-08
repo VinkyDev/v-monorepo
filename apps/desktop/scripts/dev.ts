@@ -5,6 +5,7 @@ import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 
 import { createLogger } from "@v-monorepo/logger";
+import { waitUntil } from "@v-monorepo/utils";
 import { build } from "vite-plus";
 import { z } from "zod";
 
@@ -72,24 +73,6 @@ const isHttpUp = async (url: string): Promise<boolean> => {
   }
 };
 
-const waitUntil = async (
-  label: string,
-  check: () => Promise<boolean> | boolean
-): Promise<void> => {
-  const started = Date.now();
-  const poll = async (): Promise<void> => {
-    if (Date.now() - started >= initialTimeoutMs) {
-      throw new Error(`[desktop-dev] ${label} did not become ready in time`);
-    }
-    if (await check()) {
-      return;
-    }
-    await delay(200);
-    await poll();
-  };
-  await poll();
-};
-
 const ensureWebDevServer = async (): Promise<void> => {
   if (await isHttpUp(rendererUrl)) {
     log.info("reusing existing web dev server");
@@ -103,7 +86,11 @@ const ensureWebDevServer = async (): Promise<void> => {
     String(rendererPort),
     "--strictPort",
   ]);
-  await waitUntil("web dev server", async () => await isHttpUp(rendererUrl));
+  await waitUntil(async () => await isHttpUp(rendererUrl), {
+    intervalMs: 200,
+    message: "[desktop-dev] web dev server did not become ready in time",
+    timeoutMs: initialTimeoutMs,
+  });
 };
 
 const startElectron = (): void => {
@@ -171,14 +158,11 @@ const watchElectronTarget = async (configFile: string): Promise<void> => {
     scheduleRestart();
   });
 
-  const waitForFirstBundle = async (): Promise<void> => {
-    if (ready) {
-      return;
-    }
-    await delay(watchPollMs);
-    await waitForFirstBundle();
-  };
-  await waitForFirstBundle();
+  await waitUntil(() => ready, {
+    intervalMs: watchPollMs,
+    message: "[desktop-dev] first electron bundle did not become ready in time",
+    timeoutMs: initialTimeoutMs,
+  });
 };
 
 const main = async (): Promise<void> => {

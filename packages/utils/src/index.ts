@@ -1,1 +1,1 @@
-export * from "./with-retry.ts";
+export { type WaitUntilOptions, waitUntil } from "./wait-until.ts";

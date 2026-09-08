@@ -16,6 +16,7 @@
 | 语言 | TypeScript 7 | 严格模式；共享 tsconfig 在 `@v-monorepo/config` |
 | 运行时 | Node.js 24.19.0 (LTS) | `.node-version` 固定；`vp env` 按此解析 |
 | 质量 | [Ultracite](https://www.ultracite.ai/) → Oxlint、Oxfmt；Vitest | 预设经根目录 `vite.config.ts` 接入 Vite+；`vp check` 格式化 + Lint + 类型检查；`vp test` 跑测试 |
+| 工具函数 | [es-toolkit](https://es-toolkit.dev) | 通用工具直接 `import { … } from "es-toolkit"`；项目特有 helper 才进 `@v-monorepo/utils` |
 | CI | GitHub Actions + setup-vp | `vp check` → 全仓测试 → 构建；Vite Task 结果跨 run 缓存 |
 
 ### 前端 `apps/web`
@@ -81,7 +82,7 @@ packages/
   api-client/        Hono RPC 传输工厂（`hc<AppType>`，不列请求函数）
   ui/                UI 组件（shadcn + Base UI）
   electron/          桌面桥：IPC 目录与渲染进程访问器（可选）
-  utils/             项目内 helper
+  utils/             项目内 helper（优先 es-toolkit）
   config/            TypeScript presets
 ```
 

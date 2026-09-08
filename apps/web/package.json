@@ -23,7 +23,7 @@
     "@v-monorepo/logger": "workspace:*",
     "@v-monorepo/shared": "workspace:*",
     "@v-monorepo/ui": "workspace:*",
-    "@v-monorepo/utils": "workspace:*",
+    "es-toolkit": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
