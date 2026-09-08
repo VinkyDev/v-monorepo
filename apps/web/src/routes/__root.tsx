@@ -8,7 +8,6 @@ import {
   DefaultErrorComponent,
   DefaultNotFoundComponent,
 } from "#/components/default-error.tsx";
-import { logRouteError } from "#/lib/route-error.ts";
 
 const RootShell = ({ children }: { children: ReactNode }) => (
   <>
@@ -34,5 +33,4 @@ export const Route = createRootRoute({
   component: RootComponent,
   errorComponent: RootErrorComponent,
   notFoundComponent: DefaultNotFoundComponent,
-  onCatch: logRouteError,
 });

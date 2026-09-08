@@ -8,7 +8,6 @@ import { DefaultErrorComponent } from "#/components/default-error.tsx";
 import { DefaultPendingComponent } from "#/components/default-pending.tsx";
 import "#/env.ts";
 import { createQueryClient } from "#/lib/query-client.ts";
-import { logRouteError } from "#/lib/route-error.ts";
 
 import { routeTree } from "./routeTree.gen";
 
@@ -16,7 +15,6 @@ const queryClient = createQueryClient();
 
 const router = createRouter({
   defaultErrorComponent: DefaultErrorComponent,
-  defaultOnCatch: logRouteError,
   defaultPendingComponent: DefaultPendingComponent,
   defaultPreload: "intent",
   routeTree,

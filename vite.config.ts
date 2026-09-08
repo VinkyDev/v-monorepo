@@ -23,7 +23,11 @@ const agentIgnorePatterns = [
 export default defineConfig({
   fmt: {
     ...oxfmt,
-    ignorePatterns: [...(oxfmt.ignorePatterns ?? []), ...agentIgnorePatterns],
+    ignorePatterns: [
+      ...(oxfmt.ignorePatterns ?? []),
+      ...agentIgnorePatterns,
+      "/AGENTS.md",
+    ],
   },
   lint: {
     extends: [core, react, tanstack, vitest, antiSlop],

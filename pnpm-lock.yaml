@@ -503,9 +503,6 @@ importers:
       '@v-monorepo/electron':
         specifier: workspace:*
         version: link:../../packages/electron
-      '@v-monorepo/logger':
-        specifier: workspace:*
-        version: link:../../packages/logger
       '@v-monorepo/shared':
         specifier: workspace:*
         version: link:../../packages/shared

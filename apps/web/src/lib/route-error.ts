@@ -1,7 +1,4 @@
-import { createLogger } from "@v-monorepo/logger";
 import { AppError } from "@v-monorepo/shared";
-
-const log = createLogger({ name: "web" });
 
 export interface RouteErrorView {
   title: string;
@@ -14,8 +11,4 @@ export const routeErrorView = (error: Error): RouteErrorView => {
     detail: appError.message === appError.title ? undefined : appError.message,
     title: appError.title,
   };
-};
-
-export const logRouteError = (error: Error): void => {
-  log.error("Route error", error);
 };
