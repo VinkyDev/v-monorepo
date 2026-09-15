@@ -1,7 +1,7 @@
 import { useQueryErrorResetBoundary } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
 import type { ErrorComponentProps } from "@tanstack/react-router";
-import { errorCatalog } from "@v-monorepo/shared";
+import { AppError, errorCatalog } from "@v-monorepo/shared";
 import { Button } from "@v-monorepo/ui/components/button";
 import {
   Empty,
@@ -25,7 +25,8 @@ const HomeLink = () => (
 export const DefaultErrorComponent = ({ error }: ErrorComponentProps) => {
   const router = useRouter();
   const queryErrorResetBoundary = useQueryErrorResetBoundary();
-  const view = routeErrorView(error);
+  const appError = AppError.fromCause(error);
+  const view = routeErrorView(appError);
 
   useEffect(() => {
     queryErrorResetBoundary.reset();
@@ -47,7 +48,7 @@ export const DefaultErrorComponent = ({ error }: ErrorComponentProps) => {
           <details className="text-muted-foreground w-full text-left text-sm">
             <summary>开发信息</summary>
             <pre className="mt-2 overflow-x-auto font-mono text-xs whitespace-pre-wrap">
-              {error.stack ?? error.message}
+              {error instanceof Error ? (error.stack ?? error.message) : String(error)}
             </pre>
           </details>
         ) : null}

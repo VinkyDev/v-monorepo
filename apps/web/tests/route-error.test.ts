@@ -15,8 +15,10 @@ describe(routeErrorView, () => {
     expect(routeErrorView(new AppError("BAD_REQUEST")).detail).toBeUndefined();
   });
 
-  test("wraps unknown errors as INTERNAL_ERROR without leaking the message", () => {
-    expect(routeErrorView(new Error("secret internals"))).toStrictEqual({
+  test("does not leak wrapped unknown error messages", () => {
+    expect(
+      routeErrorView(AppError.fromCause(new Error("secret internals")))
+    ).toStrictEqual({
       detail: errorCatalog.INTERNAL_ERROR.detail,
       title: errorCatalog.INTERNAL_ERROR.title,
     });
