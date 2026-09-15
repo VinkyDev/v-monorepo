@@ -36,7 +36,7 @@
 | --- | --- |
 | 框架 | [Hono](https://hono.dev/) |
 | 类型化调用 | [Hono RPC](https://hono.dev/docs/guides/rpc)，`AppType` 驱动客户端 |
-| 校验 | Zod + `@hono/standard-validator` |
+| 校验 | Zod + hono-openapi `validator`（校验同时写进 OpenAPI 文档） |
 | 文档 | hono-openapi + Swagger UI（`/docs`、`/openapi.json`） |
 | 运行 | 开发用 `@hono/vite-dev-server`；生产打成自包含 `dist/server.mjs`（依赖全内联，无需 node_modules） |
 
@@ -46,7 +46,7 @@
 | ---- | --------------------------------- |
 | 框架 | [Flue](https://flueframework.com) |
 
-与 Web/Server 的错误契约相互独立；在 Agent 调用本仓库 API 之前不必强行对齐。
+Flue 自带 `FlueError` 与内置 `onError`，错误体是 `{ error: { type, message, details } }`。覆盖它会打断 Flue 客户端，所以这一层保持 Flue 自己的契约，不并入下面的 `ApiError`。
 
 ### 桌面 `apps/desktop`
 
@@ -63,10 +63,55 @@
 | --- | --- | --- |
 | Schema | Zod 4 | 请求体、环境变量、共享 payload |
 | 环境变量 | [T3 Env](https://env.t3.gg) (`@t3-oss/env-core`) | 进程启动时校验，缺了或类型不对直接失败 |
-| 错误 | `AppError` + `errorCatalog` | 服务端 throw、客户端还原，同一套码 |
-| HTTP 错误体 | [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) Problem Details | `application/problem+json`，由 `toResponse` / `fromResponse` 处理 |
+| 错误 | `ApiError` + `errorCatalog` | 服务端 throw、客户端还原，同一套码；HTTP 与 Electron IPC 共用 |
+| 日志与上报 | `@v-monorepo/logger` 的 `LogSink` | 所有日志与上报只有这一个出口 |
 
-业务错误加在 `packages/shared` 的 `businessErrors`；`throw new AppError("YOUR_CODE")` 即可，可选 `{ message }` 覆盖默认文案。
+## 错误与日志
+
+错误体是 `application/json`，配正确的 HTTP status 与 `X-Request-Id` 响应头：
+
+```json
+{
+  "code": "invalid_params",
+  "message": "参数校验失败",
+  "data": {
+    "fields": [{ "path": "email", "message": "Invalid email address" }]
+  }
+}
+```
+
+`code` 是唯一的分支依据，HTTP status 只表达协议语义（同一个 status 可以对应多个业务码）。`data` 的形状由 `code` 决定：`isApiError(error, "email_taken")` 会把 `error.data` 收窄到 `{ email: string }`。
+
+**新增一个业务错误**（后两步可选）：
+
+1. 在 `packages/shared/src/error-catalog.ts` 的 `businessErrors` 加一条 `{ status, message }`。
+2. 需要结构化载荷时，在同文件的 `errorDataSchemas` 加一条 Zod schema —— 类型与运行时校验都从它派生。
+3. 需要全局副作用（比如跳转登录）时，在 `apps/web/src/lib/api-error-effects.ts` 的 `apiErrorEffects` 加一条；命中后调用方不再提示。
+
+服务端 `throw new ApiError("email_taken", { data: { email } })`，客户端在 `apiFetch` 里原样还原成同一个 `ApiError`。演示见 `/demo` 页面与 `apps/server/src/routes/demo`。
+
+**接入监控**：模板不含任何上报 SDK。所有日志与已分类的错误都流经 `packages/logger` 的 `LogSink`。sink 列表初始为空，由各进程入口自行组装（入口已各有一行 `addSink(consoleSink)`），接入监控就是在旁边再加一个 sink，业务代码零改动：
+
+```ts
+import { addSink, serializeError } from "@v-monorepo/logger";
+
+addSink({
+  name: "sentry",
+  write: ({ level, event, message, meta, error }) => {
+    if (level === "debug" || level === "info") {
+      return;
+    }
+    Sentry.captureException(error ?? new Error(message), {
+      contexts: { error: error === undefined ? {} : serializeError(error) },
+      extra: meta,
+      level: level === "warn" ? "warning" : level,
+      tags: { event },
+    });
+  },
+});
+```
+
+`@sentry/hono`、`Sentry.reactErrorHandler`、`@sentry/electron` 的自动插桩与这个 sink 互补：前者负责性能与未捕获异常，后者负责我们主动分类过的错误。
 
 ## 仓库结构
 
@@ -77,8 +122,8 @@ apps/
   agents/       Flue Agent
   desktop/      Electron 壳（可选）
 packages/
-  shared/            契约：Zod、错误码、AppError
-  logger/            tslog 封装：测试静音
+  shared/            契约：Zod、错误码表、ApiError
+  logger/            同构日志：LogRecord / LogSink，上报的唯一出口
   api-client/        Hono RPC 传输工厂（`hc<AppType>`，不列请求函数）
   ui/                UI 组件（shadcn + Base UI）
   electron/          桌面桥：IPC 目录与渲染进程访问器（可选）
@@ -86,7 +131,7 @@ packages/
   config/            TypeScript presets
 ```
 
-数据流：页面 `useQuery` → `apiClient`（`@v-monorepo/api-client` 传输工厂）→ `apps/server`。路由与响应类型来自 `AppType`；错误来自 `AppError`。
+数据流：页面 `useQuery` → `apiClient`（`@v-monorepo/api-client` 传输工厂）→ `apps/server`。路由与响应类型来自 `AppType`；错误来自 `ApiError`。
 
 ## 代码规范
 

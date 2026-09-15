@@ -1,110 +1,183 @@
-import {
-  AppError,
-  BODY_LIMIT_BYTES,
-  PROBLEM_CONTENT_TYPE,
-  errorCatalog,
-} from "@v-monorepo/shared";
+import type { LogRecord } from "@v-monorepo/logger";
+import { collectLogs } from "@v-monorepo/logger/testing";
+import { ApiError, BODY_LIMIT_BYTES, errorCatalog } from "@v-monorepo/shared";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { describe, expect, test } from "vite-plus/test";
-import { z } from "zod";
+import { requestId } from "hono/request-id";
+import { beforeEach, describe, expect, test } from "vite-plus/test";
 
 import { createApp } from "#/app.ts";
-import { handleAppError } from "#/problem.ts";
-import { validateJson } from "#/validate.ts";
+import type { AppEnv } from "#/error.ts";
+import { handleError } from "#/error.ts";
 
-const readAppError = async (response: Response) => {
-  const contentType = response.headers.get("content-type") ?? "";
-  expect(contentType).toContain(PROBLEM_CONTENT_TYPE);
-  return await AppError.fromResponse(response);
+const request = async (path: string, init?: RequestInit): Promise<Response> =>
+  await createApp().request(path, init);
+
+const readError = async (response: Response): Promise<ApiError> => {
+  expect(response.headers.get("content-type")).toContain("application/json");
+  return await ApiError.fromResponse(response);
 };
 
-describe("app problem responses", () => {
-  test("api responses allow any origin", async () => {
-    const response = await createApp().request("/api/health", {
+const appWith = (routes: Record<string, () => never>): Hono<AppEnv> => {
+  const app = new Hono<AppEnv>().use(requestId());
+  for (const [path, handler] of Object.entries(routes)) {
+    app.get(path, handler);
+  }
+  return app.onError(handleError);
+};
+
+describe("app edges", () => {
+  test("responses allow any origin and carry a request id", async () => {
+    const response = await request("/api/health", {
       headers: { Origin: "https://example.com" },
     });
+
     expect(response.status).toBe(200);
     expect(response.headers.get("access-control-allow-origin")).toBe("*");
+    expect(response.headers.get("x-request-id")).toBeTruthy();
   });
 
-  test("unknown routes return a 404 problem", async () => {
-    const response = await createApp().request("/api/missing");
+  test("unknown routes return the not_found code", async () => {
+    const response = await request("/api/missing");
+    const error = await readError(response);
+
     expect(response.status).toBe(404);
-    const error = await readAppError(response);
-    expect(error.code).toBe("NOT_FOUND");
+    expect(error.code).toBe("not_found");
   });
 
-  test("payload over the body limit returns a 413 problem", async () => {
-    const response = await createApp().request("/api/health", {
+  test("payload over the body limit returns payload_too_large", async () => {
+    const response = await request("/api/health", {
       body: "x".repeat(BODY_LIMIT_BYTES + 1),
       method: "POST",
     });
+    const error = await readError(response);
+
     expect(response.status).toBe(413);
-    const error = await readAppError(response);
-    expect(error.code).toBe("PAYLOAD_TOO_LARGE");
+    expect(error.code).toBe("payload_too_large");
   });
 });
 
-describe(handleAppError, () => {
-  test("unhandled errors return a generic 500 problem", async () => {
-    const app = new Hono()
-      .get("/boom", () => {
-        throw new Error("secret internals");
-      })
-      .onError(handleAppError);
-    const response = await app.request("/boom");
-    expect(response.status).toBe(500);
-    const error = await readAppError(response);
-    expect(error.code).toBe("INTERNAL_ERROR");
-    expect(error.message).toBe(errorCatalog.INTERNAL_ERROR.detail);
+describe("demo routes", () => {
+  test.for([
+    ["unauthorized", 401, "unauthorized"],
+    ["not_found", 404, "not_found"],
+    ["timeout", 504, "timeout"],
+    ["session_expired", 401, "session_expired"],
+    ["crash", 500, "internal"],
+  ] as const)("?fail=%s answers %i", async ([fail, status, code]) => {
+    const response = await request(`/api/demo/probe?fail=${fail}`);
+    const error = await readError(response);
+
+    expect(response.status).toBe(status);
+    expect(error.code).toBe(code);
   });
 
-  test("HTTPException keeps 4xx messages and hides 5xx messages", async () => {
-    const app = new Hono().onError(handleAppError);
-    app.get("/gone", () => {
-      throw new HTTPException(404, { message: "Widget not found" });
-    });
-    app.get("/boom", () => {
-      throw new HTTPException(500, { message: "secret internals" });
-    });
+  test("a probe without a failure succeeds", async () => {
+    const response = await request("/api/demo/probe");
 
-    const gone = await readAppError(await app.request("/gone"));
-    expect(gone.code).toBe("NOT_FOUND");
-    expect(gone.message).toBe("Widget not found");
-
-    const boom = await readAppError(await app.request("/boom"));
-    expect(boom.code).toBe("INTERNAL_ERROR");
-    expect(boom.message).toBe(errorCatalog.INTERNAL_ERROR.detail);
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toStrictEqual({ ok: true });
   });
 
-  test("json validation failures return field errors", async () => {
-    const app = new Hono()
-      .post("/echo", validateJson(z.object({ name: z.string().min(1) })), (c) =>
-        c.json(c.req.valid("json"))
-      )
-      .onError(handleAppError);
-    const response = await app.request("/echo", {
-      body: JSON.stringify({ name: "" }),
+  test("an unknown query value fails validation", async () => {
+    const response = await request("/api/demo/probe?fail=nope");
+    const error = await readError(response);
+
+    expect(response.status).toBe(422);
+    expect(error.data).toMatchObject({ fields: [{ path: "fail" }] });
+  });
+
+  test("invalid params carry a message per dotted field path", async () => {
+    const response = await request("/api/demo/signup", {
+      body: JSON.stringify({ email: "nope", name: "" }),
       headers: { "Content-Type": "application/json" },
       method: "POST",
     });
-    expect(response.status).toBe(400);
-    const error = await readAppError(response);
-    expect(error.code).toBe("VALIDATION_ERROR");
-    expect(error.errors !== undefined && error.errors.length > 0).toBeTruthy();
+    const error = await readError(response);
+
+    expect(response.status).toBe(422);
+    expect(error.code).toBe("invalid_params");
+    // `data` only survives parsing when every field carries a non-empty message.
+    expect(error.data).toMatchObject({
+      fields: [{ path: "email" }, { path: "name" }],
+    });
   });
 
-  test("thrown AppError serializes catalog code and override message", async () => {
-    const app = new Hono()
-      .get("/widget", () => {
-        throw new AppError("NOT_FOUND", { message: "Widget not found" });
-      })
-      .onError(handleAppError);
-    const response = await app.request("/widget");
-    expect(response.status).toBe(404);
-    const error = await readAppError(response);
-    expect(error.code).toBe("NOT_FOUND");
-    expect(error.message).toBe("Widget not found");
+  test("a business failure carries its typed data", async () => {
+    const response = await request("/api/demo/signup", {
+      body: JSON.stringify({ email: "taken@example.com", name: "Ada" }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    });
+    const error = await readError(response);
+
+    expect(response.status).toBe(409);
+    expect(error.code).toBe("email_taken");
+    expect(error.data).toStrictEqual({ email: "taken@example.com" });
+  });
+});
+
+describe(handleError, () => {
+  let logs: LogRecord[] = [];
+
+  beforeEach(() => {
+    logs = collectLogs();
+  });
+
+  test("an unhandled error becomes a generic 500 and is logged once", async () => {
+    const app = appWith({
+      "/boom": () => {
+        throw new Error("secret internals");
+      },
+    });
+
+    const error = await readError(await app.request("/boom"));
+
+    expect(error.code).toBe("internal");
+    expect(error.message).toBe(errorCatalog.internal.message);
+    expect(logs).toMatchObject([
+      {
+        event: "api_request_failed",
+        level: "error",
+        meta: { code: "internal", status: 500 },
+      },
+    ]);
+    expect(logs[0]?.meta?.requestId).toBeTruthy();
+  });
+
+  test("logs a thrown 5xx but stays quiet about a 4xx", async () => {
+    const app = appWith({
+      "/down": () => {
+        throw new ApiError("unavailable");
+      },
+      "/gone": () => {
+        throw new ApiError("not_found");
+      },
+    });
+
+    await app.request("/gone");
+    expect(logs).toHaveLength(0);
+
+    await app.request("/down");
+    expect(logs).toMatchObject([{ meta: { code: "unavailable" } }]);
+  });
+
+  test("HTTPException keeps 4xx messages and hides 5xx messages", async () => {
+    const app = appWith({
+      "/boom": () => {
+        throw new HTTPException(500, { message: "secret internals" });
+      },
+      "/gone": () => {
+        throw new HTTPException(404, { message: "Widget not found" });
+      },
+    });
+
+    const gone = await readError(await app.request("/gone"));
+    expect(gone.code).toBe("not_found");
+    expect(gone.message).toBe("Widget not found");
+
+    const boom = await readError(await app.request("/boom"));
+    expect(boom.code).toBe("internal");
+    expect(boom.message).toBe(errorCatalog.internal.message);
   });
 });

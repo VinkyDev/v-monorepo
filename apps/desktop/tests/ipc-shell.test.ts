@@ -1,7 +1,10 @@
-import { describe, expect, test } from "vite-plus/test";
+import type { LogRecord } from "@v-monorepo/logger";
+import { collectLogs } from "@v-monorepo/logger/testing";
+import { ApiError, errorCatalog } from "@v-monorepo/shared";
+import { beforeEach, describe, expect, test } from "vite-plus/test";
 import { z } from "zod";
 
-import { assertSender } from "#/main/ipc/handle.ts";
+import { assertSender, toIpcResult } from "#/main/ipc/handle.ts";
 import { parseClipboardText, parseExternalUrl } from "#/main/ipc/shell.ts";
 
 describe("ipc shell policy", () => {
@@ -37,5 +40,45 @@ describe("ipc shell policy", () => {
 
   test("clipboard write rejects oversized text", () => {
     expect(() => parseClipboardText("x".repeat(1_048_577))).toThrow(z.ZodError);
+  });
+});
+
+describe(toIpcResult, () => {
+  let logs: LogRecord[] = [];
+
+  beforeEach(() => {
+    logs = collectLogs();
+  });
+
+  test("wraps a value", async () => {
+    await expect(
+      toIpcResult("app:probe", () => "43.4.1")
+    ).resolves.toStrictEqual({ ok: true, value: "43.4.1" });
+    expect(logs).toHaveLength(0);
+  });
+
+  test("keeps a classified failure and logs it", async () => {
+    await expect(
+      toIpcResult("app:probe", () => {
+        throw new ApiError("forbidden", { message: "untrusted ipc sender" });
+      })
+    ).resolves.toStrictEqual({
+      error: { code: "forbidden", message: "untrusted ipc sender" },
+      ok: false,
+    });
+    expect(logs).toMatchObject([
+      { event: "ipc_handler_failed", meta: { channel: "app:probe" } },
+    ]);
+  });
+
+  test("degrades an unclassified failure to internal", async () => {
+    await expect(
+      toIpcResult("app:probe", () => {
+        throw new Error("secret internals");
+      })
+    ).resolves.toStrictEqual({
+      error: { code: "internal", message: errorCatalog.internal.message },
+      ok: false,
+    });
   });
 });

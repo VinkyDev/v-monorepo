@@ -1,5 +1,6 @@
 export { isDesktop, shellApi } from "./accessor.ts";
 export { desktopBridgeGlobal, type DesktopApi } from "./bridge.ts";
+export type { IpcResult } from "./ipc.ts";
 export {
   productionRendererUrl,
   rendererHost,
@@ -9,6 +10,7 @@ export {
 } from "./renderer.ts";
 export type {
   ShellApi,
+  ShellBridge,
   ShellCapability,
   ShellCapabilityName,
 } from "./shell.ts";

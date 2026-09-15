@@ -8,4 +8,6 @@ A module under `src/agents/` whose first line is `'use agent'` exports agents: e
 - `pnpm exec flue docs search <query>` then `flue docs read <path>`
 - `pnpm exec flue add` — blueprints for channels, sandboxes, databases
 
+Errors stay on Flue's own contract. `createAgentRouter` registers an `onError` that emits `{ error: { type, message, details } }`, and agent-run failures travel on the conversation stream's `submission-settled` event rather than over HTTP. Do not replace either with the repo's `ApiError` envelope — Flue clients parse the former.
+
 **Flue** — [docs](https://flueframework.com/docs/) or `pnpm exec flue docs`

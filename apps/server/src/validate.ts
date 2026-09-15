@@ -1,54 +1,37 @@
-import { sValidator } from "@hono/standard-validator";
-import { AppError } from "@v-monorepo/shared";
-import type { ProblemInvalidParam } from "@v-monorepo/shared";
-import { z } from "zod";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { ApiError } from "@v-monorepo/shared";
+import type { FieldError } from "@v-monorepo/shared";
+import type { ValidationTargets } from "hono";
+import { validator } from "hono-openapi";
 
-const keyedPathSchema = z.object({
-  key: z.union([z.string(), z.number()]),
+type PathSegment = StandardSchemaV1.PathSegment | PropertyKey;
+
+/** Standard Schema lets a path segment be a bare key or a `{ key }` wrapper. */
+const isKeyedSegment = (
+  segment: PathSegment
+): segment is StandardSchemaV1.PathSegment => typeof segment === "object";
+
+const segmentKey = (segment: PathSegment): string =>
+  String(isKeyedSegment(segment) ? segment.key : segment);
+
+const toFieldError = (issue: StandardSchemaV1.Issue): FieldError => ({
+  message: issue.message,
+  path: (issue.path ?? []).map(segmentKey).join("."),
 });
 
-const pathSegmentSchema = z.union([z.string(), z.number(), keyedPathSchema]);
-
-const issueSchema = z.object({
-  message: z.string(),
-  path: z.array(pathSegmentSchema).optional(),
-});
-
-const pathKey = (segment: z.infer<typeof pathSegmentSchema>): string => {
-  const keyed = keyedPathSchema.safeParse(segment);
-  if (keyed.success) {
-    return String(keyed.data.key);
-  }
-  const primitive = z.union([z.string(), z.number()]).safeParse(segment);
-  if (primitive.success) {
-    return String(primitive.data);
-  }
-  return "request";
-};
-
-const invalidParamFromIssue = (
-  issue: z.infer<typeof issueSchema>
-): ProblemInvalidParam => {
-  const keys = (issue.path ?? []).map(pathKey);
-  if (keys.length === 0) {
-    return { name: "request", reason: issue.message };
-  }
-  return {
-    name: keys.join("."),
-    pointer: `/${keys.join("/")}`,
-    reason: issue.message,
-  };
-};
-
-export const validateJson = <Schema extends z.ZodType>(schema: Schema) =>
-  sValidator("json", schema, (result) => {
+/** Validates a request target and documents its schema in the OpenAPI spec. */
+export const validate = <
+  Target extends keyof ValidationTargets,
+  Schema extends StandardSchemaV1,
+>(
+  target: Target,
+  schema: Schema
+) =>
+  validator(target, schema, (result) => {
     if (result.success) {
       return;
     }
-    const issues = z.array(issueSchema).safeParse(result.error);
-    throw new AppError("VALIDATION_ERROR", {
-      errors: issues.success
-        ? issues.data.map(invalidParamFromIssue)
-        : undefined,
+    throw new ApiError("invalid_params", {
+      data: { fields: result.error.map(toFieldError) },
     });
   });

@@ -4,10 +4,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Toaster } from "@v-monorepo/ui/components/toast";
 import type { ReactNode } from "react";
 
-import {
-  DefaultErrorComponent,
-  DefaultNotFoundComponent,
-} from "#/components/default-error.tsx";
+import { ErrorScreen, NotFoundScreen } from "#/components/error-screen.tsx";
 
 const RootShell = ({ children }: { children: ReactNode }) => (
   <>
@@ -25,12 +22,12 @@ const RootComponent = () => (
 
 const RootErrorComponent = (props: ErrorComponentProps) => (
   <RootShell>
-    <DefaultErrorComponent {...props} />
+    <ErrorScreen {...props} />
   </RootShell>
 );
 
 export const Route = createRootRoute({
   component: RootComponent,
   errorComponent: RootErrorComponent,
-  notFoundComponent: DefaultNotFoundComponent,
+  notFoundComponent: NotFoundScreen,
 });

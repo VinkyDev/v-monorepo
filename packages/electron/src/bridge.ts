@@ -1,7 +1,7 @@
-import type { ShellApi } from "./shell.ts";
+import type { ShellBridge } from "./shell.ts";
 
 export const desktopBridgeGlobal = "desktop";
 
 export interface DesktopApi {
-  shell: ShellApi;
+  shell: ShellBridge;
 }

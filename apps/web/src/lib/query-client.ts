@@ -1,42 +1,80 @@
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
-import { AppError } from "@v-monorepo/shared";
+import { logger } from "@v-monorepo/logger";
+import { isApiError } from "@v-monorepo/shared";
 import { toast } from "@v-monorepo/ui/components/toast";
 
 import { env } from "#/env.ts";
+import { runApiErrorEffect } from "#/lib/api-error-effects.ts";
+import { toErrorView } from "#/lib/error-view.ts";
 
-const toastQueryError = (title: string, description?: string) => {
-  if (description === undefined) {
-    toast.add({ priority: "high", title, type: "error" });
+declare module "@tanstack/react-query" {
+  interface Register {
+    /** Set `showErrorToast: false` when the form renders the failure itself. */
+    mutationMeta: { showErrorToast?: boolean };
+  }
+}
+
+/** Only failures a second attempt could plausibly survive. */
+export const isRetryable = (cause: unknown): boolean =>
+  isApiError(cause) && (cause.status >= 500 || cause.code === "rate_limited");
+
+/** 4xx are expected user errors and a cancellation is not an error at all. */
+const isWorthReporting = (cause: Error): boolean =>
+  cause.name !== "AbortError" && (!isApiError(cause) || cause.status >= 500);
+
+const report = (cause: Error): void => {
+  if (!isWorthReporting(cause)) {
     return;
   }
-  toast.add({ description, priority: "high", title, type: "error" });
+  logger.error({
+    error: cause,
+    event: "api_request_failed",
+    message: cause.message,
+  });
 };
 
-const notifyFromError = (error: Error) => {
-  const appError = AppError.fromCause(error);
-  if (appError.message === appError.title) {
-    toastQueryError(appError.title);
-    return;
-  }
-  toastQueryError(appError.title, appError.message);
+const toastError = (cause: Error): void => {
+  toast.add({
+    priority: "high",
+    title: toErrorView(cause).message,
+    type: "error",
+  });
 };
 
-const shouldRetryQuery = (failureCount: number, error: Error) => {
-  if (error instanceof AppError && error.status < 500) {
-    return false;
-  }
-  return failureCount < env.VITE_MAX_RETRY_COUNT;
-};
-
-export const createQueryClient = () =>
-  new QueryClient({
+export const createQueryClient = (): QueryClient => {
+  const queryClient: QueryClient = new QueryClient({
     defaultOptions: {
-      queries: { retry: shouldRetryQuery },
+      queries: {
+        retry: (failureCount, cause) =>
+          isRetryable(cause) && failureCount < env.VITE_MAX_RETRY_COUNT,
+        // A first load has nothing to show, so it goes to the route error boundary;
+        // a background refresh keeps the stale data and only toasts.
+        throwOnError: (_cause, query) => query.state.data === undefined,
+      },
     },
     mutationCache: new MutationCache({
-      onError: notifyFromError,
+      onError: (cause, _variables, _context, mutation) => {
+        report(cause);
+        if (runApiErrorEffect(cause, queryClient)) {
+          return;
+        }
+        if (mutation.meta?.showErrorToast !== false) {
+          toastError(cause);
+        }
+      },
     }),
     queryCache: new QueryCache({
-      onError: notifyFromError,
+      onError: (cause, query) => {
+        report(cause);
+        if (runApiErrorEffect(cause, queryClient)) {
+          return;
+        }
+        if (query.state.data !== undefined) {
+          toastError(cause);
+        }
+      },
     }),
   });
+
+  return queryClient;
+};

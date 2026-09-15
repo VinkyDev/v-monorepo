@@ -1,3 +1,5 @@
+import type { IpcResult } from "./ipc.ts";
+
 export const shellCapabilities = {
   getElectronVersion: { channel: "app:electronVersion" },
   openExternal: { channel: "app:openExternal" },
@@ -30,6 +32,14 @@ export interface ShellCapability {
   };
 }
 
+/** What preload exposes: every call resolves, success or failure. */
+export type ShellBridge = {
+  [K in ShellCapabilityName]: (
+    ...args: ShellCapability[K]["args"]
+  ) => Promise<IpcResult<ShellCapability[K]["result"]>>;
+};
+
+/** What pages call: failures throw an `ApiError`, like any other request. */
 export type ShellApi = {
   [K in ShellCapabilityName]: (
     ...args: ShellCapability[K]["args"]

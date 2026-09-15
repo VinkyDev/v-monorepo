@@ -1,28 +1,37 @@
 import { shellCapabilities } from "@v-monorepo/electron";
-import type { ShellApi } from "@v-monorepo/electron";
+import type { IpcResult, ShellBridge } from "@v-monorepo/electron";
+import { errorBodySchema } from "@v-monorepo/shared";
 import { ipcRenderer } from "electron";
 import { z } from "zod";
 
-export const shellApi: ShellApi = {
+const failureSchema = z.object({
+  error: errorBodySchema,
+  ok: z.literal(false),
+});
+
+/** Forwards the envelope untouched; the renderer accessor turns it back into an error. */
+const invoke = async <Value>(
+  valueSchema: z.ZodType<Value>,
+  channel: string,
+  ...args: string[]
+): Promise<IpcResult<Value>> =>
+  z
+    .union([
+      z.object({ ok: z.literal(true), value: valueSchema }),
+      failureSchema,
+    ])
+    .parse(await ipcRenderer.invoke(channel, ...args));
+
+const nothing = z.undefined();
+const text = z.string();
+
+export const shellApi: ShellBridge = {
   getElectronVersion: async () =>
-    z
-      .string()
-      .parse(
-        await ipcRenderer.invoke(shellCapabilities.getElectronVersion.channel)
-      ),
-  openExternal: async (url) => {
-    await ipcRenderer.invoke(shellCapabilities.openExternal.channel, url);
-  },
+    await invoke(text, shellCapabilities.getElectronVersion.channel),
+  openExternal: async (url) =>
+    await invoke(nothing, shellCapabilities.openExternal.channel, url),
   readClipboardText: async () =>
-    z
-      .string()
-      .parse(
-        await ipcRenderer.invoke(shellCapabilities.readClipboardText.channel)
-      ),
-  writeClipboardText: async (text) => {
-    await ipcRenderer.invoke(
-      shellCapabilities.writeClipboardText.channel,
-      text
-    );
-  },
+    await invoke(text, shellCapabilities.readClipboardText.channel),
+  writeClipboardText: async (value) =>
+    await invoke(nothing, shellCapabilities.writeClipboardText.channel, value),
 };

@@ -1,14 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { isDesktop } from "@v-monorepo/electron";
 import { Button } from "@v-monorepo/ui/components/button";
+import { lazy } from "react";
 
+import { AppBoundary } from "#/components/app-boundary.tsx";
 import { apiClient } from "#/lib/api.ts";
-import { lazyComponent } from "#/lib/lazy-component.ts";
 import { withSuspense } from "#/lib/with-suspense.tsx";
 
 const DesktopDemo = withSuspense(
-  lazyComponent(async () => await import("#/components/desktop-demo.tsx"))
+  lazy(async () => await import("#/components/desktop-demo.tsx"))
 );
 
 const HealthDemo = () => {
@@ -67,9 +68,16 @@ const Home = () => (
       <p className="text-muted-foreground mt-1 text-sm">
         UI 来自 <code>@v-monorepo/ui</code>，请求走 Hono RPC
       </p>
+      <Link className="text-sm underline underline-offset-4" to="/demo">
+        错误链路演示 →
+      </Link>
     </header>
 
-    {isDesktop() ? <DesktopDemo /> : null}
+    {isDesktop() ? (
+      <AppBoundary name="desktop-demo">
+        <DesktopDemo />
+      </AppBoundary>
+    ) : null}
 
     <HealthDemo />
   </main>

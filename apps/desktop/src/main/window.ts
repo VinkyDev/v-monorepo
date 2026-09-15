@@ -1,11 +1,11 @@
 import { productionRendererUrl } from "@v-monorepo/electron";
-import { createLogger } from "@v-monorepo/logger";
+import { logger } from "@v-monorepo/logger";
 import { BrowserWindow } from "electron";
 
 import { setupCorsBypass } from "#/main/cors.ts";
 import { isTrustedRendererUrl } from "#/main/urls.ts";
 
-const log = createLogger({ name: "desktop" });
+const log = logger.child({ scope: "desktop" });
 
 const denyUntrusted = (details: {
   preventDefault: () => void;
@@ -48,18 +48,26 @@ export const createMainWindow = (preloadFile: string): BrowserWindow => {
   win.webContents.on("will-redirect", denyUntrusted);
 
   win.webContents.on("preload-error", (_event, preloadPath, error) => {
-    log.error(`preload failed: ${preloadPath}`, error);
+    log.error({
+      error,
+      event: "preload_failed",
+      message: `preload failed: ${preloadPath}`,
+    });
   });
 
   win.webContents.on(
     "did-fail-load",
     (_event, errorCode, errorDescription, validatedURL) => {
+      // -3 is ERR_ABORTED, which every in-app navigation produces.
       if (errorCode === -3) {
         return;
       }
-      log.error(
-        `failed to load ${validatedURL}: ${errorDescription} (${errorCode})`
-      );
+      log.error({
+        error: new Error(errorDescription),
+        event: "renderer_load_failed",
+        message: `failed to load ${validatedURL}: ${errorDescription}`,
+        meta: { errorCode },
+      });
     }
   );
 

@@ -19,8 +19,8 @@
   },
   "dependencies": {
     "@hono/node-server": "catalog:",
-    "@hono/standard-validator": "catalog:",
     "@hono/swagger-ui": "catalog:",
+    "@standard-schema/spec": "catalog:",
     "@t3-oss/env-core": "catalog:",
     "@v-monorepo/logger": "workspace:*",
     "@v-monorepo/shared": "workspace:*",

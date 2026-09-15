@@ -1,13 +1,40 @@
 import { isDesktop, shellApi } from "@v-monorepo/electron";
+import { logger, toError } from "@v-monorepo/logger";
 import { Button } from "@v-monorepo/ui/components/button";
+import { toast } from "@v-monorepo/ui/components/toast";
 import { useEffect, useState } from "react";
+
+import { toErrorView } from "#/lib/error-view.ts";
+
+/**
+ * Shell calls sit outside React Query, so they report and surface here instead
+ * of leaving an unhandled rejection behind.
+ */
+const reportShellFailure = (capability: string, cause: unknown): void => {
+  const error = toError(cause);
+  logger.error({
+    error,
+    event: "shell_call_failed",
+    message: error.message,
+    meta: { capability },
+  });
+  toast.add({
+    priority: "high",
+    title: toErrorView(cause).message,
+    type: "error",
+  });
+};
 
 const ElectronVersionDemo = () => {
   const [version, setVersion] = useState<string | undefined>();
 
   useEffect(() => {
     const loadVersion = async (): Promise<void> => {
-      setVersion(await shellApi().getElectronVersion());
+      try {
+        setVersion(await shellApi().getElectronVersion());
+      } catch (error) {
+        reportShellFailure("getElectronVersion", error);
+      }
     };
     void loadVersion();
   }, []);
@@ -29,11 +56,10 @@ const OpenExternalDemo = () => {
     setBusy(true);
     try {
       await shellApi().openExternal("https://viteplus.dev/guide/");
-      setBusy(false);
     } catch (error) {
-      setBusy(false);
-      throw error;
+      reportShellFailure("openExternal", error);
     }
+    setBusy(false);
   };
 
   return (
@@ -63,22 +89,20 @@ const ClipboardDemo = () => {
     try {
       await shellApi().writeClipboardText(draft);
       setCopied(draft);
-      setBusy(false);
     } catch (error) {
-      setBusy(false);
-      throw error;
+      reportShellFailure("writeClipboardText", error);
     }
+    setBusy(false);
   };
 
   const readClipboard = async (): Promise<void> => {
     setBusy(true);
     try {
       setCopied(await shellApi().readClipboardText());
-      setBusy(false);
     } catch (error) {
-      setBusy(false);
-      throw error;
+      reportShellFailure("readClipboardText", error);
     }
+    setBusy(false);
   };
 
   return (

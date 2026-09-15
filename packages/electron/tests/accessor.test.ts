@@ -1,13 +1,12 @@
+import { ApiError, isApiError } from "@v-monorepo/shared";
 import { describe, expect, test } from "vite-plus/test";
 
 import { desktopBridgeGlobal, isDesktop, shellApi } from "#/index.ts";
-import type { DesktopApi, ShellApi } from "#/index.ts";
+import type { DesktopApi, ShellBridge } from "#/index.ts";
 
-type DesktopGlobalThis = typeof globalThis & {
-  desktop?: DesktopApi;
-};
+// The fake preload API is installed on the same global the bridge reads.
+type DesktopGlobalThis = typeof globalThis & { desktop?: DesktopApi };
 
-// SAFETY: tests install a fake preload API on the same global the bridge reads.
 const desktopGlobals = (): DesktopGlobalThis => globalThis;
 
 const withDesktopApi = async (
@@ -24,16 +23,22 @@ const withDesktopApi = async (
   }
 };
 
-const fakeShell = (opened: string[]): ShellApi => ({
-  getElectronVersion: async () => await Promise.resolve("43.4.1"),
+const fakeShell = (opened: string[]): ShellBridge => ({
+  getElectronVersion: async () =>
+    await Promise.resolve({ ok: true, value: "43.4.1" }),
   openExternal: async (url: string) => {
     opened.push(url);
-    await Promise.resolve();
+    return await Promise.resolve({
+      error: new ApiError("bad_request", {
+        message: "blocked external url",
+      }).toBody(),
+      ok: false,
+    });
   },
-  readClipboardText: async () => await Promise.resolve("clipped"),
-  writeClipboardText: async () => {
-    await Promise.resolve();
-  },
+  readClipboardText: async () =>
+    await Promise.resolve({ ok: true, value: "clipped" }),
+  writeClipboardText: async () =>
+    await Promise.resolve({ ok: true, value: undefined }),
 });
 
 describe("desktop bridge", () => {
@@ -45,15 +50,28 @@ describe("desktop bridge", () => {
     });
   });
 
-  test("shellApi methods call through the preload API", async () => {
-    const opened: string[] = [];
-    await withDesktopApi({ shell: fakeShell(opened) }, async () => {
+  test("shellApi unwraps a successful envelope", async () => {
+    await withDesktopApi({ shell: fakeShell([]) }, async () => {
       expect(isDesktop()).toBeTruthy();
       await expect(shellApi().getElectronVersion()).resolves.toBe("43.4.1");
       await expect(shellApi().readClipboardText()).resolves.toBe("clipped");
       await shellApi().writeClipboardText("hello");
-      await shellApi().openExternal("https://example.com");
-      expect(opened).toStrictEqual(["https://example.com"]);
+    });
+  });
+
+  test("a failed envelope becomes the same ApiError the server would throw", async () => {
+    const opened: string[] = [];
+
+    await withDesktopApi({ shell: fakeShell(opened) }, async () => {
+      const rejected = shellApi().openExternal("file:///etc/passwd");
+
+      await expect(rejected).rejects.toSatisfy(isApiError);
+      await expect(rejected).rejects.toMatchObject({
+        code: "bad_request",
+        message: "blocked external url",
+        status: 400,
+      });
+      expect(opened).toStrictEqual(["file:///etc/passwd"]);
     });
   });
 });

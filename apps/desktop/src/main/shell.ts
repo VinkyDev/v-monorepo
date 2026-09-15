@@ -1,7 +1,9 @@
 import path from "node:path";
 
+import { addSink, consoleSink } from "@v-monorepo/logger";
 import { app, BrowserWindow } from "electron";
 
+import { watchCrashes } from "#/main/crash.ts";
 import { ipcInit } from "#/main/ipc/index.ts";
 import { registerRendererScheme, serveRenderer } from "#/main/renderer.ts";
 import { createMainWindow } from "#/main/window.ts";
@@ -30,6 +32,8 @@ const startDesktop = async (): Promise<void> => {
 };
 
 export const bootDesktop = (): void => {
+  addSink(consoleSink);
+  watchCrashes();
   registerRendererScheme();
 
   app.on("window-all-closed", () => {

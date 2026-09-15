@@ -7,14 +7,15 @@
     "#/*": "./src/*"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./testing": "./src/testing.ts"
   },
   "scripts": {
     "test": "vp test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "tslog": "catalog:"
+    "@v-monorepo/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

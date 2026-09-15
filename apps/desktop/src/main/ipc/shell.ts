@@ -1,4 +1,5 @@
 import { shellCapabilities } from "@v-monorepo/electron";
+import { ApiError } from "@v-monorepo/shared";
 import { clipboard, shell } from "electron";
 import { z } from "zod";
 
@@ -11,7 +12,9 @@ const allowedExternalProtocols = new Set(["http:", "https:", "mailto:"]);
 const electronVersion = (): string => {
   const version = process.versions.electron;
   if (version === undefined || version === "") {
-    throw new Error("electron version is unavailable");
+    throw new ApiError("unavailable", {
+      message: "electron version is unavailable",
+    });
   }
   return version;
 };
@@ -29,7 +32,7 @@ const isAllowedExternalUrl = (value: string): boolean => {
 export const parseExternalUrl = (url: string): string => {
   const parsed = ipcUrlSchema.parse(url);
   if (!isAllowedExternalUrl(parsed)) {
-    throw new Error("blocked external url");
+    throw new ApiError("bad_request", { message: "blocked external url" });
   }
   return parsed;
 };

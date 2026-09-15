@@ -1,7 +1,9 @@
 import { pathToFileURL } from "node:url";
 
 import { rendererScheme } from "@v-monorepo/electron";
-import { createLogger } from "@v-monorepo/logger";
+import { logger, toError } from "@v-monorepo/logger";
+import { ApiError } from "@v-monorepo/shared";
+import type { ErrorCode } from "@v-monorepo/shared";
 import { net, protocol } from "electron";
 
 import {
@@ -14,9 +16,15 @@ import {
   rewriteToOrigin,
 } from "#/main/renderer-route.ts";
 
-const log = createLogger({ name: "desktop" });
+const log = logger.child({ scope: "desktop" });
 
 type ProxyInit = RequestInit & { duplex?: "half" };
+
+/** The renderer parses these exactly like a server response, so the shell stays invisible. */
+const errorResponse = (code: ErrorCode): Response => {
+  const error = new ApiError(code);
+  return Response.json(error.toBody(), { status: error.status });
+};
 
 const requireApiOrigin = (value: string | undefined): string => {
   if (value === undefined || value === "") {
@@ -55,8 +63,12 @@ const proxyApi = async (
       proxyInit(request, new Headers(request.headers))
     );
   } catch (error) {
-    log.error(`api proxy failed: ${target}`, error);
-    return new Response("Bad Gateway", { status: 502 });
+    log.error({
+      error: toError(error),
+      event: "api_proxy_failed",
+      message: `api proxy failed: ${target}`,
+    });
+    return errorResponse("unavailable");
   }
 };
 
@@ -69,8 +81,12 @@ const proxyVite = async (
   try {
     return await fetch(target, proxyInit(request, headers));
   } catch (error) {
-    log.error(`vite proxy failed: ${target}`, error);
-    return new Response("Vite Dev Server Unavailable", { status: 502 });
+    log.error({
+      error: toError(error),
+      event: "vite_proxy_failed",
+      message: `vite proxy failed: ${target}`,
+    });
+    return errorResponse("unavailable");
   }
 };
 
@@ -101,7 +117,7 @@ export const serveRenderer = (options: {
   protocol.handle(rendererScheme, async (request) => {
     const url = parseRendererUrl(request.url);
     if (url === undefined) {
-      return new Response("Not Found", { status: 404 });
+      return errorResponse("not_found");
     }
 
     if (isApiPathname(url.pathname)) {
@@ -116,7 +132,7 @@ export const serveRenderer = (options: {
       options.rendererRoot
     );
     if (filePath === undefined) {
-      return new Response("Not Found", { status: 404 });
+      return errorResponse("not_found");
     }
     return await net.fetch(pathToFileURL(filePath).href);
   });

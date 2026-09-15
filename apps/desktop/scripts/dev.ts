@@ -4,12 +4,14 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 
-import { createLogger } from "@v-monorepo/logger";
+import { addSink, consoleSink, createLogger } from "@v-monorepo/logger";
 import { waitUntil } from "@v-monorepo/utils";
 import { build } from "vite-plus";
 import { z } from "zod";
 
-const log = createLogger({ name: "desktop-dev" });
+addSink(consoleSink);
+
+const log = createLogger({ scope: "desktop-dev" });
 
 const desktopRoot = path.join(import.meta.dirname, "..");
 const repoRoot = path.join(desktopRoot, "../..");
@@ -75,7 +77,7 @@ const isHttpUp = async (url: string): Promise<boolean> => {
 
 const ensureWebDevServer = async (): Promise<void> => {
   if (await isHttpUp(rendererUrl)) {
-    log.info("reusing existing web dev server");
+    log.info({ message: "reusing existing web dev server" });
     return;
   }
   spawnVp(webRoot, [
@@ -119,7 +121,7 @@ const scheduleRestart = (): void => {
   }
   clearTimeout(restartTimer);
   restartTimer = setTimeout(() => {
-    log.info("restarting electron");
+    log.info({ message: "restarting electron" });
     if (electronChild === undefined) {
       startElectron();
       return;

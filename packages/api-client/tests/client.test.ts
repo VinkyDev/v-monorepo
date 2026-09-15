@@ -1,23 +1,32 @@
 import { createApp } from "@v-monorepo/server";
-import { AppError, errorCatalog, healthStatusSchema } from "@v-monorepo/shared";
+import {
+  errorCatalog,
+  healthStatusSchema,
+  isApiError,
+} from "@v-monorepo/shared";
+import type { ApiError } from "@v-monorepo/shared";
 import { describe, expect, test } from "vite-plus/test";
 
 import { createApiClient } from "#/index.ts";
 
-const clientFor = (app: ReturnType<typeof createApp>, baseUrl: string) =>
-  createApiClient(baseUrl, {
-    fetch: async (input, init) => {
-      const request =
-        input instanceof Request ? input : new Request(input, init);
-      return await app.fetch(request);
-    },
+const clientFor = (baseUrl: string) => {
+  const app = createApp();
+  return createApiClient(baseUrl, {
+    fetch: async (input, init) =>
+      await app.fetch(
+        input instanceof Request ? input : new Request(input, init)
+      ),
   });
+};
 
-const expectAppError = async (promise: Promise<unknown>): Promise<AppError> => {
+const failingClient = (fetchFn: typeof fetch) =>
+  createApiClient("https://api.test", { fetch: fetchFn });
+
+const expectApiError = async (promise: Promise<unknown>): Promise<ApiError> => {
   try {
     await promise;
   } catch (error) {
-    if (error instanceof AppError) {
+    if (isApiError(error)) {
       return error;
     }
     throw error;
@@ -26,31 +35,82 @@ const expectAppError = async (promise: Promise<unknown>): Promise<AppError> => {
 };
 
 describe(createApiClient, () => {
-  test("createApiClient reads a successful health response from the server", async () => {
-    const client = clientFor(createApp(), "http://v-monorepo.test/api");
-    const response = await client.health.$get();
+  test("reads a successful response", async () => {
+    const response = await clientFor(
+      "http://v-monorepo.test/api"
+    ).health.$get();
+
     expect(healthStatusSchema.parse(await response.json()).status).toBe("ok");
   });
 
-  test("createApiClient throws AppError when the server returns a problem", async () => {
-    const client = clientFor(createApp(), "http://v-monorepo.test/api/missing");
-    const error = await expectAppError(client.health.$get());
-    expect(error.code).toBe("NOT_FOUND");
-    expect(error.title).toBe(errorCatalog.NOT_FOUND.title);
-    expect(error.message).toBe(errorCatalog.NOT_FOUND.detail);
+  test("restores the server's code, message and trace id", async () => {
+    const client = clientFor("http://v-monorepo.test/api");
+
+    const error = await expectApiError(
+      client.demo.probe.$get({ query: { fail: "session_expired" } })
+    );
+
+    expect(error.code).toBe("session_expired");
+    expect(error.status).toBe(401);
+    expect(error.message).toBe(errorCatalog.session_expired.message);
+    expect(error.traceId).toBeTruthy();
+    expect(error.request).toStrictEqual({
+      method: "GET",
+      path: "/api/demo/probe",
+      status: 401,
+    });
   });
 
-  test("createApiClient wraps network failures as AppError", async () => {
-    const client = createApiClient("https://api.test", {
-      fetch: () => {
-        throw new Error("network down");
-      },
+  test("passes an abort through untouched", async () => {
+    const client = failingClient(() => {
+      throw new DOMException("aborted", "AbortError");
     });
 
-    const error = await expectAppError(client.health.$get());
-    expect(error.code).toBe("INTERNAL_ERROR");
-    expect(error.message).toBe(errorCatalog.INTERNAL_ERROR.detail);
-    expect(error.title).toBe(errorCatalog.INTERNAL_ERROR.title);
-    expect(error.cause).toBeInstanceOf(Error);
+    await expect(client.health.$get()).rejects.toMatchObject({
+      name: "AbortError",
+    });
+  });
+
+  test("maps a timeout to the timeout code", async () => {
+    const client = failingClient(() => {
+      throw new DOMException("too slow", "TimeoutError");
+    });
+
+    const error = await expectApiError(client.health.$get());
+
+    expect(error.code).toBe("timeout");
+  });
+
+  test("maps an unreachable server to unavailable, which is retryable", async () => {
+    const client = failingClient(() => {
+      throw new TypeError("network down");
+    });
+
+    const error = await expectApiError(client.health.$get());
+
+    expect(error.code).toBe("unavailable");
+    expect(error.status).toBe(503);
+    expect(error.cause).toBeInstanceOf(TypeError);
+    expect(error.request).toStrictEqual({
+      method: "GET",
+      path: "/health",
+    });
+  });
+
+  test("falls back to the status when the response is not ours", async () => {
+    const client = failingClient(
+      async () =>
+        await Promise.resolve(
+          new Response("<html>gateway</html>", {
+            headers: { "content-type": "text/html" },
+            status: 502,
+          })
+        )
+    );
+
+    const error = await expectApiError(client.health.$get());
+
+    expect(error.code).toBe("internal");
+    expect(error.request?.status).toBe(502);
   });
 });
