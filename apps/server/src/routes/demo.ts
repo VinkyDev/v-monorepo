@@ -5,7 +5,6 @@ import { z } from "zod";
 
 import { validate } from "#/lib/validate.ts";
 
-/** A tour of the error contract. Delete this folder and its route to drop it. */
 const probeSchema = z.object({
   fail: z
     .enum(["unauthorized", "not_found", "timeout", "session_expired", "crash"])
@@ -30,7 +29,7 @@ export const demoRoutes = new Hono()
     (c) => {
       const { fail } = c.req.valid("query");
       if (fail === "crash") {
-        // Not an ApiError: the edge must hide it behind a generic 500.
+        // 故意不用 `ApiError`：边缘层必须把它兜成通用 500。
         throw new Error("secret internals");
       }
       if (fail !== undefined) {

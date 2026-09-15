@@ -9,7 +9,6 @@ const failureSchema = z.object({
   ok: z.literal(false),
 });
 
-/** Forwards the envelope untouched; the renderer accessor turns it back into an error. */
 const invoke = async <Value>(
   valueSchema: z.ZodType<Value>,
   channel: string,

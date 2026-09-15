@@ -10,7 +10,7 @@ type DesktopGlobalThis = typeof globalThis & {
 };
 
 const getDesktopBridge = (): DesktopApi | undefined => {
-  // SAFETY: preload attaches DesktopApi under desktopBridgeGlobal; browsers leave it unset.
+  // SAFETY: preload 将 DesktopApi 挂在 desktopBridgeGlobal；浏览器中不存在。
   const globals = globalThis as DesktopGlobalThis;
   return globals[desktopBridgeGlobal];
 };
@@ -23,12 +23,10 @@ const requireDesktop = (): DesktopApi => {
   return desktop;
 };
 
-/** Rebuilt here rather than in preload, where `contextBridge` would strip the fields. */
 const unwrap = <T>(result: IpcResult<T>): T => {
   if (result.ok) {
     return result.value;
   }
-  // No HTTP status on this transport, so a code we do not know degrades to `internal`.
   throw ApiError.fromBody(result.error, "internal");
 };
 

@@ -12,10 +12,8 @@ import { createQueryClient } from "#/lib/query-client.ts";
 
 import { routeTree } from "./routeTree.gen";
 
-// Entry points compose the sinks; a monitoring backend is one more `addSink` here.
 addSink(consoleSink);
 
-// A chunk that 404s after a deploy never recovers by retrying — the file is gone.
 window.addEventListener("vite:preloadError", () => {
   window.location.reload();
 });

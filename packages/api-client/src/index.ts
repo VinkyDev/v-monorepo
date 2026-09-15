@@ -4,10 +4,8 @@ import type { RequestSummary } from "@v-monorepo/shared";
 import { hc } from "hono/client";
 import type { ClientRequestOptions } from "hono/client";
 
-/** Above the server's own 10s timeout, so its 504 wins the race and keeps its body. */
 const DEFAULT_TIMEOUT_MS = 15_000;
 
-/** The server's `requestId` adopts a well-formed inbound value, so one id spans both logs. */
 const TRACE_HEADER = "X-Request-Id";
 
 export interface CreateApiClientOptions extends Pick<
@@ -21,10 +19,8 @@ export interface CreateApiClientOptions extends Pick<
 const nameOf = (cause: unknown): string | undefined =>
   cause instanceof Error ? cause.name : undefined;
 
-/** A relative base URL — the web app uses `/api` — only yields a pathname against a base. */
 const LOCAL_BASE = "http://localhost";
 
-/** Query strings can carry tokens, so only the path survives into a log. */
 const pathOf = (url: string): string =>
   URL.canParse(url, LOCAL_BASE) ? new URL(url, LOCAL_BASE).pathname : url;
 
@@ -39,7 +35,7 @@ const describeRequest = (
         path: pathOf(input instanceof URL ? input.href : input),
       };
 
-/** The composite adopts the first signal's reason, which is what tells the two apart. */
+/** 组合 signal 沿用先中止者的 reason，据此区分超时与取消。 */
 const withDeadline = (
   signal: AbortSignal | null | undefined,
   timeoutMs: number
@@ -51,7 +47,6 @@ const withDeadline = (
 const apiFetch =
   (fetchFn: typeof fetch, timeoutMs: number): typeof fetch =>
   async (input, init) => {
-    // `init` wins over a `Request` input, the same precedence `fetch` itself applies.
     const source = input instanceof Request ? input : undefined;
     const headers = new Headers(init?.headers ?? source?.headers);
     const traceId = headers.get(TRACE_HEADER) ?? crypto.randomUUID();
@@ -67,7 +62,6 @@ const apiFetch =
     try {
       response = await fetchFn(input, request);
     } catch (error) {
-      // A cancellation is not a failure; wrapping it would fake a server error.
       if (nameOf(error) === "AbortError") {
         throw error;
       }
@@ -86,7 +80,7 @@ const apiFetch =
     });
   };
 
-/** Resolved per call, so a late `globalThis.fetch` patch still reaches an existing client. */
+/** 调用时才取 `globalThis.fetch`，事后补丁对已有 client 也生效。 */
 const globalFetch: typeof fetch = async (input, init) =>
   await globalThis.fetch(input, init);
 

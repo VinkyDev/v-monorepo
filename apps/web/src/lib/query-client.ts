@@ -9,16 +9,13 @@ import { toErrorView } from "#/lib/error-view.ts";
 
 declare module "@tanstack/react-query" {
   interface Register {
-    /** Set `showErrorToast: false` when the form renders the failure itself. */
     mutationMeta: { showErrorToast?: boolean };
   }
 }
 
-/** Only failures a second attempt could plausibly survive. */
 export const isRetryable = (cause: unknown): boolean =>
   isApiError(cause) && (cause.status >= 500 || cause.code === "rate_limited");
 
-/** 4xx are expected user errors and a cancellation is not an error at all. */
 const isWorthReporting = (cause: Error): boolean =>
   cause.name !== "AbortError" && (!isApiError(cause) || cause.status >= 500);
 
@@ -47,8 +44,6 @@ export const createQueryClient = (): QueryClient => {
       queries: {
         retry: (failureCount, cause) =>
           isRetryable(cause) && failureCount < env.VITE_MAX_RETRY_COUNT,
-        // A first load has nothing to show, so it goes to the route error boundary;
-        // a background refresh keeps the stale data and only toasts.
         throwOnError: (_cause, query) => query.state.data === undefined,
       },
     },

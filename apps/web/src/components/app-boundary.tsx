@@ -15,12 +15,11 @@ const BoundaryFallback = ({ error }: ErrorComponentProps) => (
 );
 
 interface AppBoundaryProps {
-  /** Stable key for aggregation; it must not contain dynamic values. */
+  /** 聚合用的 key，必须稳定，不含动态值。 */
   name: string;
   children: ReactNode;
 }
 
-/** Keeps one failing widget from taking the page down. Whole pages are the router's job. */
 export const AppBoundary = ({ name, children }: AppBoundaryProps) => (
   <CatchBoundary
     errorComponent={BoundaryFallback}

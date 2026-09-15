@@ -97,7 +97,7 @@ describe("demo routes", () => {
 
     expect(response.status).toBe(422);
     expect(error.code).toBe("invalid_params");
-    // `data` only survives parsing when every field carries a non-empty message.
+    // 每个 field 都有非空 message，`data` 才解析得出来。
     expect(error.data).toMatchObject({
       fields: [{ path: "email" }, { path: "name" }],
     });

@@ -1,9 +1,7 @@
 import { isApiError } from "@v-monorepo/shared";
 
-/** Monitoring backends truncate payloads anyway; cut here so we control where. */
 const STACK_LIMIT = 2048;
 
-/** JSON.stringify that never throws, circular input included. */
 export const safeJson = (cause: unknown): string => {
   try {
     return JSON.stringify(cause) ?? String(cause);
@@ -12,11 +10,9 @@ export const safeJson = (cause: unknown): string => {
   }
 };
 
-/** For boundaries that catch `unknown` but must hand an `Error` to the logger. */
 export const toError = (cause: unknown): Error =>
   cause instanceof Error ? cause : new Error(safeJson(cause));
 
-/** The flattened fields a monitoring backend can index. */
 export interface SerializedError {
   name: string;
   message: string;

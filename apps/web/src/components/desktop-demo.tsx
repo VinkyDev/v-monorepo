@@ -6,10 +6,7 @@ import { useEffect, useState } from "react";
 
 import { toErrorView } from "#/lib/error-view.ts";
 
-/**
- * Shell calls sit outside React Query, so they report and surface here instead
- * of leaving an unhandled rejection behind.
- */
+/** shell 调用不走 React Query，错误在此自行上报。 */
 const reportShellFailure = (capability: string, cause: unknown): void => {
   const error = toError(cause);
   logger.error({

@@ -13,8 +13,6 @@ const jsonResponse = (status: number, body: JsonValue): Response =>
   Response.json(body, { headers: { "X-Request-Id": "req-1" }, status });
 
 describe(codeForStatus, () => {
-  // A duplicate status would silently strand whichever protocol code lost it, and
-  // would let a business code (401 `session_expired`) hijack the lookup.
   test.for(protocolCodes)("%s round-trips through its status", (code) => {
     expect(codeForStatus(errorCatalog[code].status)).toBe(code);
   });
@@ -90,7 +88,6 @@ describe(ApiError, () => {
     const overHttp = await ApiError.fromResponse(
       jsonResponse(429, { code: "quota_exhausted", message: "配额用尽" })
     );
-    // No status on the IPC transport, so its fallback is a literal.
     const overIpc = ApiError.fromBody(
       { code: "quota_exhausted", message: "配额用尽" },
       "internal"
@@ -116,7 +113,6 @@ describe(isApiError, () => {
   });
 
   test("narrows to a single code when one is given", () => {
-    // `Error` is what React Query and error boundaries hand us.
     const error: Error = new ApiError("email_taken", {
       data: { email: "a@b.c" },
     });

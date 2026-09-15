@@ -11,7 +11,6 @@ import type {
 
 const sinks: LogSink[] = [];
 
-/** The single integration point: one `addSink` call wires up a monitoring backend. */
 export const addSink = (sink: LogSink): void => {
   sinks.push(sink);
 };

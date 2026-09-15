@@ -88,7 +88,6 @@ const SignupDemo = () => {
   const [name, setName] = useState("Ada");
 
   const signup = useMutation({
-    // The form shows the failure inline, so the global toast would be noise.
     meta: { showErrorToast: false },
     mutationFn: async (json: { email: string; name: string }) => {
       const response = await apiClient.demo.signup.$post({ json });

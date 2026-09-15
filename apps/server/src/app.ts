@@ -17,7 +17,6 @@ import { docsRoutes } from "#/lib/openapi.ts";
 
 export const createApp = () =>
   new Hono<AppEnv>()
-    // First, so `X-Request-Id` is on every response and in every error log.
     .use(requestId())
     .use(
       httpLogger((message, ...rest) => {
@@ -32,7 +31,7 @@ export const createApp = () =>
     .use(
       bodyLimit({
         maxSize: BODY_LIMIT_BYTES,
-        // `bodyLimit` hands back an untyped context; name ours so the log keeps its variables.
+        // `bodyLimit` 的 context 无类型；在此标注，日志才留得住变量。
         onError: (c: Context<AppEnv>) =>
           handleError(new ApiError("payload_too_large"), c),
       })

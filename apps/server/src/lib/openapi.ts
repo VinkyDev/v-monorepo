@@ -10,7 +10,6 @@ const errorResponse = (description: string) => ({
   description,
 });
 
-// `defaultOptions` is keyed by the route's own method, so every method gets the same entry.
 const errorResponsesForEveryRoute = Object.fromEntries(
   ALLOWED_METHODS.map((method) => [
     method,
@@ -23,7 +22,6 @@ const errorResponsesForEveryRoute = Object.fromEntries(
   ])
 );
 
-/** The spec for `api` plus the UI that reads it; neither is mounted under `/api`. */
 export const docsRoutes = new Hono()
   .get(
     "/openapi.json",

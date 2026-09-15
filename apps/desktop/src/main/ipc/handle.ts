@@ -20,7 +20,6 @@ export const assertSender = (senderUrl?: string): void => {
   }
 };
 
-/** Turns a handler outcome into the envelope, because only `message` survives a throw. */
 export const toIpcResult = async <T>(
   channel: string,
   run: () => T | Promise<T>
@@ -28,8 +27,6 @@ export const toIpcResult = async <T>(
   try {
     return { ok: true, value: await run() };
   } catch (error) {
-    // The renderer is a separate trust boundary: anything we did not classify
-    // becomes a generic internal error rather than leaking our internals.
     const failure = isApiError(error)
       ? error
       : new ApiError("internal", { cause: error });

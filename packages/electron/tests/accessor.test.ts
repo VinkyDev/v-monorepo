@@ -4,7 +4,6 @@ import { describe, expect, test } from "vite-plus/test";
 import { desktopBridgeGlobal, isDesktop, shellApi } from "#/index.ts";
 import type { DesktopApi, ShellBridge } from "#/index.ts";
 
-// The fake preload API is installed on the same global the bridge reads.
 type DesktopGlobalThis = typeof globalThis & { desktop?: DesktopApi };
 
 const desktopGlobals = (): DesktopGlobalThis => globalThis;

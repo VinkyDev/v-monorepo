@@ -6,7 +6,7 @@ import { validator } from "hono-openapi";
 
 type PathSegment = StandardSchemaV1.PathSegment | PropertyKey;
 
-/** Standard Schema lets a path segment be a bare key or a `{ key }` wrapper. */
+/** Standard Schema 的 path segment：裸 key 或 `{ key }` 包装。 */
 const isKeyedSegment = (
   segment: PathSegment
 ): segment is StandardSchemaV1.PathSegment => typeof segment === "object";
@@ -19,7 +19,6 @@ const toFieldError = (issue: StandardSchemaV1.Issue): FieldError => ({
   path: (issue.path ?? []).map(segmentKey).join("."),
 });
 
-/** Validates a request target and documents its schema in the OpenAPI spec. */
 export const validate = <
   Target extends keyof ValidationTargets,
   Schema extends StandardSchemaV1,

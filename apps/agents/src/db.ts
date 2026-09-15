@@ -1,7 +1,5 @@
 import { sqlite } from "@flue/runtime/node";
 
-// Conversations, attachments, and accepted submissions are stored here so
-// they survive a restart. Swap in another adapter (Postgres, libSQL, ...)
-// when one host's SQLite file is no longer enough:
+// 单机 SQLite 不够用时，换其他适配器（Postgres、libSQL 等）：
 // https://flueframework.com/docs/guide/database/
 export default sqlite("./data/flue.db");

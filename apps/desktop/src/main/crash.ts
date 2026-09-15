@@ -1,7 +1,6 @@
 import { logger, toError } from "@v-monorepo/logger";
 import { app } from "electron";
 
-/** The last line of defence, so a crash is never silent. */
 export const watchCrashes = (): void => {
   process.on("uncaughtException", (cause) => {
     logger.fatal({

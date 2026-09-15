@@ -8,7 +8,6 @@ export interface AppEnv {
   Variables: RequestIdVariables;
 }
 
-/** 4xx messages are written by us and safe to show; 5xx ones can leak internals. */
 const fromFrameworkError = (cause: Error): ApiError => {
   if (!(cause instanceof HTTPException)) {
     return new ApiError("internal", { cause });
@@ -19,7 +18,6 @@ const fromFrameworkError = (cause: Error): ApiError => {
   });
 };
 
-/** The only place a failure becomes a response, so every 5xx is logged exactly once. */
 export const handleError = (cause: Error, c: Context<AppEnv>): Response => {
   const error = isApiError(cause) ? cause : fromFrameworkError(cause);
 

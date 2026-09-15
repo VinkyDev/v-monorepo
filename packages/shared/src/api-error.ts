@@ -8,7 +8,7 @@ import {
 } from "./error-catalog.ts";
 import type { ErrorCode, ErrorData, ErrorStatus } from "./error-catalog.ts";
 
-/** The wire format. A non-2xx status already says "this failed", so there is no envelope. */
+/** 传输格式：非 2xx status 已表明失败，无需 envelope。 */
 export const errorBodySchema = z.object({
   code: z.string().min(1),
   data: z.json().optional(),
@@ -17,16 +17,15 @@ export const errorBodySchema = z.object({
 
 export type ApiErrorBody = z.infer<typeof errorBodySchema>;
 
-/** Enough to locate the call in a log; no query, headers or body that could carry secrets. */
 export interface RequestSummary {
   readonly method: string;
   readonly path: string;
-  /** Absent when the request never reached a response. */
+  /** 请求从未拿到响应时缺省。 */
   readonly status?: number;
 }
 
 export interface ApiErrorContext {
-  /** From the `X-Request-Id` response header. */
+  /** 来自 `X-Request-Id` 响应头。 */
   traceId?: string;
   request?: RequestSummary;
   cause?: unknown;
@@ -51,8 +50,6 @@ const readErrorBody = async (
   }
 };
 
-// `Symbol.for` survives the duplicate copies of this module that web, Electron main
-// and preload each bundle, where `instanceof` would not.
 const apiErrorBrand: unique symbol = Symbol.for("@v-monorepo/shared/ApiError");
 
 export class ApiError<C extends ErrorCode = ErrorCode> extends Error {
@@ -75,7 +72,6 @@ export class ApiError<C extends ErrorCode = ErrorCode> extends Error {
     this.request = options.request;
   }
 
-  /** `fallback` stands in for a code we do not know; each transport picks its own. */
   static fromBody(
     body: ApiErrorBody,
     fallback: ErrorCode,
@@ -111,7 +107,6 @@ export class ApiError<C extends ErrorCode = ErrorCode> extends Error {
   }
 }
 
-/** Pass `code` to narrow `data` too: `isApiError(e, "email_taken")`. */
 export const isApiError = <C extends ErrorCode = ErrorCode>(
   value: unknown,
   code?: C

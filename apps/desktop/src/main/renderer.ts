@@ -20,7 +20,7 @@ const log = logger.child({ scope: "desktop" });
 
 type ProxyInit = RequestInit & { duplex?: "half" };
 
-/** The renderer parses these exactly like a server response, so the shell stays invisible. */
+/** renderer 按服务端响应的方式解析它，shell 保持透明。 */
 const errorResponse = (code: ErrorCode): Response => {
   const error = new ApiError(code);
   return Response.json(error.toBody(), { status: error.status });

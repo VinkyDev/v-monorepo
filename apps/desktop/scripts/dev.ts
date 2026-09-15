@@ -25,7 +25,7 @@ const watchPollMs = 50;
 const binExt = process.platform === "win32" ? ".cmd" : "";
 const vpBin = path.join(repoRoot, "node_modules/.bin", `vp${binExt}`);
 const require = createRequire(path.join(desktopRoot, "package.json"));
-// electron's CJS entry exports the absolute path to the binary.
+// electron 的 CJS 入口导出二进制的绝对路径。
 const electronBin = z.string().parse(require("electron"));
 
 type BuildResult = Awaited<ReturnType<typeof build>>;

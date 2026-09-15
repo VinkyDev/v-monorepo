@@ -16,7 +16,7 @@ const headline = (record: LogRecord): string =>
     ? record.message
     : `${record.event} · ${record.message}`;
 
-/** Passed through unflattened so devtools can expand them. */
+/** 不扁平化，留给 devtools 展开。 */
 const details = (record: LogRecord): (LogMeta | Error)[] => {
   const extra: (LogMeta | Error)[] = [];
   if (record.meta !== undefined) {
@@ -33,7 +33,7 @@ const writeBrowser = (record: LogRecord): void => {
     record.scope === undefined
       ? record.level
       : `${record.level} ${record.scope}`;
-  // oxlint-disable-next-line no-console -- the console sink is the one place console is the product
+  // oxlint-disable-next-line no-console -- 这个 sink 的职责就是写 console
   console[consoleMethod(record.level)](
     `%c${label}%c ${headline(record)}`,
     `background:${levelColor[record.level]};color:#fff;padding:1px 5px;border-radius:3px`,
@@ -44,7 +44,7 @@ const writeBrowser = (record: LogRecord): void => {
 
 const writeNode = (record: LogRecord): void => {
   const scope = record.scope === undefined ? "" : ` [${record.scope}]`;
-  // oxlint-disable-next-line no-console -- the console sink is the one place console is the product
+  // oxlint-disable-next-line no-console -- 这个 sink 的职责就是写 console
   console[consoleMethod(record.level)](
     `${record.time.toTimeString().slice(0, 8)} ${record.level.toUpperCase().padEnd(5)}${scope} ${headline(record)}`,
     ...details(record)

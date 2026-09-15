@@ -58,7 +58,7 @@ export const createMainWindow = (preloadFile: string): BrowserWindow => {
   win.webContents.on(
     "did-fail-load",
     (_event, errorCode, errorDescription, validatedURL) => {
-      // -3 is ERR_ABORTED, which every in-app navigation produces.
+      // -3 是 ERR_ABORTED，应用内每次导航都会产生它。
       if (errorCode === -3) {
         return;
       }

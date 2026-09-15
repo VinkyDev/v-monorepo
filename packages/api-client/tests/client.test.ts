@@ -11,11 +11,9 @@ import { describe, expect, test } from "vite-plus/test";
 
 import { createApiClient } from "#/index.ts";
 
-/** Web and desktop both run on a relative `/api`, so that is the shape under test. */
 const baseUrl = "/api";
 const origin = "http://v-monorepo.test";
 
-/** A browser resolves a relative URL against the page origin; do the same here. */
 const urlOf = (input: RequestInfo | URL): URL =>
   new URL(input instanceof Request ? input.url : input, origin);
 
@@ -33,7 +31,7 @@ const clientFor = (onRequest?: (request: Request) => void) =>
 const failingClient = (fetchFn: typeof fetch, timeoutMs?: number) =>
   createApiClient("https://api.test", { fetch: fetchFn, timeoutMs });
 
-/** Faithful to `fetch`: answers only once the signal aborts, and with its reason. */
+/** 只在 signal 中止时响应并带上 reason，与 `fetch` 行为一致。 */
 const hangingFetch: typeof fetch = async (_input, init) => {
   const signal = init?.signal ?? AbortSignal.abort();
   if (!signal.aborted) {
@@ -126,7 +124,6 @@ describe(createApiClient, () => {
     expect(error.code).toBe("unavailable");
     expect(error.status).toBe(503);
     expect(error.cause).toBeInstanceOf(TypeError);
-    // No response carried one back, so the id we sent is all support has to go on.
     expect(error.traceId).toBeTruthy();
     expect(error.request).toStrictEqual({
       method: "GET",
