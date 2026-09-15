@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | 统一 CLI | [Vite+](https://viteplus.dev/guide/) (`vp`) | 开发、构建、测试、格式化、Lint 走同一套命令 |
 | 打包 | Vite + Rolldown | `vp dev` / `vp build` |
-| 包管理 | pnpm workspace + catalog | 版本集中在 `pnpm-workspace.yaml` |
+| 包管理 | pnpm 12.4.1 workspace + catalog | `engines.pnpm` 固定；缺失时由 `devEngines.packageManager` 下载；catalog 在 `pnpm-workspace.yaml` |
 | 语言 | TypeScript 7 | 严格模式；共享 tsconfig 在 `@v-monorepo/config` |
 | 运行时 | Node.js 24.19.0 (LTS) | `.node-version` 固定；`vp env` 按此解析 |
 | 质量 | [Ultracite](https://www.ultracite.ai/) → Oxlint、Oxfmt；Vitest | 预设经根目录 `vite.config.ts` 接入 Vite+；`vp check` 格式化 + Lint + 类型检查；`vp test` 跑测试 |
