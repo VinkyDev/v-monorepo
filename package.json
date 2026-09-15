@@ -14,6 +14,7 @@
     "prepare": "vp config"
   },
   "devDependencies": {
+    "@shadcn/lint": "catalog:",
     "@types/node": "catalog:",
     "@v-monorepo/config": "workspace:*",
     "knip": "catalog:",

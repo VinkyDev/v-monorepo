@@ -32,7 +32,10 @@ export default defineConfig({
   lint: {
     extends: [core, react, tanstack, vitest, antiSlop],
     ignorePatterns: [...(core.ignorePatterns ?? []), ...agentIgnorePatterns],
-    jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
+    jsPlugins: [
+      { name: "vite-plus", specifier: "vite-plus/oxlint-plugin" },
+      "@shadcn/lint",
+    ],
     options: { typeAware: true, typeCheck: true },
     overrides: [
       {
@@ -55,6 +58,11 @@ export default defineConfig({
     ],
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
+    },
+    settings: {
+      shadcn: {
+        ui: "@v-monorepo/ui/components",
+      },
     },
   },
   run: {

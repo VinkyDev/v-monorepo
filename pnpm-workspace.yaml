@@ -23,6 +23,7 @@ catalog:
   "@tanstack/router-plugin": ^1.168.35
 
   # ui / styling
+  "@shadcn/lint": ^0.1.0
   "@base-ui/react": ^1.8.0
   "@fontsource-variable/noto-sans": ^5.3.0
   "@fontsource-variable/playfair-display": ^5.3.0
@@ -48,7 +49,7 @@ catalog:
   "@hono/vite-dev-server": ^0.26.1
   hono: ^4.13.7
   hono-openapi: ^1.3.1
-  oxlint: 1.79.0
+  oxlint: 1.82.0
   ultracite: ^7.11.0
   knip: ^6.34.0
   es-toolkit: ^1.52.0
@@ -80,3 +81,5 @@ allowBuilds:
   electron-winstaller: true
   esbuild: true
   protobufjs: true
+minimumReleaseAgeExclude:
+  - "@shadcn/lint@0.1.0"
