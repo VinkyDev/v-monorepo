@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
     plugins: lazyPlugins(() => [
       devServer({
         adapter: nodeAdapter,
-        entry: "src/index.ts",
+        entry: "src/dev.ts",
       }),
     ]),
     publicDir: false,

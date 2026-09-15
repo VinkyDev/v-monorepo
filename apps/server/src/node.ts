@@ -1,12 +1,12 @@
 import { serve } from "@hono/node-server";
 import { addSink, consoleSink, logger } from "@v-monorepo/logger";
 
-import { env } from "./env.ts";
-import app from "./index.ts";
+import { createApp } from "#/app.ts";
+import { env } from "#/env.ts";
 
 addSink(consoleSink);
 
-serve({ fetch: app.fetch, port: env.PORT }, (info) => {
+serve({ fetch: createApp().fetch, port: env.PORT }, (info) => {
   const origin = `http://localhost:${info.port}`;
   logger.info({
     event: "server_listening",

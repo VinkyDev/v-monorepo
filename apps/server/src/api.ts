@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 
-import { demoRoutes } from "./routes/demo/index.ts";
-import { healthRoutes } from "./routes/health/index.ts";
+import { demoRoutes } from "#/routes/demo.ts";
+import { healthRoutes } from "#/routes/health.ts";
 
 export const api = new Hono()
   .route("/health", healthRoutes)

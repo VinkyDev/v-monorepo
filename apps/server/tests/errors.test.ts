@@ -7,8 +7,8 @@ import { requestId } from "hono/request-id";
 import { beforeEach, describe, expect, test } from "vite-plus/test";
 
 import { createApp } from "#/app.ts";
-import type { AppEnv } from "#/error.ts";
-import { handleError } from "#/error.ts";
+import type { AppEnv } from "#/lib/error.ts";
+import { handleError } from "#/lib/error.ts";
 
 const request = async (path: string, init?: RequestInit): Promise<Response> =>
   await createApp().request(path, init);

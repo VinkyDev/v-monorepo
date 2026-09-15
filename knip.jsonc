@@ -30,7 +30,7 @@
       },
     },
     "apps/server": {
-      "entry": ["src/node.ts"],
+      "entry": ["src/node.ts", "src/dev.ts"],
     },
   },
 }

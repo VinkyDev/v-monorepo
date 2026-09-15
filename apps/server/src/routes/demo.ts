@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { describeRoute } from "hono-openapi";
 import { z } from "zod";
 
-import { validate } from "../../validate.ts";
+import { validate } from "#/lib/validate.ts";
 
 /** A tour of the error contract. Delete this folder and its route to drop it. */
 const probeSchema = z.object({

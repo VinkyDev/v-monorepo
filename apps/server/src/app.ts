@@ -1,13 +1,7 @@
-import { swaggerUI } from "@hono/swagger-ui";
 import { logger } from "@v-monorepo/logger";
-import {
-  ApiError,
-  BODY_LIMIT_BYTES,
-  errorBodySchema,
-} from "@v-monorepo/shared";
+import { ApiError, BODY_LIMIT_BYTES } from "@v-monorepo/shared";
 import { Hono } from "hono";
 import type { Context } from "hono";
-import { ALLOWED_METHODS, openAPIRouteHandler, resolver } from "hono-openapi";
 import { bodyLimit } from "hono/body-limit";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
@@ -16,30 +10,13 @@ import { requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
 import { timeout } from "hono/timeout";
 
-import { api } from "./api.ts";
-import { handleError } from "./error.ts";
-import type { AppEnv } from "./error.ts";
+import { api } from "#/api.ts";
+import { handleError } from "#/lib/error.ts";
+import type { AppEnv } from "#/lib/error.ts";
+import { docsRoutes } from "#/lib/openapi.ts";
 
-const errorResponse = (description: string) => ({
-  content: { "application/json": { schema: resolver(errorBodySchema) } },
-  description,
-});
-
-// `defaultOptions` is keyed by the route's own method, so every method gets the same entry.
-const errorResponsesForEveryRoute = Object.fromEntries(
-  ALLOWED_METHODS.map((method) => [
-    method,
-    {
-      responses: {
-        "4XX": { $ref: "#/components/responses/ClientError" },
-        "5XX": { $ref: "#/components/responses/ServerError" },
-      },
-    },
-  ])
-);
-
-export const createApp = () => {
-  const app = new Hono<AppEnv>()
+export const createApp = () =>
+  new Hono<AppEnv>()
     // First, so `X-Request-Id` is on every response and in every error log.
     .use(requestId())
     .use(
@@ -50,11 +27,7 @@ export const createApp = () => {
         });
       })
     )
-    .use(
-      secureHeaders({
-        crossOriginResourcePolicy: "cross-origin",
-      })
-    )
+    .use(secureHeaders({ crossOriginResourcePolicy: "cross-origin" }))
     .use(compress())
     .use(
       bodyLimit({
@@ -65,43 +38,8 @@ export const createApp = () => {
       })
     )
     .use("/api/*", timeout(10_000))
-    .use(
-      "/api/*",
-      cors({
-        origin: "*",
-      })
-    )
-    .route("/api", api);
-
-  app.get(
-    "/openapi.json",
-    openAPIRouteHandler(api, {
-      defaultOptions: errorResponsesForEveryRoute,
-      documentation: {
-        components: {
-          responses: {
-            ClientError: errorResponse(
-              "请求被拒绝。按 `code` 分支，`data` 的形状由 `code` 决定。"
-            ),
-            ServerError: errorResponse(
-              "服务端错误。排障用的 trace id 在 `X-Request-Id` 响应头。"
-            ),
-          },
-        },
-        info: {
-          description:
-            "Hono RPC routes. Client types come from AppType via @v-monorepo/api-client.",
-          title: "v-monorepo API",
-          version: "0.0.0",
-        },
-        servers: [{ description: "API base path", url: "/api" }],
-      },
-    })
-  );
-  app.get("/docs", swaggerUI({ url: "/openapi.json" }));
-
-  app.notFound((c) => handleError(new ApiError("not_found"), c));
-  app.onError(handleError);
-
-  return app;
-};
+    .use("/api/*", cors({ origin: "*" }))
+    .route("/api", api)
+    .route("/", docsRoutes)
+    .notFound((c) => handleError(new ApiError("not_found"), c))
+    .onError(handleError);
