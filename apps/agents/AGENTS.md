@@ -1,13 +1,11 @@
 # `@v-monorepo/agents`
 
-[Flue](https://flueframework.com) agents as TypeScript functions.
+[Mastra](https://mastra.ai) agents. Register each agent in `src/mastra/index.ts`. Models use `"provider/model"`; credentials come from Mastra's provider env vars (`OPENAI_API_KEY`, optional `OPENAI_BASE_URL`, …). `DATABASE_URL` is validated by T3 Env in `src/env.ts`.
 
-A module under `src/agents/` whose first line is `'use agent'` exports agents: every exported capitalized function is one; the function name is its durable identity. Mount each route in `src/app.ts`.
+- `pnpm run dev` — Studio + REST at http://localhost:4111. Agent **Editor** and Observability traces are on.
+- `pnpm exec mastra api agent list` — inspect the local server
+- `pnpm exec mastra api agent generate hello-agent` — talk to Hello
 
-- `pnpm exec flue run src/agents/hello.ts --message "Hi"` — run locally
-- `pnpm exec flue docs search <query>` then `flue docs read <path>`
-- `pnpm exec flue add` — blueprints for channels, sandboxes, databases
+Storage is `PostgresStoreVNext` via `DATABASE_URL` (memory and Studio observability share the same local database). Errors stay on Mastra's own contract. Do not replace them with the repo's `ApiError` envelope — Mastra Studio and `mastra api` parse the former.
 
-Errors stay on Flue's own contract. `createAgentRouter` registers an `onError` that emits `{ error: { type, message, details } }`, and agent-run failures travel on the conversation stream's `submission-settled` event rather than over HTTP. Do not replace either with the repo's `ApiError` envelope — Flue clients parse the former.
-
-**Flue** — [docs](https://flueframework.com/docs/) or `pnpm exec flue docs`
+**Mastra** — [docs](https://mastra.ai/docs/)

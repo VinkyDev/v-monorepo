@@ -4,6 +4,12 @@ packages:
 
 catalogMode: prefer
 
+# Mastra's bundler loads TypeScript through typescript-paths, which needs
+# classic ts.sys. tsgo (catalog TypeScript 7) does not expose it.
+catalogs:
+  mastra:
+    typescript: ^5.9.2
+
 catalog:
   "@types/node": ^24.13.3
   "@types/react": ^19.3.0
@@ -50,10 +56,13 @@ catalog:
   ultracite: ^7.11.1
   knip: ^6.35.1
   es-toolkit: ^1.52.0
-  "@flue/cli": ^2.0.5
-  "@flue/vite": ^2.0.5
-  "@flue/runtime": ^2.0.5
-  "@earendil-works/pi-ai": ^0.85.1
+  "@mastra/core": ^1.67.0
+  "@mastra/editor": ^0.15.0
+  "@mastra/mcp": ^1.18.0
+  "@mastra/memory": ^1.30.0
+  "@mastra/observability": ^1.17.8
+  "@mastra/pg": ^1.25.0
+  mastra: ^1.30.0
 
   # desktop
   electron: ^44.3.0
@@ -65,7 +74,6 @@ update:
 overrides:
   vite: "catalog:"
   oxlint: "catalog:"
-  "@earendil-works/pi-ai": "catalog:"
 peerDependencyRules:
   allowAny:
     - vite
@@ -80,3 +88,15 @@ allowBuilds:
   protobufjs: true
 minimumReleaseAgeExclude:
   - "@shadcn/lint@0.1.0"
+  - "@mastra/core@1.67.0"
+  - "@mastra/deployer@1.67.0"
+  - "@mastra/pg@1.25.0"
+  - "@mastra/loggers@1.3.2"
+  - "@mastra/mcp@1.18.0"
+  - "@mastra/memory@1.30.0"
+  - "@mastra/observability@1.17.8"
+  - "@mastra/editor@0.15.0"
+  - "@mastra/schema-compat@1.3.10"
+  - "@mastra/server@1.67.0"
+  - mastra@1.30.0
+  - typescript@5.9.3

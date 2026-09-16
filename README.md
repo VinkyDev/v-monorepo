@@ -42,11 +42,15 @@
 
 ### Agent `apps/agents`
 
-| 层   | 选型                              |
-| ---- | --------------------------------- |
-| 框架 | [Flue](https://flueframework.com) |
+| 层            | 选型                                               |
+| ------------- | -------------------------------------------------- |
+| 框架          | [Mastra](https://mastra.ai)                        |
+| 开发          | `mastra dev`（Studio + REST）                      |
+| 存储          | PostgreSQL（`DATABASE_URL`，本地 5432）            |
+| Observability | `@mastra/observability`（Studio traces）           |
+| Editor        | `@mastra/editor`（Studio 改 instructions / tools） |
 
-Flue 自带 `FlueError` 与内置 `onError`，错误体是 `{ error: { type, message, details } }`。覆盖它会打断 Flue 客户端，所以这一层保持 Flue 自己的契约，不并入下面的 `ApiError`。
+Mastra 自带 Studio、REST 与错误契约。覆盖它会打断 Studio 和 `mastra api`，所以这一层保持 Mastra 自己的契约，不并入下面的 `ApiError`。
 
 ### 桌面 `apps/desktop`
 
@@ -119,7 +123,7 @@ addSink({
 apps/
   web/          React 应用
   server/       Hono API
-  agents/       Flue Agent
+  agents/       Mastra Agent
   desktop/      Electron 壳（可选）
 packages/
   shared/            契约：Zod、错误码表、ApiError
@@ -155,7 +159,7 @@ vp install
 ```sh
 pnpm dev:web          # http://localhost:5173
 pnpm dev:server       # http://127.0.0.1:3001，文档 /docs
-pnpm dev:agents       # http://localhost:5174
+pnpm dev:agents       # http://localhost:4111
 pnpm dev:desktop      # Electron 壳 + web 开发服
 pnpm package:desktop  # 打当前平台安装包；/api 默认转到 127.0.0.1:3001
 ```

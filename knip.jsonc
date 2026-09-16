@@ -9,15 +9,11 @@
   },
   "tags": ["-lintignore"],
   "treatConfigHintsAsErrors": true,
+  "ignore": [".agents/**"],
   "workspaces": {
     "apps/agents": {
-      "entry": [
-        "flue.config.ts",
-        "src/app.ts",
-        "src/db.ts",
-        "src/agents/**/*.ts",
-      ],
-      "ignoreDependencies": ["@flue/cli"],
+      "entry": ["src/mastra/index.ts"],
+      "ignoreDependencies": ["vite"],
     },
     "apps/desktop": {
       "entry": ["src/main/index.ts", "src/preload/index.ts"],

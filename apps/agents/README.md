@@ -1,6 +1,6 @@
 # @v-monorepo/agents
 
-A [Flue](https://flueframework.com) agent project, served locally with Vite.
+A [Mastra](https://mastra.ai) agent project. Development is `mastra dev` (Studio + REST). Tests still go through Vite+.
 
 ## Setup
 
@@ -8,7 +8,9 @@ A [Flue](https://flueframework.com) agent project, served locally with Vite.
 pnpm install
 ```
 
-Copy `.env.example` to `.env` and set `PROVIDER_ID`, `MODEL_ID`, and `API_KEY` (any [provider Pi supports](https://pi.dev/docs/latest/providers#api-keys)). For `openai-compat` or `anthropic-compat`, also set `BASE_URL`.
+Copy `.env.example` to `.env` and set `OPENAI_API_KEY` and `DATABASE_URL`. For an OpenAI-compatible gateway, also set `OPENAI_BASE_URL`. Local Postgres is `postgresql://localhost:5432/mastra` on port 5432.
+
+The Hello agent uses `openai/gpt-5.6-luna`. Change the `model` string in `src/mastra/agents/hello.ts` to switch models.
 
 ## Develop
 
@@ -16,25 +18,15 @@ Copy `.env.example` to `.env` and set `PROVIDER_ID`, `MODEL_ID`, and `API_KEY` (
 pnpm run dev
 ```
 
-The Hello agent is served at `http://localhost:5174/agents/hello` — see `src/app.ts` for the route map and an example request.
+Studio is at http://localhost:4111. The Hello agent id is `hello-agent`.
 
 ```sh
-curl -X POST http://localhost:5174/agents/hello/my-first-chat \
-  -H 'content-type: application/json' \
-  -d '{"kind":"user","body":"Tell me a joke."}'
+pnpm exec mastra api agent list
 ```
-
-## Talk without a server
-
-```sh
-pnpm exec flue run src/agents/hello.ts --message "Say hello!"
-```
-
-Conversations are durable — pass `--id <id>` to continue one.
 
 ## Deploy
 
 ```sh
 pnpm run build
-node dist/server.mjs
+pnpm run start
 ```
