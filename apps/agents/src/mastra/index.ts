@@ -9,12 +9,12 @@ import { PostgresStoreVNext } from "@mastra/pg";
 
 import { parseEnv } from "#/env.ts";
 
-import { helloAgent } from "./agents/hello.ts";
+import { researchAgent } from "./agents/research.ts";
 
 const env = parseEnv(process.env);
 
 export const mastra = new Mastra({
-  agents: { helloAgent },
+  agents: { researchAgent },
   editor: new MastraEditor(),
   observability: new Observability({
     configs: {
