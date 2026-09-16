@@ -10,6 +10,8 @@
   "tags": ["-lintignore"],
   "treatConfigHintsAsErrors": true,
   "ignore": [".agents/**"],
+  // Loaded through `ultracite/oxlint/shadcn`
+  "ignoreDependencies": ["@shadcn/lint"],
   "workspaces": {
     "apps/agents": {
       "entry": ["src/mastra/index.ts"],

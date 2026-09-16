@@ -144,7 +144,7 @@ packages/
 | 项 | 本仓库 |
 | --- | --- |
 | 格式化 | `ultracite/oxfmt` |
-| Lint | `ultracite/oxlint`：`core`、`react`、`tanstack`、`vitest`、`anti-slop` |
+| Lint | `ultracite/oxlint`：`core`、`react`、`tanstack`、`vitest`、`anti-slop`、`shadcn` |
 | 类型 | `lint.options.typeAware` 与 `typeCheck`（含 `typescript/no-deprecated` 等类型感知规则） |
 | 提交 | `staged` 对改动执行 `vp check --fix` |
 

@@ -2,6 +2,7 @@ import oxfmt from "ultracite/oxfmt";
 import antiSlop from "ultracite/oxlint/anti-slop";
 import core from "ultracite/oxlint/core";
 import react from "ultracite/oxlint/react";
+import shadcn from "ultracite/oxlint/shadcn";
 import tanstack from "ultracite/oxlint/tanstack";
 import vitest from "ultracite/oxlint/vitest";
 import { defineConfig } from "vite-plus";
@@ -30,12 +31,9 @@ export default defineConfig({
     ],
   },
   lint: {
-    extends: [core, react, tanstack, vitest, antiSlop],
+    extends: [core, react, tanstack, vitest, antiSlop, shadcn],
     ignorePatterns: [...(core.ignorePatterns ?? []), ...agentIgnorePatterns],
-    jsPlugins: [
-      { name: "vite-plus", specifier: "vite-plus/oxlint-plugin" },
-      "@shadcn/lint",
-    ],
+    jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     options: { typeAware: true, typeCheck: true },
     overrides: [
       {
@@ -53,6 +51,12 @@ export default defineConfig({
               ],
             },
           ],
+        },
+      },
+      {
+        files: ["packages/ui/src/components/**"],
+        rules: {
+          "shadcn/no-arbitrary-values": "off",
         },
       },
     ],
