@@ -67,10 +67,14 @@ const sendDocument = async (
   };
 };
 
+const removeDocument = async (): Promise<void> => {
+  await Promise.resolve();
+};
+
 export const documentAttachmentAdapter = {
   accept: "text/*,application/json,application/pdf,.txt,.md,.csv,.json,.pdf",
   add: addDocument,
-  remove: async () => Promise.resolve(),
+  remove: removeDocument,
   send: sendDocument,
 } satisfies AttachmentAdapter;
 
