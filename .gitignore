@@ -38,3 +38,6 @@ coverage
 
 tmp
 release
+
+.agents
+skills-lock.json

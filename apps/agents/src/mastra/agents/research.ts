@@ -28,7 +28,7 @@ Reply in the user's language.`,
       },
     },
   }),
-  model: "tencent-tokenhub/deepseek/deepseek-flash",
+  model: "custom/deepseek-v4.1-flash",
   name: "Research",
   defaultOptions: {
     maxSteps: 20,

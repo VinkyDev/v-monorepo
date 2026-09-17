@@ -8,9 +8,17 @@ A [Mastra](https://mastra.ai) agent project. Development is `mastra dev` (Studio
 pnpm install
 ```
 
-Copy `.env.example` to `.env` and set `OPENAI_API_KEY` and `DATABASE_URL`. For an OpenAI-compatible gateway, also set `OPENAI_BASE_URL`. Local Postgres is `postgresql://localhost:5432/mastra` on port 5432.
+Copy `.env.example` to `.env` and set `DATABASE_URL`. Local Postgres is `postgresql://localhost:5432/mastra` on port 5432.
 
 The Research agent uses `tencent-tokenhub/hy4-preview`. Change the `model` string in `src/mastra/agents/research.ts` to switch models.
+
+An optional OpenAI-compatible provider is `custom/<model>`. Set all of:
+
+- `CUSTOM_API_KEY` — bearer token
+- `CUSTOM_BASE_URL` — OpenAI-compatible root (no `/chat/completions` suffix)
+- `CUSTOM_MODEL_LIST` — comma-separated model ids
+
+For the built-in OpenAI provider, set `OPENAI_API_KEY` and optional `OPENAI_BASE_URL`.
 
 MCP servers are started with `npx` and need no extra API keys:
 

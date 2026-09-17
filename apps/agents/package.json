@@ -17,6 +17,7 @@
     "@ag-ui/core": "catalog:",
     "@ag-ui/encoder": "catalog:",
     "@ag-ui/mastra": "catalog:",
+    "@ai-sdk/openai-compatible": "^3",
     "@mastra/client-js": "catalog:",
     "@mastra/core": "catalog:",
     "@mastra/editor": "catalog:",

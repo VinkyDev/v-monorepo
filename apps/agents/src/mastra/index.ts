@@ -11,11 +11,13 @@ import { parseEnv } from "#/env.ts";
 
 import { researchAgent } from "./agents/research.ts";
 import { aguiRoute } from "./agui.ts";
+import { customGateway } from "./providers/custom.ts";
 
 const env = parseEnv(process.env);
 
 export const mastra = new Mastra({
   agents: { researchAgent },
+  gateways: { custom: customGateway },
   server: {
     apiRoutes: [aguiRoute],
     host: "127.0.0.1",
