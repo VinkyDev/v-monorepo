@@ -32,7 +32,13 @@ export default defineConfig({
   },
   lint: {
     extends: [core, react, tanstack, vitest, antiSlop, shadcn],
-    ignorePatterns: [...(core.ignorePatterns ?? []), ...agentIgnorePatterns],
+    ignorePatterns: [
+      ...(core.ignorePatterns ?? []),
+      ...agentIgnorePatterns,
+      "apps/web/src/components/assistant-ui/**",
+      "apps/web/src/hooks/use-attachment-src.ts",
+      "apps/web/src/hooks/use-copy-to-clipboard.ts",
+    ],
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     options: { typeAware: true, typeCheck: true },
     overrides: [
@@ -56,7 +62,10 @@ export default defineConfig({
       {
         files: ["packages/ui/src/components/**"],
         rules: {
+          "eslint/func-style": "off",
+          "react/function-component-definition": "off",
           "shadcn/no-arbitrary-values": "off",
+          "shadcn/no-restyle": "off",
         },
       },
     ],

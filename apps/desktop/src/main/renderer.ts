@@ -7,7 +7,9 @@ import type { ErrorCode } from "@v-monorepo/shared";
 import { net, protocol } from "electron";
 
 import {
+  defaultAgentsOrigin,
   defaultApiOrigin,
+  isAgentsPathname,
   isApiPathname,
   parseRendererUrl,
   requireLoopbackOrigin,
@@ -26,13 +28,17 @@ const errorResponse = (code: ErrorCode): Response => {
   return Response.json(error.toBody(), { status: error.status });
 };
 
-const requireApiOrigin = (value: string | undefined): string => {
+const requireOrigin = (
+  value: string | undefined,
+  fallback: string,
+  envName: string
+): string => {
   if (value === undefined || value === "") {
-    return defaultApiOrigin;
+    return fallback;
   }
   const origin = resolveHttpOrigin(value);
   if (origin === undefined) {
-    throw new Error("invalid API_ORIGIN");
+    throw new Error(`invalid ${envName}`);
   }
   return origin;
 };
@@ -107,11 +113,21 @@ export const registerRendererScheme = (): void => {
 };
 
 export const serveRenderer = (options: {
-  rendererRoot: string;
+  agentsOrigin?: string;
   apiOrigin?: string;
+  rendererRoot: string;
   viteOrigin?: string;
 }): void => {
-  const apiOrigin = requireApiOrigin(options.apiOrigin);
+  const agentsOrigin = requireOrigin(
+    options.agentsOrigin,
+    defaultAgentsOrigin,
+    "AGENTS_ORIGIN"
+  );
+  const apiOrigin = requireOrigin(
+    options.apiOrigin,
+    defaultApiOrigin,
+    "API_ORIGIN"
+  );
   const viteOrigin = requireLoopbackOrigin(options.viteOrigin);
 
   protocol.handle(rendererScheme, async (request) => {
@@ -122,6 +138,9 @@ export const serveRenderer = (options: {
 
     if (isApiPathname(url.pathname)) {
       return await proxyApi(request, rewriteToOrigin(url, apiOrigin));
+    }
+    if (isAgentsPathname(url.pathname)) {
+      return await proxyApi(request, rewriteToOrigin(url, agentsOrigin));
     }
     if (viteOrigin !== undefined) {
       return await proxyVite(request, rewriteToOrigin(url, viteOrigin));

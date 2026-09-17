@@ -23,7 +23,7 @@
 
 | 层 | 选型 |
 | --- | --- |
-| UI | React 19 |
+| UI | React 19 + [assistant-ui](https://www.assistant-ui.com/) over AG-UI |
 | 路由 | [TanStack Router](https://tanstack.com/router)（文件路由，`routeTree.gen.ts` 生成） |
 | 数据 | [TanStack Query](https://tanstack.com/query) |
 | 样式 | Tailwind CSS 4 |
@@ -59,7 +59,7 @@ Mastra 自带 Studio、REST 与错误契约。覆盖它会打断 Studio 和 `mas
 | 运行时 | Electron（main / preload 与渲染进程隔离，sandbox + contextIsolation） |
 | 渲染 | 直接加载 `@v-monorepo/web`，不复制前端 |
 | 构建 | `vp` 打 main / preload；小脚本编排开发服与热重启 |
-| 打包 | electron-builder；窗口始终 `app://bundle/`，`/api` 由主进程转发 |
+| 打包 | electron-builder；窗口始终 `app://bundle/`，`/api` 与 `/agui` 由主进程转发 |
 
 ### 契约与数据
 
@@ -92,7 +92,7 @@ Mastra 自带 Studio、REST 与错误契约。覆盖它会打断 Studio 和 `mas
 2. 需要结构化载荷时，在同文件的 `errorDataSchemas` 加一条 Zod schema —— 类型与运行时校验都从它派生。
 3. 需要全局副作用（比如跳转登录）时，在 `apps/web/src/lib/api-error-effects.ts` 的 `apiErrorEffects` 加一条；命中后调用方不再提示。
 
-服务端 `throw new ApiError("email_taken", { data: { email } })`，客户端在 `apiFetch` 里原样还原成同一个 `ApiError`。演示见 `/demo` 页面与 `apps/server/src/routes/demo`。
+服务端 `throw new ApiError("email_taken", { data: { email } })`，客户端在 `apiFetch` 里原样还原成同一个 `ApiError`。服务端契约演示仍在 `apps/server/src/routes/demo`。
 
 **接入监控**：模板不含任何上报 SDK。所有日志与已分类的错误都流经 `packages/logger` 的 `LogSink`。sink 列表初始为空，由各进程入口自行组装（入口已各有一行 `addSink(consoleSink)`），接入监控就是在旁边再加一个 sink，业务代码零改动：
 
@@ -135,7 +135,7 @@ packages/
   config/            TypeScript presets
 ```
 
-数据流：页面 `useQuery` → `apiClient`（`@v-monorepo/api-client` 传输工厂）→ `apps/server`。路由与响应类型来自 `AppType`；错误来自 `ApiError`。
+数据流：首页聊天 `HttpAgent` → `/agui/research-agent`（Vite / Electron 转发）→ `apps/agents`。其它页面 `useQuery` → `apiClient` → `apps/server`。路由与响应类型来自 `AppType`；错误来自 `ApiError`。Mastra 走自己的 AG-UI / REST 契约。
 
 ## 代码规范
 
@@ -161,7 +161,7 @@ pnpm dev:web          # http://localhost:5173
 pnpm dev:server       # http://127.0.0.1:3001，文档 /docs
 pnpm dev:agents       # http://localhost:4111
 pnpm dev:desktop      # Electron 壳 + web 开发服
-pnpm package:desktop  # 打当前平台安装包；/api 默认转到 127.0.0.1:3001
+pnpm package:desktop  # 打当前平台安装包；/api → 127.0.0.1:3001，/agui → 127.0.0.1:4111
 ```
 
 ```sh

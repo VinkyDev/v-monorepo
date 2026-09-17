@@ -6,6 +6,13 @@
   },
   "ignoreIssues": {
     "**/*.gen.ts": ["exports", "types", "enumMembers"],
+    "apps/web/src/components/assistant-ui/**": [
+      "exports",
+      "types",
+      "enumMembers",
+      "nsExports",
+      "nsTypes",
+    ],
   },
   "tags": ["-lintignore"],
   "treatConfigHintsAsErrors": true,
@@ -16,6 +23,9 @@
     "apps/agents": {
       "entry": ["src/mastra/index.ts"],
       "ignoreDependencies": ["vite"],
+    },
+    "apps/web": {
+      "entry": ["src/lib/api.ts"],
     },
     "apps/desktop": {
       "entry": ["src/main/index.ts", "src/preload/index.ts"],

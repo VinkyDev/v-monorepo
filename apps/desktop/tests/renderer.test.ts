@@ -6,7 +6,9 @@ import { productionRendererUrl } from "@v-monorepo/electron";
 import { describe, expect, test } from "vite-plus/test";
 
 import {
+  defaultAgentsOrigin,
   defaultApiOrigin,
+  isAgentsPathname,
   isApiPathname,
   parseRendererUrl,
   requireLoopbackOrigin,
@@ -35,6 +37,20 @@ describe("renderer routing", () => {
       "http://127.0.0.1:3001/api/health?ready=1"
     );
     expect(parseRendererUrl("https://evil.example/api/health")).toBeUndefined();
+  });
+
+  test("AG-UI paths rewrite onto the agents origin", () => {
+    expect(isAgentsPathname("/agui")).toBeTruthy();
+    expect(isAgentsPathname("/agui/research-agent")).toBeTruthy();
+    expect(isAgentsPathname("/agui-token")).toBeFalsy();
+
+    const chat = parseRendererUrl("app://bundle/agui/research-agent");
+    if (chat === undefined) {
+      throw new Error("expected renderer url");
+    }
+    expect(rewriteToOrigin(chat, defaultAgentsOrigin)).toBe(
+      "http://127.0.0.1:4111/agui/research-agent"
+    );
   });
 
   test("API_ORIGIN accepts http(s) and rejects the rest", () => {

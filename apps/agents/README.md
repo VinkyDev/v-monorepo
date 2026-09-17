@@ -26,7 +26,7 @@ The first Studio start downloads the Wikipedia MCP package. Subsequent starts re
 pnpm run dev
 ```
 
-Studio is at http://localhost:4111. The Research agent id is `research-agent`. It loads the `research-brief` skill, then searches live sources and cites them.
+Studio is at http://localhost:4111. The Research agent id is `research-agent`. It loads the `research-brief` skill, then searches live sources and cites them. The web app talks to it over AG-UI at `POST /agui/research-agent`.
 
 ```sh
 pnpm exec mastra api agent list

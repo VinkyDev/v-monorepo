@@ -28,8 +28,12 @@ Reply in the user's language.`,
       },
     },
   }),
-  model: "tencent-tokenhub/hy4-preview",
+  model: "tencent-tokenhub/deepseek/deepseek-flash",
   name: "Research",
+  defaultOptions: {
+    maxSteps: 20,
+  },
+  maxRetries: 2,
   skills: [researchBriefSkill],
   tools: {
     ...(await mcp.listTools()),

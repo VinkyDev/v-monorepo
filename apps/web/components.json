@@ -3,6 +3,9 @@
   "style": "base-sera",
   "rsc": false,
   "tsx": true,
+  "registries": {
+    "@assistant-ui": "https://r.assistant-ui.com/styles/{style}/{name}.json"
+  },
   "tailwind": {
     "config": "",
     "css": "../../packages/ui/src/styles/globals.css",
@@ -11,9 +14,9 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@/components",
-    "hooks": "@/hooks",
-    "lib": "@/lib",
+    "components": "#/components",
+    "hooks": "#/hooks",
+    "lib": "#/lib",
     "utils": "cn",
     "ui": "@v-monorepo/ui/components"
   },

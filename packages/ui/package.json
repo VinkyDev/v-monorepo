@@ -24,7 +24,8 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "shadcn": "catalog:",
-    "tw-animate-css": "catalog:"
+    "tw-animate-css": "catalog:",
+    "tw-shimmer": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

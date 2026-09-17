@@ -17,6 +17,7 @@ const rendererRoot = (): string =>
 const startDesktop = async (): Promise<void> => {
   await app.whenReady();
   serveRenderer({
+    agentsOrigin: process.env.AGENTS_ORIGIN,
     apiOrigin: process.env.API_ORIGIN,
     rendererRoot: rendererRoot(),
     viteOrigin: app.isPackaged ? undefined : process.env.ELECTRON_RENDERER_URL,

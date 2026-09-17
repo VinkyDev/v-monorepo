@@ -4,9 +4,13 @@ import path from "node:path";
 import { rendererHost, rendererProtocol } from "@v-monorepo/electron";
 
 export const defaultApiOrigin = "http://127.0.0.1:3001";
+export const defaultAgentsOrigin = "http://127.0.0.1:4111";
 
 export const isApiPathname = (pathname: string): boolean =>
   pathname === "/api" || pathname.startsWith("/api/");
+
+export const isAgentsPathname = (pathname: string): boolean =>
+  pathname === "/agui" || pathname.startsWith("/agui/");
 
 export const resolveHttpOrigin = (value?: string): string | undefined => {
   if (value === undefined || value === "") {

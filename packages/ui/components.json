@@ -13,7 +13,7 @@
   "aliases": {
     "components": "@v-monorepo/ui/components",
     "utils": "cn",
-    "hooks": "@v-monorepo/ui/hooks",
+    "hooks": "#/hooks",
     "lib": "#/lib",
     "ui": "@v-monorepo/ui/components"
   },

@@ -14,19 +14,26 @@
     "test": "vp test"
   },
   "dependencies": {
+    "@ag-ui/client": "catalog:",
+    "@assistant-ui/react": "catalog:",
+    "@assistant-ui/react-ag-ui": "catalog:",
+    "@assistant-ui/react-markdown": "catalog:",
     "@t3-oss/env-core": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-router-devtools": "catalog:",
     "@v-monorepo/api-client": "workspace:*",
-    "@v-monorepo/electron": "workspace:*",
     "@v-monorepo/logger": "workspace:*",
     "@v-monorepo/shared": "workspace:*",
     "@v-monorepo/ui": "workspace:*",
+    "class-variance-authority": "catalog:",
+    "cn": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "zod": "catalog:"
+    "remark-gfm": "catalog:",
+    "zod": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",

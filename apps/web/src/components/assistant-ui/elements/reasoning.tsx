@@ -1,0 +1,337 @@
+"use client";
+
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@v-monorepo/ui/components/collapsible";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "cn";
+import { ChevronDownIcon } from "lucide-react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+
+import {
+  collapsePanel,
+  metaChevron,
+  metaTrigger,
+  ShimmerLabel,
+  thinScroll,
+} from "#/components/assistant-ui/elements/surfaces.tsx";
+
+export const ANIMATION_DURATION = 200;
+
+const ReasoningPreviewContext = createContext(false);
+
+const reasoningVariants = cva("aui-reasoning-root w-full", {
+  variants: {
+    variant: {
+      outline: "my-2 rounded-lg border px-3 py-2",
+      ghost: "my-2",
+      muted: "bg-muted/50 my-2 rounded-lg px-3 py-2",
+    },
+  },
+  defaultVariants: {
+    variant: "outline",
+  },
+});
+
+export type ReasoningRootProps = Omit<
+  React.ComponentProps<typeof Collapsible>,
+  "open" | "onOpenChange"
+> &
+  VariantProps<typeof reasoningVariants> & {
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    defaultOpen?: boolean;
+    /**
+     * Whether the reasoning is currently streaming. While `true` the
+     * disclosure is held open with a bottom-pinned live preview; when
+     * streaming ends it returns to `defaultOpen`, and the first manual
+     * toggle takes over the open/close state permanently. The live preview
+     * keeps following the newest tokens while the disclosure is open during
+     * streaming, even after a manual toggle, and pauses while the reader is
+     * scrolled up.
+     */
+    streaming?: boolean;
+    /** Called right before the disclosure animates, on toggle and on streaming transitions. */
+    onAnimationStart?: () => void;
+  };
+
+function ReasoningRoot({
+  className,
+  variant,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  defaultOpen = false,
+  streaming,
+  onAnimationStart,
+  children,
+  ...props
+}: ReasoningRootProps) {
+  const [initialOpen] = useState(defaultOpen);
+  const [userOpen, setUserOpen] = useState<boolean | null>(null);
+
+  const isControlled = controlledOpen !== undefined;
+  const isOpen = isControlled
+    ? controlledOpen
+    : (userOpen ?? (streaming || initialOpen));
+  const isPreview = streaming === true && isOpen;
+
+  const prevStreamingRef = useRef(streaming);
+  useLayoutEffect(() => {
+    if (prevStreamingRef.current === streaming) return;
+    prevStreamingRef.current = streaming;
+    // A streaming transition only animates the panel when the resting state
+    // is collapsed; with `defaultOpen` the disclosure stays open across it.
+    if (!isControlled && userOpen === null && !initialOpen) {
+      onAnimationStart?.();
+    }
+  }, [streaming, isControlled, userOpen, initialOpen, onAnimationStart]);
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      onAnimationStart?.();
+      if (!isControlled) {
+        setUserOpen(open);
+      }
+      controlledOnOpenChange?.(open);
+    },
+    [onAnimationStart, isControlled, controlledOnOpenChange]
+  );
+
+  return (
+    <Collapsible
+      data-slot="reasoning-root"
+      data-variant={variant}
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      className={cn(
+        "group/reasoning-root",
+        reasoningVariants({ variant, className })
+      )}
+      style={
+        {
+          "--animation-duration": `${ANIMATION_DURATION}ms`,
+        } as React.CSSProperties
+      }
+      {...props}
+    >
+      <ReasoningPreviewContext.Provider value={isPreview}>
+        {children}
+      </ReasoningPreviewContext.Provider>
+    </Collapsible>
+  );
+}
+
+function ReasoningFade({
+  side = "bottom",
+  className,
+  ...props
+}: React.ComponentProps<"div"> & { side?: "top" | "bottom" }) {
+  if (side === "top") {
+    return (
+      <div
+        data-slot="reasoning-fade"
+        className={cn(
+          "aui-reasoning-fade pointer-events-none absolute inset-x-0 top-0 z-10 h-8",
+          "bg-[linear-gradient(to_bottom,var(--color-background),transparent)]",
+          "group-data-[variant=muted]/reasoning-root:bg-[linear-gradient(to_bottom,color-mix(in_oklab,var(--color-muted)_50%,var(--color-background)),transparent)]",
+          "fade-in-0 animate-in",
+          "animation-duration-(--animation-duration)",
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+
+  return (
+    <div
+      data-slot="reasoning-fade"
+      className={cn(
+        "aui-reasoning-fade pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8",
+        "bg-[linear-gradient(to_top,var(--color-background),transparent)]",
+        "group-data-[variant=muted]/reasoning-root:bg-[linear-gradient(to_top,color-mix(in_oklab,var(--color-muted)_50%,var(--color-background)),transparent)]",
+        "fade-in-0 animate-in",
+        "animation-duration-(--animation-duration)",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function ReasoningTrigger({
+  active,
+  duration,
+  status,
+  className,
+  ...props
+}: React.ComponentProps<typeof CollapsibleTrigger> & {
+  active?: boolean;
+  duration?: number;
+  status?: string;
+}) {
+  const durationText = duration ? ` (${duration}s)` : "";
+
+  return (
+    <CollapsibleTrigger
+      data-slot="reasoning-trigger"
+      className={cn(
+        "aui-reasoning-trigger group/trigger",
+        metaTrigger,
+        "max-w-full py-1.5 leading-snug",
+        className
+      )}
+      {...props}
+    >
+      <ShimmerLabel
+        data-slot="reasoning-trigger-label"
+        active={active}
+        className="aui-reasoning-trigger-label-wrapper shrink-0 tabular-nums"
+      >
+        Thinking{durationText}
+      </ShimmerLabel>
+      {status ? (
+        <>
+          <span
+            data-slot="reasoning-trigger-separator"
+            aria-hidden
+            className="aui-reasoning-trigger-separator opacity-40"
+          >
+            ·
+          </span>
+          <span
+            data-slot="reasoning-trigger-status"
+            className="aui-reasoning-trigger-status min-w-0 truncate"
+          >
+            {status}
+          </span>
+        </>
+      ) : null}
+      <ChevronDownIcon
+        data-slot="reasoning-trigger-chevron"
+        className={cn("aui-reasoning-trigger-chevron", metaChevron)}
+      />
+    </CollapsibleTrigger>
+  );
+}
+
+function ReasoningContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof CollapsibleContent>) {
+  const isPreview = useContext(ReasoningPreviewContext);
+
+  return (
+    <CollapsibleContent
+      data-slot="reasoning-content"
+      className={cn(
+        "aui-reasoning-content text-muted-foreground relative text-sm outline-none",
+        "group/collapsible-content",
+        collapsePanel,
+        "data-closed:pointer-events-none",
+        className
+      )}
+      {...props}
+    >
+      {isPreview ? <ReasoningFade side="top" /> : null}
+      {children}
+      {isPreview ? <ReasoningFade /> : null}
+    </CollapsibleContent>
+  );
+}
+
+function ReasoningText({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"div">) {
+  const isPreview = useContext(ReasoningPreviewContext);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isPreview) return;
+    const scrollEl = scrollRef.current;
+    const contentEl = contentRef.current;
+    if (!scrollEl || !contentEl) return;
+
+    let pinned = true;
+    let lastScrollTop = scrollEl.scrollTop;
+    let lastScrollHeight = scrollEl.scrollHeight;
+    const isAtBottom = () =>
+      Math.abs(
+        scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight
+      ) <= 1 || scrollEl.scrollHeight <= scrollEl.clientHeight;
+
+    const pin = () => {
+      if (!pinned) return;
+      scrollEl.scrollTop = scrollEl.scrollHeight;
+    };
+    // A pin's own scroll event can arrive after new content grew the scroll
+    // height and read as "not at bottom"; only an upward move at unchanged
+    // scroll height is user intent.
+    const onScroll = () => {
+      if (isAtBottom()) {
+        pinned = true;
+      } else if (
+        scrollEl.scrollTop < lastScrollTop &&
+        scrollEl.scrollHeight === lastScrollHeight
+      ) {
+        pinned = false;
+      }
+      lastScrollTop = scrollEl.scrollTop;
+      lastScrollHeight = scrollEl.scrollHeight;
+    };
+
+    pin();
+    scrollEl.addEventListener("scroll", onScroll);
+    const observer = new ResizeObserver(pin);
+    observer.observe(contentEl);
+    return () => {
+      scrollEl.removeEventListener("scroll", onScroll);
+      observer.disconnect();
+    };
+  }, [isPreview]);
+
+  return (
+    <div
+      ref={scrollRef}
+      data-slot="reasoning-text"
+      className={cn(
+        "aui-reasoning-text relative z-0 max-h-64 overflow-y-auto pt-1 leading-relaxed text-pretty",
+        thinScroll,
+        isPreview ? "pb-8" : "pb-0.5",
+        "group-data-closed/collapsible-content:hidden",
+        className
+      )}
+      {...props}
+    >
+      <div
+        ref={contentRef}
+        className="aui-reasoning-text-content flex flex-col gap-2"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export {
+  ReasoningRoot,
+  ReasoningTrigger,
+  ReasoningContent,
+  ReasoningText,
+  ReasoningFade,
+  reasoningVariants,
+};
