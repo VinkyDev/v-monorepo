@@ -2,9 +2,12 @@
 
 React app. The home screen is a Research chat: assistant-ui over the AG-UI protocol, proxied to `@v-monorepo/agents` at `/agui/research-agent`.
 
-- `src/components/agent-runtime.tsx` — `HttpAgent` + `useAgUiRuntime` + 新对话
+- `src/components/agent-runtime.tsx` — `HttpAgent` + `useAgUiRuntime` + Mastra-backed thread list + attachments
 - `src/components/agent-thread.tsx` — 官方 `@assistant-ui/thread`（`src/components/assistant-ui`）
-- `src/components/assistant-ui/` — shadcn registry 安装的 Thread / ToolFallback / ToolGroup / Reasoning / Markdown
+- `src/lib/research-threads.ts` — 对话列表的本地状态（AG-UI transcript）
+- `src/lib/research-memory.ts` — Mastra Memory 的 list / rename / archive / delete
+- `src/lib/research-attachments.ts` — assistant-ui `AttachmentAdapter`（图片走 image，文本/PDF 走 document，刷新后仍是附件）
+- `src/components/assistant-ui/` — shadcn registry 安装的 Thread / ThreadList / ToolFallback / ToolGroup / Reasoning / Markdown
 - `src/lib/api.ts` — `createApiClient` singleton (Hono RPC, for pages that call `apps/server`)
 - `src/lib/query-client.ts` — retry, `throwOnError`, and the global error handlers
 - `src/lib/api-error-effects.ts` — codes the app answers centrally; a hit means the call site stays quiet

@@ -37,6 +37,10 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           target: agentsOrigin,
         },
+        "/memory": {
+          changeOrigin: true,
+          target: agentsOrigin,
+        },
         "/api": {
           changeOrigin: true,
           target: apiOrigin,

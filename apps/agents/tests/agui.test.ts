@@ -1,6 +1,7 @@
 import { EventType, RunAgentInputSchema } from "@ag-ui/core";
 import type { BaseEvent } from "@ag-ui/core";
 import { describe, expect, test } from "vite-plus/test";
+import { z } from "zod";
 
 import { createAguiSseResponse, tryGetAgentById } from "#/mastra/agui.ts";
 
@@ -82,5 +83,35 @@ describe(createAguiSseResponse, () => {
     const body = await readSse(response);
     expect(body).toContain('"type":"RUN_ERROR"');
     expect(body).toContain("tool exploded");
+  });
+});
+
+describe("RunAgentInputSchema multimodal content", () => {
+  test("keeps multimodal user image content", () => {
+    const parsed = RunAgentInputSchema.parse({
+      context: [],
+      messages: [
+        {
+          content: [
+            { text: "这是什么", type: "text" },
+            {
+              source: { mimeType: "image/png", type: "data", value: "abc" },
+              type: "image",
+            },
+          ],
+          id: "m1",
+          role: "user",
+        },
+      ],
+      runId: "run-1",
+      state: {},
+      threadId: "thread-1",
+      tools: [],
+    });
+    const content = parsed.messages[0]?.content;
+    const imageParts = z
+      .array(z.looseObject({ type: z.literal("image") }))
+      .safeParse(content);
+    expect(imageParts.success && imageParts.data.length > 0).toBeTruthy();
   });
 });

@@ -14,6 +14,7 @@ export const researchAgent = new Agent({
 
 Before a research question, load the research-brief skill and follow it.
 Use Wikipedia MCP and web_fetch. Cite every claim.
+If the user attaches an image or document, treat it as source material before tools.
 If a tool errors, say so and try another source.
 Reply in the user's language.`,
   memory: new Memory({
@@ -25,6 +26,7 @@ Reply in the user's language.`,
           openQuestions: z.array(z.string()).optional(),
           topic: z.string().optional(),
         }),
+        scope: "thread",
       },
     },
   }),

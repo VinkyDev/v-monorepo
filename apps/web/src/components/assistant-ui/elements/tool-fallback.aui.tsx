@@ -736,15 +736,20 @@ const ToolFallbackImpl: ToolCallMessagePartComponent = ({
   const isCancelled =
     status?.type === "incomplete" && status.reason === "cancelled";
   const isRequiresAction = status?.type === "requires-action";
+  // Mastra executes Wikipedia/skill/web_fetch on the server. AG-UI still marks
+  // unresolved streamed calls as requires-action; only a real gate should pause.
+  const isApprovalGate = approval != null || interrupt != null;
   const shouldRenderApproval =
-    isRequiresAction && offersInterruptAction(status, approval, interrupt);
+    isRequiresAction &&
+    isApprovalGate &&
+    offersInterruptAction(status, approval, interrupt);
 
-  const [open, setOpen] = useState(isRequiresAction);
+  const [open, setOpen] = useState(shouldRenderApproval);
   const [prevRequiresAction, setPrevRequiresAction] =
-    useState(isRequiresAction);
-  if (isRequiresAction !== prevRequiresAction) {
-    setPrevRequiresAction(isRequiresAction);
-    if (isRequiresAction) setOpen(true);
+    useState(shouldRenderApproval);
+  if (shouldRenderApproval !== prevRequiresAction) {
+    setPrevRequiresAction(shouldRenderApproval);
+    if (shouldRenderApproval) setOpen(true);
   }
 
   return (

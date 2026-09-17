@@ -4,6 +4,8 @@ import { EventEncoder } from "@ag-ui/encoder";
 import { MastraAgent } from "@ag-ui/mastra";
 import { registerApiRoute } from "@mastra/core/server";
 
+import { publicCors, readResourceId } from "./resource-id.ts";
+
 interface AguiRun {
   abortRun: () => void;
   run: (input: RunAgentInput) => {
@@ -91,17 +93,18 @@ export const createAguiSseResponse = (
 };
 
 export const aguiRoute = registerApiRoute("/agui/:agentId", {
-  cors: {
-    allowHeaders: ["Content-Type", "Accept"],
-    allowMethods: ["POST", "OPTIONS"],
-    origin: "*",
-  },
+  cors: publicCors,
   handler: async (context) => {
     const agentId = context.req.param("agentId");
     const mastra = context.get("mastra");
     const agent = tryGetAgentById((id) => mastra.getAgentById(id), agentId);
     if (agent === undefined) {
       return context.json({ error: `Agent ${agentId} not found` }, 404);
+    }
+
+    const resourceId = readResourceId(context.req.raw);
+    if (resourceId === undefined) {
+      return context.json({ error: "missing resource id" }, 400);
     }
 
     let body: unknown;
@@ -120,7 +123,7 @@ export const aguiRoute = registerApiRoute("/agui/:agentId", {
     const aguiAgent = new MastraAgent({
       agent,
       agentId,
-      resourceId: input.threadId,
+      resourceId,
       streamServerToolCalls: true,
     });
 
