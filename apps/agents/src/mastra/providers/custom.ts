@@ -1,5 +1,8 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import type { MastraModelGatewayInterface } from "@mastra/core/llm";
+import type {
+  GatewayLanguageModel,
+  MastraModelGatewayInterface,
+} from "@mastra/core/llm";
 
 const id = "custom";
 
@@ -52,12 +55,17 @@ export const customGateway: MastraModelGatewayInterface = {
     if (url === undefined) {
       throw new Error("Missing CUSTOM_BASE_URL environment variable");
     }
-    return createOpenAICompatible({
+    const model = createOpenAICompatible({
       apiKey,
       baseURL: url,
       headers,
       name: providerId,
       supportsStructuredOutputs: true,
     }).chatModel(modelId);
+    // SAFETY: chatModel is specificationVersion "v4". GatewayLanguageModel includes
+    // Mastra's vendored LanguageModelV4 (@ai-sdk/provider@4.0.4); openai-compatible
+    // 3.0.51 types the same v4 model from 4.0.17, where JSONValue became Readonly.
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+    return model as GatewayLanguageModel;
   },
 };

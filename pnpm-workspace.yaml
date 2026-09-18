@@ -23,10 +23,10 @@ catalog:
   # react
   react: ^19.3.0
   react-dom: ^19.3.0
-  "@tanstack/react-query": ^5.102.8
-  "@tanstack/react-router": ^1.170.36
+  "@tanstack/react-query": ^5.103.1
+  "@tanstack/react-router": ^1.170.38
   "@tanstack/react-router-devtools": ^1.167.2
-  "@tanstack/router-plugin": ^1.168.38
+  "@tanstack/router-plugin": ^1.168.40
 
   # ui / styling
   "@shadcn/lint": ^0.1.0
@@ -54,7 +54,7 @@ catalog:
   hono-openapi: ^1.3.3
   oxlint: 1.83.0
   ultracite: ^7.12.0
-  knip: ^6.35.1
+  knip: ^6.36.0
   es-toolkit: ^1.52.0
   "@mastra/core": ^1.67.0
   "@mastra/editor": ^0.15.0
@@ -73,10 +73,11 @@ catalog:
   assistant-stream: ^0.3.43
 
   # desktop
-  electron: ^44.3.0
+  electron: ^44.4.1
   electron-builder: ^26.16.1
   remark-gfm: ^4.0.1
   tw-shimmer: ^0.4.13
+  "@ai-sdk/openai-compatible": ^3.0.51
 
 update:
   ignoreDeps:

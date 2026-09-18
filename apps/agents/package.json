@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/openai-compatible": "^3",
+    "@ai-sdk/openai-compatible": "catalog:",
     "@mastra/ai-sdk": "catalog:",
     "@mastra/core": "catalog:",
     "@mastra/editor": "catalog:",
