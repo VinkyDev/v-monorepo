@@ -1,3 +1,4 @@
+import { chatRoute } from "@mastra/ai-sdk";
 import { Mastra } from "@mastra/core";
 import { MastraEditor } from "@mastra/editor";
 import {
@@ -10,12 +11,6 @@ import { PostgresStoreVNext } from "@mastra/pg";
 import { parseEnv } from "#/env.ts";
 
 import { researchAgent } from "./agents/research.ts";
-import { aguiRoute } from "./agui.ts";
-import {
-  deleteMemoryThreadRoute,
-  listMemoryThreadsRoute,
-  patchMemoryThreadRoute,
-} from "./memory-routes.ts";
 import { customGateway } from "./providers/custom.ts";
 
 const env = parseEnv(process.env);
@@ -25,10 +20,13 @@ export const mastra = new Mastra({
   gateways: { custom: customGateway },
   server: {
     apiRoutes: [
-      aguiRoute,
-      deleteMemoryThreadRoute,
-      listMemoryThreadsRoute,
-      patchMemoryThreadRoute,
+      chatRoute({
+        path: "/chat/:agentId",
+        heartbeatMs: 15_000,
+        sendReasoning: true,
+        sendSources: true,
+        version: "v7",
+      }),
     ],
     host: "127.0.0.1",
   },

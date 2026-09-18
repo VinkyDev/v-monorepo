@@ -10,8 +10,6 @@ pnpm install
 
 Copy `.env.example` to `.env` and set `DATABASE_URL`. Local Postgres is `postgresql://localhost:5432/mastra` on port 5432.
 
-The Research agent uses `tencent-tokenhub/hy4-preview`. Change the `model` string in `src/mastra/agents/research.ts` to switch models.
-
 An optional OpenAI-compatible provider is `custom/<model>`. Set all of:
 
 - `CUSTOM_API_KEY` — bearer token
@@ -34,7 +32,7 @@ The first Studio start downloads the Wikipedia MCP package. Subsequent starts re
 pnpm run dev
 ```
 
-Studio is at http://localhost:4111. The Research agent id is `research-agent`. It loads the `research-brief` skill, then searches live sources and cites them. The web app talks to it over AG-UI at `POST /agui/research-agent`.
+Studio is at http://localhost:4111. The Research agent id is `research-agent`. It loads the `research-brief` skill, then searches live sources and cites them. The web app talks to it over AI SDK at `POST /chat/research-agent`. Sessions are `/api/memory/threads`.
 
 ```sh
 pnpm exec mastra api agent list

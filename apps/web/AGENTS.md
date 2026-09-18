@@ -1,12 +1,10 @@
 # `@v-monorepo/web`
 
-React app. The home screen is a Research chat: assistant-ui over the AG-UI protocol, proxied to `@v-monorepo/agents` at `/agui/research-agent`.
+React app. The home screen is a Research chat: assistant-ui `useChatRuntime` over Mastra `chatRoute`, proxied to `@v-monorepo/agents` at `/chat/research-agent`. Sessions live in Mastra Memory at `/api/memory/threads`.
 
-- `src/components/agent-runtime.tsx` — `HttpAgent` + `useAgUiRuntime` + Mastra-backed thread list + attachments
+- `src/components/agent-runtime.tsx` — `useRemoteThreadListRuntime` + `useChatRuntime` (`AssistantChatTransport`) + attachments
 - `src/components/agent-thread.tsx` — 官方 `@assistant-ui/thread`（`src/components/assistant-ui`）
-- `src/lib/research-threads.ts` — 对话列表的本地状态（AG-UI transcript）
-- `src/lib/research-memory.ts` — Mastra Memory 的 list / rename / archive / delete
-- `src/lib/research-attachments.ts` — assistant-ui `AttachmentAdapter`（图片走 image，文本/PDF 走 document，刷新后仍是附件）
+- `src/lib/mastra-threads.ts` — `MastraClient` `RemoteThreadListAdapter`；`ownerId` 只存在 localStorage
 - `src/components/assistant-ui/` — shadcn registry 安装的 Thread / ThreadList / ToolFallback / ToolGroup / Reasoning / Markdown
 - `src/lib/api.ts` — `createApiClient` singleton (Hono RPC, for pages that call `apps/server`)
 - `src/lib/query-client.ts` — retry, `throwOnError`, and the global error handlers
@@ -19,4 +17,4 @@ Error routing: a first load with no data throws to the route error boundary (`Er
 
 File routes auto-split; don't wrap them in `React.lazy`. Route pending/error UI lives on the router.
 
-Run `pnpm dev:agents` alongside `pnpm dev:web`.
+Run `pnpm dev:agents` alongside `pnpm dev:web`. Vite proxies `/chat` and `/api/memory` to agents; remaining `/api` goes to `apps/server`.

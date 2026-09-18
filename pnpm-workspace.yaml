@@ -63,23 +63,20 @@ catalog:
   "@mastra/observability": ^1.17.8
   "@mastra/pg": ^1.25.0
   "@mastra/client-js": ^1.46.0
+  "@mastra/ai-sdk": ^1.10.3
   mastra: ^1.30.0
 
-  # ag-ui / assistant-ui
-  "@ag-ui/client": ^0.0.59
-  "@ag-ui/core": ^0.0.59
-  "@ag-ui/encoder": ^0.0.59
-  "@ag-ui/mastra": ^1.1.4
+  # assistant-ui
   "@assistant-ui/react": ^0.15.20
-  "@assistant-ui/react-ag-ui": ^0.0.59
+  "@assistant-ui/ai-sdk": ^0.0.6
   "@assistant-ui/react-markdown": ^0.14.15
+  assistant-stream: ^0.3.43
 
   # desktop
   electron: ^44.3.0
   electron-builder: ^26.16.1
   remark-gfm: ^4.0.1
   tw-shimmer: ^0.4.13
-  zustand: ^5.0.15
 
 update:
   ignoreDeps:
@@ -114,11 +111,8 @@ minimumReleaseAgeExclude:
   - "@mastra/server@1.67.0"
   - mastra@1.30.0
   - typescript@5.9.3
-  - "@ag-ui/client@0.0.59"
-  - "@ag-ui/core@0.0.59"
-  - "@ag-ui/encoder@0.0.59"
-  - "@ag-ui/mastra@1.1.4"
   - "@assistant-ui/react@0.15.20"
-  - "@assistant-ui/react-ag-ui@0.0.59"
+  - "@assistant-ui/ai-sdk@0.0.6"
   - "@assistant-ui/react-markdown@0.14.15"
   - "@mastra/client-js@1.46.0"
+  - "@mastra/ai-sdk@1.10.3"

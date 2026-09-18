@@ -10,7 +10,10 @@ export const isApiPathname = (pathname: string): boolean =>
   pathname === "/api" || pathname.startsWith("/api/");
 
 export const isAgentsPathname = (pathname: string): boolean =>
-  pathname === "/agui" || pathname.startsWith("/agui/");
+  pathname === "/chat" || pathname.startsWith("/chat/");
+
+export const isMastraMemoryPathname = (pathname: string): boolean =>
+  pathname === "/api/memory" || pathname.startsWith("/api/memory/");
 
 export const resolveHttpOrigin = (value?: string): string | undefined => {
   if (value === undefined || value === "") {

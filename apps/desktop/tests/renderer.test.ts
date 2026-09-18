@@ -10,6 +10,7 @@ import {
   defaultApiOrigin,
   isAgentsPathname,
   isApiPathname,
+  isMastraMemoryPathname,
   parseRendererUrl,
   requireLoopbackOrigin,
   resolveHttpOrigin,
@@ -39,17 +40,32 @@ describe("renderer routing", () => {
     expect(parseRendererUrl("https://evil.example/api/health")).toBeUndefined();
   });
 
-  test("AG-UI paths rewrite onto the agents origin", () => {
-    expect(isAgentsPathname("/agui")).toBeTruthy();
-    expect(isAgentsPathname("/agui/research-agent")).toBeTruthy();
-    expect(isAgentsPathname("/agui-token")).toBeFalsy();
+  test("chat paths rewrite onto the agents origin", () => {
+    expect(isAgentsPathname("/chat")).toBeTruthy();
+    expect(isAgentsPathname("/chat/research-agent")).toBeTruthy();
+    expect(isAgentsPathname("/chat-token")).toBeFalsy();
 
-    const chat = parseRendererUrl("app://bundle/agui/research-agent");
+    const chat = parseRendererUrl("app://bundle/chat/research-agent");
     if (chat === undefined) {
       throw new Error("expected renderer url");
     }
     expect(rewriteToOrigin(chat, defaultAgentsOrigin)).toBe(
-      "http://127.0.0.1:4111/agui/research-agent"
+      "http://127.0.0.1:4111/chat/research-agent"
+    );
+  });
+
+  test("Mastra memory paths rewrite onto the agents origin before /api", () => {
+    expect(isMastraMemoryPathname("/api/memory")).toBeTruthy();
+    expect(isMastraMemoryPathname("/api/memory/threads")).toBeTruthy();
+    expect(isMastraMemoryPathname("/api/memories")).toBeFalsy();
+    expect(isApiPathname("/api/memory/threads")).toBeTruthy();
+
+    const memory = parseRendererUrl("app://bundle/api/memory/threads");
+    if (memory === undefined) {
+      throw new Error("expected renderer url");
+    }
+    expect(rewriteToOrigin(memory, defaultAgentsOrigin)).toBe(
+      "http://127.0.0.1:4111/api/memory/threads"
     );
   });
 

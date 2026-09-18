@@ -16,7 +16,6 @@
   },
   "tags": ["-lintignore"],
   "treatConfigHintsAsErrors": true,
-  "ignore": [".agents/**"],
   // Loaded through `ultracite/oxlint/shadcn`
   "ignoreDependencies": ["@shadcn/lint"],
   "workspaces": {

@@ -4,7 +4,7 @@ Electron shell around `@v-monorepo/web`. Main and preload live here; the rendere
 
 - `pnpm dev:desktop` — web Vite, watch-build main/preload, launch Electron
 - `pnpm package:desktop` — package the current platform
-- Window URL is `app://bundle/`. Main proxies `/api` to `API_ORIGIN` and `/agui` to `AGENTS_ORIGIN` with Electron `net.fetch`; other requests go to Vite (dev) or the static export (prod)
+- Window URL is `app://bundle/`. Main proxies `/chat` and `/api/memory` to `AGENTS_ORIGIN`, remaining `/api` to `API_ORIGIN`, with Electron `net.fetch`; other requests go to Vite (dev) or the static export (prod)
 - Preload is CommonJS (`sandbox: true`). Bundle every dependency except `electron`; a sandboxed preload cannot `require()` npm packages.
 - IPC: one file per domain in `ipc/` (`shell.ts`), composed by `ipcInit`. New domain: that file, a preload module on `desktop.<domain>`, and a catalog plus accessor on `@v-monorepo/electron`
 - Register channels with `handle` from `ipc/handle.ts`. It wraps the outcome in an `IpcResult`, logs the failure, and degrades anything unclassified to `internal` so the renderer never sees our internals. Throw `ApiError` for anything the renderer should be able to branch on.

@@ -33,11 +33,11 @@ export default defineConfig(({ mode }) => {
       host: "127.0.0.1",
       port: 5173,
       proxy: {
-        "/agui": {
+        "/chat": {
           changeOrigin: true,
           target: agentsOrigin,
         },
-        "/memory": {
+        "/api/memory": {
           changeOrigin: true,
           target: agentsOrigin,
         },

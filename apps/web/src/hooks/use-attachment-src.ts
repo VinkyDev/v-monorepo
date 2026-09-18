@@ -2,7 +2,6 @@
 
 import { useAuiState } from "@assistant-ui/react";
 import { useEffect, useState } from "react";
-import { useShallow } from "zustand/react/shallow";
 
 const useFileSrc = (file: File | undefined) => {
   const [entry, setEntry] = useState<{ file: File; url: string } | undefined>(
@@ -31,16 +30,15 @@ const useFileSrc = (file: File | undefined) => {
 };
 
 export const useAttachmentSrc = () => {
-  const { file, src } = useAuiState(
-    useShallow((s): { file?: File; src?: string } => {
-      if (s.attachment.type !== "image") return {};
-      if (s.attachment.file) return { file: s.attachment.file };
-      const src = s.attachment.content?.filter((c) => c.type === "image")[0]
-        ?.image;
-      if (!src) return {};
-      return { src };
-    })
+  const file = useAuiState((s) =>
+    s.attachment.type === "image" ? s.attachment.file : undefined
   );
+  const imageSrc = useAuiState((s) => {
+    if (s.attachment.type !== "image" || s.attachment.file) {
+      return undefined;
+    }
+    return s.attachment.content?.find((part) => part.type === "image")?.image;
+  });
 
-  return useFileSrc(file) ?? src;
+  return useFileSrc(file) ?? imageSrc;
 };

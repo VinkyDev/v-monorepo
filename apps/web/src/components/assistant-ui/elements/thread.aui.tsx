@@ -5,7 +5,6 @@ import {
   ActionBarPrimitive,
   AuiIf,
   type AssistantState,
-  BranchPickerPrimitive,
   ComposerPrimitive,
   ErrorPrimitive,
   groupPartByType,
@@ -27,14 +26,11 @@ import {
   ArrowUpIcon,
   AudioLinesIcon,
   CheckIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   CopyIcon,
   DownloadIcon,
   MicIcon,
   MoreHorizontalIcon,
   PhoneIcon,
-  RefreshCwIcon,
   SquareIcon,
 } from "lucide-react";
 import {
@@ -696,8 +692,6 @@ const AssistantMessage: FC = () => {
     TaskGroup: TaskGroupComponent,
   } = useContext(ThreadComponentsContext);
   const groupBy = TaskGroupComponent ? taskAwareGroupBy : messageGroupBy;
-  // AG-UI emits one assistant message per tool round. Treat only the latest
-  // as the turn footer so earlier steps do not reserve a hover toolbar.
   const isLast = useAuiState((s) => s.message.isLast);
 
   const ACTION_BAR_PT = "pt-1.5";
@@ -806,7 +800,6 @@ const AssistantMessage: FC = () => {
           data-slot="aui_assistant-message-footer"
           className={cn("ms-2 flex items-center", ACTION_BAR_HEIGHT)}
         >
-          <BranchPicker />
           <AssistantActionBar />
         </div>
       ) : null}
@@ -831,11 +824,6 @@ const AssistantActionBar: FC = () => {
           </AuiIf>
         </TooltipIconButton>
       </ActionBarPrimitive.Copy>
-      <ActionBarPrimitive.Reload asChild>
-        <TooltipIconButton tooltip="Refresh">
-          <RefreshCwIcon />
-        </TooltipIconButton>
-      </ActionBarPrimitive.Reload>
       <ActionBarMorePrimitive.Root>
         <ActionBarMorePrimitive.Trigger asChild>
           <TooltipIconButton tooltip="More" className="data-open:bg-accent">
@@ -888,41 +876,6 @@ const UserMessage: FC = () => {
           />
         </div>
       </div>
-
-      <BranchPicker
-        data-slot="aui_user-branch-picker"
-        className="col-span-full col-start-1 row-start-3 -me-1 justify-end"
-      />
     </MessagePrimitive.Root>
-  );
-};
-
-const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({
-  className,
-  ...rest
-}) => {
-  return (
-    <BranchPickerPrimitive.Root
-      hideWhenSingleBranch
-      className={cn(
-        "aui-branch-picker-root text-muted-foreground -ms-2 me-2 inline-flex items-center text-xs",
-        className
-      )}
-      {...rest}
-    >
-      <BranchPickerPrimitive.Previous asChild>
-        <TooltipIconButton tooltip="Previous">
-          <ChevronLeftIcon />
-        </TooltipIconButton>
-      </BranchPickerPrimitive.Previous>
-      <span className="aui-branch-picker-state font-medium">
-        <BranchPickerPrimitive.Number /> / <BranchPickerPrimitive.Count />
-      </span>
-      <BranchPickerPrimitive.Next asChild>
-        <TooltipIconButton tooltip="Next">
-          <ChevronRightIcon />
-        </TooltipIconButton>
-      </BranchPickerPrimitive.Next>
-    </BranchPickerPrimitive.Root>
   );
 };

@@ -11,6 +11,7 @@ import {
   defaultApiOrigin,
   isAgentsPathname,
   isApiPathname,
+  isMastraMemoryPathname,
   parseRendererUrl,
   requireLoopbackOrigin,
   resolveHttpOrigin,
@@ -136,11 +137,14 @@ export const serveRenderer = (options: {
       return errorResponse("not_found");
     }
 
+    if (
+      isMastraMemoryPathname(url.pathname) ||
+      isAgentsPathname(url.pathname)
+    ) {
+      return await proxyApi(request, rewriteToOrigin(url, agentsOrigin));
+    }
     if (isApiPathname(url.pathname)) {
       return await proxyApi(request, rewriteToOrigin(url, apiOrigin));
-    }
-    if (isAgentsPathname(url.pathname)) {
-      return await proxyApi(request, rewriteToOrigin(url, agentsOrigin));
     }
     if (viteOrigin !== undefined) {
       return await proxyVite(request, rewriteToOrigin(url, viteOrigin));

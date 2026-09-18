@@ -14,10 +14,11 @@
     "test": "vp test"
   },
   "dependencies": {
-    "@ag-ui/client": "catalog:",
+    "@assistant-ui/ai-sdk": "catalog:",
     "@assistant-ui/react": "catalog:",
-    "@assistant-ui/react-ag-ui": "catalog:",
     "@assistant-ui/react-markdown": "catalog:",
+    "@mastra/ai-sdk": "catalog:",
+    "@mastra/client-js": "catalog:",
     "@t3-oss/env-core": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
@@ -26,14 +27,14 @@
     "@v-monorepo/logger": "workspace:*",
     "@v-monorepo/shared": "workspace:*",
     "@v-monorepo/ui": "workspace:*",
+    "assistant-stream": "catalog:",
     "class-variance-authority": "catalog:",
     "cn": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "remark-gfm": "catalog:",
-    "zod": "catalog:",
-    "zustand": "catalog:"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",

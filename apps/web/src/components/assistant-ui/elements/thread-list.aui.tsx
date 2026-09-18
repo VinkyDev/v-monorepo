@@ -49,10 +49,21 @@ export const ThreadList: FC = () => {
         <ThreadListSearch value={search} onValueChange={setSearch} />
       ) : null}
       <ThreadListItems searchQuery={hasThreads ? search : ""} />
+      <ThreadListLoadMore />
       {hasArchived ? <ThreadListArchived /> : null}
     </ThreadListRoot>
   );
 };
+
+const ThreadListLoadMore: FC = () => (
+  <AuiIf condition={(s) => s.threads.hasMore}>
+    <ThreadListPrimitive.LoadMore asChild>
+      <Button variant="ghost" className="mt-1 w-full text-sm">
+        加载更多
+      </Button>
+    </ThreadListPrimitive.LoadMore>
+  </AuiIf>
+);
 
 export const ThreadListSearch = forwardRef<
   HTMLInputElement,
