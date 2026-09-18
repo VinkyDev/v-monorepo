@@ -10,13 +10,13 @@ import { PostgresStoreVNext } from "@mastra/pg";
 
 import { parseEnv } from "#/env.ts";
 
-import { researchAgent } from "./agents/research.ts";
+import { assistantAgent } from "./agents/assistant.ts";
 import { customGateway } from "./providers/custom.ts";
 
 const env = parseEnv(process.env);
 
 export const mastra = new Mastra({
-  agents: { researchAgent },
+  agents: { assistantAgent },
   gateways: { custom: customGateway },
   server: {
     apiRoutes: [

@@ -1,6 +1,6 @@
 # @v-monorepo/agents
 
-A [Mastra](https://mastra.ai) agent project. Development is `mastra dev` (Studio + REST). Tests still go through Vite+.
+A [Mastra](https://mastra.ai) agent project. Development is `mastra dev` (Studio + REST).
 
 ## Setup
 
@@ -32,11 +32,11 @@ The first Studio start downloads the Wikipedia MCP package. Subsequent starts re
 pnpm run dev
 ```
 
-Studio is at http://localhost:4111. The Research agent id is `research-agent`. It loads the `research-brief` skill, then searches live sources and cites them. The web app talks to it over AI SDK at `POST /chat/research-agent`. Sessions are `/api/memory/threads`.
+Studio is at http://localhost:4111. The included demo agent has the id `assistant`. Its research-focused implementation loads the `research-brief` skill, searches live sources, and cites them. The web app talks to it over AI SDK at `POST /chat/assistant`. Sessions are `/api/memory/threads`.
 
 ```sh
 pnpm exec mastra api agent list
-pnpm exec mastra api agent generate research-agent
+pnpm exec mastra api agent generate assistant
 ```
 
 ## Deploy

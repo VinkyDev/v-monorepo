@@ -42,15 +42,15 @@ describe("renderer routing", () => {
 
   test("chat paths rewrite onto the agents origin", () => {
     expect(isAgentsPathname("/chat")).toBeTruthy();
-    expect(isAgentsPathname("/chat/research-agent")).toBeTruthy();
+    expect(isAgentsPathname("/chat/assistant")).toBeTruthy();
     expect(isAgentsPathname("/chat-token")).toBeFalsy();
 
-    const chat = parseRendererUrl("app://bundle/chat/research-agent");
+    const chat = parseRendererUrl("app://bundle/chat/assistant");
     if (chat === undefined) {
       throw new Error("expected renderer url");
     }
     expect(rewriteToOrigin(chat, defaultAgentsOrigin)).toBe(
-      "http://127.0.0.1:4111/chat/research-agent"
+      "http://127.0.0.1:4111/chat/assistant"
     );
   });
 

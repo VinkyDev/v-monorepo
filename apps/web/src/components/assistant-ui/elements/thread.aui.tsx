@@ -31,6 +31,7 @@ import {
   MicIcon,
   MoreHorizontalIcon,
   PhoneIcon,
+  RefreshCwIcon,
   SquareIcon,
 } from "lucide-react";
 import {
@@ -824,6 +825,11 @@ const AssistantActionBar: FC = () => {
           </AuiIf>
         </TooltipIconButton>
       </ActionBarPrimitive.Copy>
+      <ActionBarPrimitive.Reload asChild>
+        <TooltipIconButton tooltip="Regenerate">
+          <RefreshCwIcon />
+        </TooltipIconButton>
+      </ActionBarPrimitive.Reload>
       <ActionBarMorePrimitive.Root>
         <ActionBarMorePrimitive.Trigger asChild>
           <TooltipIconButton tooltip="More" className="data-open:bg-accent">

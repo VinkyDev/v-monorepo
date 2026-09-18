@@ -6,10 +6,10 @@ import { z } from "zod";
 import { mcp } from "../mcp.ts";
 import { researchBriefSkill } from "../skills/research-brief.ts";
 
-export const researchAgent = new Agent({
+export const assistantAgent = new Agent({
   description:
     "Live-source researcher. Wikipedia MCP and page fetch — no search API key.",
-  id: "research-agent",
+  id: "assistant",
   instructions: `You are Research. Answer with live sources, not memory of the training cutoff.
 
 Before a research question, load the research-brief skill and follow it.

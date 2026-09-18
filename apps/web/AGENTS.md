@@ -1,10 +1,8 @@
 # `@v-monorepo/web`
 
-React app. The home screen is a Research chat: assistant-ui `useChatRuntime` over Mastra `chatRoute`, proxied to `@v-monorepo/agents` at `/chat/research-agent`. Sessions live in Mastra Memory at `/api/memory/threads`.
+React app. The home screen is a configurable assistant-ui chat over Mastra `chatRoute`. `VITE_AGENT_ID` selects the agent (the included demo uses `assistant`). Sessions live in Mastra Memory at `/api/memory/threads`.
 
-- `src/components/agent-runtime.tsx` — `useRemoteThreadListRuntime` + `useChatRuntime` (`AssistantChatTransport`) + attachments
-- `src/components/agent-thread.tsx` — 官方 `@assistant-ui/thread`（`src/components/assistant-ui`）
-- `src/lib/mastra-threads.ts` — `MastraClient` `RemoteThreadListAdapter`；`ownerId` 只存在 localStorage
+- `src/features/chat/` — chat 页面组合、runtime 和 Mastra adapter
 - `src/components/assistant-ui/` — shadcn registry 安装的 Thread / ThreadList / ToolFallback / ToolGroup / Reasoning / Markdown
 - `src/lib/api.ts` — `createApiClient` singleton (Hono RPC, for pages that call `apps/server`)
 - `src/lib/query-client.ts` — retry, `throwOnError`, and the global error handlers

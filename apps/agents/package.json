@@ -10,7 +10,6 @@
     "dev": "mastra dev",
     "build": "mastra build",
     "start": "mastra start",
-    "test": "vp test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

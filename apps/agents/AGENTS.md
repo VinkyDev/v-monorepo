@@ -2,9 +2,9 @@
 
 [Mastra](https://mastra.ai) agents. Register each agent in `src/mastra/index.ts`. Models use `"provider/model"`; credentials come from Mastra's provider env vars (`OPENAI_API_KEY`, optional `OPENAI_BASE_URL`, …). An optional OpenAI-compatible gateway is `custom/<model>` (`src/mastra/providers/custom.ts`), configured only by `CUSTOM_BASE_URL`, `CUSTOM_API_KEY`, and `CUSTOM_MODEL_LIST` (comma-separated ids). `DATABASE_URL` is validated by T3 Env in `src/env.ts`. MCP servers live in `src/mastra/mcp.ts` (Wikipedia, no extra keys). Attach skills with `createSkill` from `@mastra/core/skills`.
 
-- `pnpm run dev` — Studio + REST at http://localhost:4111. Agent **Editor** and Observability traces are on. Chat is `POST /chat/:agentId` (Research: `/chat/research-agent`). Memory threads are `/api/memory/threads`.
+- `pnpm run dev` — Studio + REST at http://localhost:4111. Agent **Editor** and Observability traces are on. Chat is `POST /chat/:agentId` (included demo: `/chat/assistant`). Memory threads are `/api/memory/threads`.
 - `pnpm exec mastra api agent list` — inspect the local server
-- `pnpm exec mastra api agent generate research-agent` — talk to Research
+- `pnpm exec mastra api agent generate assistant` — talk to the demo agent
 
 Chat requests send `memory: { thread, resource }`. Working memory is thread-scoped. Thread titles come from the first user message via the assistant-ui adapter (this custom gateway does not support Mastra `generateTitle`, which needs a non-streaming completion).
 

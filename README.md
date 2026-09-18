@@ -135,7 +135,7 @@ packages/
   config/            TypeScript presets
 ```
 
-数据流：首页聊天 `useChatRuntime` → `POST /chat/research-agent`（Vite / Electron 转发）→ `apps/agents` `chatRoute`。会话 `MastraClient` → `/api/memory/threads`。其它页面 `useQuery` → `apiClient` → `apps/server`。路由与响应类型来自 `AppType`；错误来自 `ApiError`。Mastra 走自己的 AI SDK / Memory 契约。
+数据流：首页聊天 `useChatRuntime` → `POST /chat/:agentId`（由 `VITE_AGENT_ID` 选择，经 Vite / Electron 转发）→ `apps/agents` `chatRoute`。会话 `MastraClient` → `/api/memory/threads`。其它页面 `useQuery` → `apiClient` → `apps/server`。路由与响应类型来自 `AppType`；错误来自 `ApiError`。Mastra 走自己的 AI SDK / Memory 契约。
 
 ## 代码规范
 

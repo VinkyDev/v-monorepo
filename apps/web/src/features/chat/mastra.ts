@@ -10,13 +10,7 @@ import { MastraClient } from "@mastra/client-js";
 import { createAssistantStream } from "assistant-stream";
 import { useMemo } from "react";
 
-const RESEARCH_AGENT_ID = "research-agent";
-export const RESEARCH_OWNER_STORAGE_KEY = "research-agent-owner";
-
-export interface OwnerStorage {
-  getItem: (key: string) => string | null;
-  setItem: (key: string, value: string) => void;
-}
+const RESOURCE_STORAGE_KEY = "assistant-resource-id";
 
 interface ThreadArchiveFields {
   archived?: boolean;
@@ -30,39 +24,42 @@ type MemoryThread = Awaited<
   ReturnType<ReturnType<MastraClient["getMemoryThread"]>["get"]>
 >;
 
-const fallbackOwnerStorage = new Map<string, string>();
+let fallbackResourceId: string | undefined;
+let cachedResourceId: string | undefined;
 
-export const browserOwnerStorage = (): OwnerStorage => {
+const loadResourceId = (): string => {
+  if (cachedResourceId !== undefined) {
+    return cachedResourceId;
+  }
   try {
-    return window.localStorage;
+    const existing = window.localStorage.getItem(RESOURCE_STORAGE_KEY);
+    if (existing !== null && existing.length > 0) {
+      cachedResourceId = existing;
+    } else {
+      cachedResourceId = crypto.randomUUID();
+      window.localStorage.setItem(RESOURCE_STORAGE_KEY, cachedResourceId);
+    }
   } catch {
-    return {
-      getItem: (key) => fallbackOwnerStorage.get(key) ?? null,
-      setItem: (key, value) => {
-        fallbackOwnerStorage.set(key, value);
-      },
-    };
+    fallbackResourceId ??= crypto.randomUUID();
+    cachedResourceId = fallbackResourceId;
   }
+
+  return cachedResourceId;
 };
 
-export const loadOwnerId = (storage: OwnerStorage): string => {
-  const existing = storage.getItem(RESEARCH_OWNER_STORAGE_KEY);
-  if (existing !== null && existing.length > 0) {
-    return existing;
-  }
-  const id = crypto.randomUUID();
-  storage.setItem(RESEARCH_OWNER_STORAGE_KEY, id);
-  return id;
+let client: MastraClient | undefined;
+
+const getMastraClient = (): MastraClient => {
+  client ??= new MastraClient({ baseUrl: globalThis.location.origin });
+  return client;
 };
 
-export const createMastraClient = (
-  baseUrl = globalThis.location.origin
-): MastraClient => new MastraClient({ baseUrl });
+export const getChatResourceId = loadResourceId;
 
-export const isArchivedMetadata = (metadata?: ThreadArchiveFields): boolean =>
+const isArchivedMetadata = (metadata?: ThreadArchiveFields): boolean =>
   metadata?.archived === true;
 
-export const withArchivedMetadata = (
+const withArchivedMetadata = (
   metadata: ThreadArchiveFields | undefined,
   archived: boolean
 ) => ({
@@ -75,7 +72,7 @@ const asDate = (value: Date | string): Date | undefined => {
   return Number.isNaN(date.getTime()) ? undefined : date;
 };
 
-export const toRemoteThreadMetadata = (thread: {
+const toRemoteThreadMetadata = (thread: {
   id: string;
   metadata?: ThreadArchiveFields;
   title?: string;
@@ -87,7 +84,7 @@ export const toRemoteThreadMetadata = (thread: {
   title: thread.title,
 });
 
-export const archiveThreadUpdate = (
+const archiveThreadUpdate = (
   thread: Pick<MemoryThread, "resourceId" | "title"> & {
     metadata?: ThreadArchiveFields;
   },
@@ -102,7 +99,7 @@ export const archiveThreadUpdate = (
 const clipTitle = (text: string, max = 40): string =>
   text.length > max ? `${text.slice(0, max - 1)}…` : text;
 
-export const titleFromMessages = (
+const titleFromMessages = (
   messages: readonly ThreadMessage[]
 ): string | undefined => {
   for (const message of messages) {
@@ -137,7 +134,7 @@ const noopHistoryWrite = async () => {
 };
 
 const createHistoryAdapter = (
-  client: MastraClient,
+  mastra: MastraClient,
   agentId: string,
   getRemoteId: () => string | undefined
 ): ThreadHistoryAdapter => {
@@ -148,7 +145,7 @@ const createHistoryAdapter = (
       if (remoteId === undefined) {
         return { messages: [] };
       }
-      const { messages } = await client.listThreadMessages(remoteId, {
+      const { messages } = await mastra.listThreadMessages(remoteId, {
         agentId,
       });
       const uiMessages = toAISdkMessages(messages, { version: "v7" });
@@ -161,9 +158,8 @@ const createHistoryAdapter = (
     },
   };
 
-  // SAFETY: useChatRuntime supplies AI SDK UIMessage as TMessage, and
-  // toAISdkMessages({ version: "v7" }) returns the same wire type.
-  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- ThreadHistoryAdapter cannot encode that fixed format relationship.
+  // SAFETY: the generic adapter contract cannot express that this integration always loads Mastra AI SDK v7 UIMessage values.
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
   return {
     append: noopHistoryWrite,
     load: async () => await Promise.resolve({ messages: [] }),
@@ -171,17 +167,50 @@ const createHistoryAdapter = (
   } as ThreadHistoryAdapter;
 };
 
-export const createMastraThreadAdapter = ({
-  agentId = RESEARCH_AGENT_ID,
-  client,
-  ownerId,
+export const messageIdsAfter = (
+  messages: readonly { id: string }[],
+  lastRetainedId?: string
+): string[] => {
+  const lastRetainedIndex =
+    lastRetainedId === undefined
+      ? -1
+      : messages.findIndex(({ id }) => id === lastRetainedId);
+
+  if (lastRetainedId !== undefined && lastRetainedIndex === -1) {
+    throw new Error(`Message ${lastRetainedId} is missing from Mastra memory`);
+  }
+
+  return messages.slice(lastRetainedIndex + 1).map(({ id }) => id);
+};
+
+export const truncateMastraThread = async ({
+  agentId,
+  messageIds,
+  threadId,
 }: {
-  agentId?: string;
-  client: MastraClient;
-  ownerId: string;
+  agentId: string;
+  messageIds: readonly string[];
+  threadId: string;
+}): Promise<void> => {
+  const thread = getMastraClient().getMemoryThread({ agentId, threadId });
+  const { messages } = await thread.listMessages({
+    orderBy: { direction: "ASC", field: "createdAt" },
+    perPage: false,
+  });
+  const deletedIds = messageIdsAfter(messages, messageIds.at(-1));
+  if (deletedIds.length > 0) {
+    await thread.deleteMessages(deletedIds);
+  }
+};
+
+export const createMastraThreadListAdapter = ({
+  agentId,
+}: {
+  agentId: string;
 }): RemoteThreadListAdapter => {
+  const mastra = getMastraClient();
   const memoryThread = (remoteId: string) =>
-    client.getMemoryThread({ agentId, threadId: remoteId });
+    mastra.getMemoryThread({ agentId, threadId: remoteId });
 
   const persist = async (
     remoteId: string,
@@ -206,7 +235,7 @@ export const createMastraThreadAdapter = ({
     return useMemo(
       () => ({
         history: createHistoryAdapter(
-          client,
+          mastra,
           agentId,
           () => aui.threadListItem.getState().remoteId
         ),
@@ -236,10 +265,10 @@ export const createMastraThreadAdapter = ({
       });
     },
     initialize: async (localId) => {
-      const created = await client.createMemoryThread({
+      const created = await mastra.createMemoryThread({
         agentId,
         metadata: { archived: false },
-        resourceId: ownerId,
+        resourceId: getChatResourceId(),
         threadId: localId,
       });
       return { remoteId: created.id };
@@ -247,12 +276,12 @@ export const createMastraThreadAdapter = ({
     list: async (params) => {
       const page =
         params?.after === undefined ? 0 : Math.trunc(Number(params.after));
-      const response = await client.listMemoryThreads({
+      const response = await mastra.listMemoryThreads({
         agentId,
         orderBy: { direction: "DESC", field: "updatedAt" },
         page: Number.isNaN(page) ? 0 : page,
         perPage: 50,
-        resourceId: ownerId,
+        resourceId: getChatResourceId(),
       });
       return {
         nextCursor: response.hasMore
