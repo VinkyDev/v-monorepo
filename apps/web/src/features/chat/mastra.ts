@@ -133,6 +133,28 @@ const noopHistoryWrite = async () => {
   await Promise.resolve();
 };
 
+const MEMORY_MESSAGE_PAGE_SIZE = 100;
+
+type MemoryThreadClient = ReturnType<MastraClient["getMemoryThread"]>;
+type MemoryThreadMessages = Awaited<
+  ReturnType<MemoryThreadClient["listMessages"]>
+>["messages"];
+
+const listAllThreadMessages = async (thread: MemoryThreadClient) => {
+  const loadFrom = async (page: number): Promise<MemoryThreadMessages> => {
+    const { messages } = await thread.listMessages({
+      orderBy: { direction: "ASC", field: "createdAt" },
+      page,
+      perPage: MEMORY_MESSAGE_PAGE_SIZE,
+    });
+    if (messages.length < MEMORY_MESSAGE_PAGE_SIZE) {
+      return messages;
+    }
+    return [...messages, ...(await loadFrom(page + 1))];
+  };
+  return await loadFrom(0);
+};
+
 const createHistoryAdapter = (
   mastra: MastraClient,
   agentId: string,
@@ -145,9 +167,9 @@ const createHistoryAdapter = (
       if (remoteId === undefined) {
         return { messages: [] };
       }
-      const { messages } = await mastra.listThreadMessages(remoteId, {
-        agentId,
-      });
+      const messages = await listAllThreadMessages(
+        mastra.getMemoryThread({ agentId, threadId: remoteId })
+      );
       const uiMessages = toAISdkMessages(messages, { version: "v7" });
       return {
         messages: uiMessages.map((message, index) => ({
@@ -193,11 +215,10 @@ export const truncateMastraThread = async ({
   threadId: string;
 }): Promise<void> => {
   const thread = getMastraClient().getMemoryThread({ agentId, threadId });
-  const { messages } = await thread.listMessages({
-    orderBy: { direction: "ASC", field: "createdAt" },
-    perPage: false,
-  });
-  const deletedIds = messageIdsAfter(messages, messageIds.at(-1));
+  const deletedIds = messageIdsAfter(
+    await listAllThreadMessages(thread),
+    messageIds.at(-1)
+  );
   if (deletedIds.length > 0) {
     await thread.deleteMessages(deletedIds);
   }
