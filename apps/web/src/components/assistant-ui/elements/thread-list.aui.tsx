@@ -33,20 +33,40 @@ import {
   type FC,
 } from "react";
 
-import { field } from "#/components/assistant-ui/elements/surfaces.tsx";
+import { field, mono } from "#/components/assistant-ui/elements/surfaces.tsx";
 
 export const ThreadList: FC = () => {
+  const aui = useAui();
   const [search, setSearch] = useState("");
   const hasThreads = useAuiState((s) => s.threads.threadIds.length > 0);
   const hasArchived = useAuiState(
     (s) => s.threads.archivedThreadIds.length > 0
   );
+  const activeId = useAuiState((s) => s.threads.mainThreadId);
+  const { filteredIndices, threadIds } = useThreadListGroups(
+    hasThreads ? search : ""
+  );
+
+  const moveActive = (delta: number) => {
+    const ordered = filteredIndices
+      .map((index) => threadIds[index])
+      .filter((id): id is string => id !== undefined);
+    if (ordered.length === 0) return;
+    const at = ordered.findIndex((id) => id === activeId);
+    const from = at === -1 ? (delta > 0 ? -1 : 0) : at;
+    const next = ordered[(from + delta + ordered.length) % ordered.length];
+    if (next) aui.threads.item({ id: next }).switchTo();
+  };
 
   return (
     <ThreadListRoot>
       <ThreadListNew />
       {hasThreads ? (
-        <ThreadListSearch value={search} onValueChange={setSearch} />
+        <ThreadListSearch
+          value={search}
+          onValueChange={setSearch}
+          onStep={moveActive}
+        />
       ) : null}
       <ThreadListItems searchQuery={hasThreads ? search : ""} />
       <ThreadListLoadMore />
@@ -58,7 +78,10 @@ export const ThreadList: FC = () => {
 const ThreadListLoadMore: FC = () => (
   <AuiIf condition={(s) => s.threads.hasMore}>
     <ThreadListPrimitive.LoadMore asChild>
-      <Button variant="ghost" className="mt-1 w-full text-sm">
+      <Button
+        variant="ghost"
+        className="text-foreground/45 hover:text-foreground mt-1 h-8 w-full rounded-xl text-xs font-normal"
+      >
         加载更多
       </Button>
     </ThreadListPrimitive.LoadMore>
@@ -67,27 +90,41 @@ const ThreadListLoadMore: FC = () => (
 
 export const ThreadListSearch = forwardRef<
   HTMLInputElement,
-  Omit<ComponentPropsWithoutRef<typeof Input>, "value" | "onChange"> & {
+  Omit<ComponentPropsWithoutRef<"input">, "value" | "onChange"> & {
     value: string;
     onValueChange: (value: string) => void;
+    onStep?: (delta: number) => void;
   }
->(({ className, value, onValueChange, ...props }, ref) => {
+>(({ className, value, onValueChange, onStep, onKeyDown, ...props }, ref) => {
   return (
-    <div data-slot="aui_thread-list-search" className="relative px-0.5 py-1">
+    <div
+      data-slot="aui_thread-list-search"
+      className={cn(field, "flex items-center gap-2 rounded-xl px-2.5 py-1.5")}
+    >
       <SearchIcon
         data-slot="aui_thread-list-search-icon"
-        className="text-muted-foreground pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2"
+        className="text-foreground/30 size-3.5 shrink-0"
       />
-      <Input
+      <input
         ref={ref}
         type="search"
         value={value}
         onChange={(event) => onValueChange(event.target.value)}
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+          if (event.nativeEvent.isComposing || event.defaultPrevented) return;
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            onStep?.(1);
+          } else if (event.key === "ArrowUp") {
+            event.preventDefault();
+            onStep?.(-1);
+          }
+        }}
         aria-label="搜索对话"
         placeholder="搜索对话"
         className={cn(
-          field,
-          "border-border h-8 rounded-md px-2 ps-8 text-sm",
+          "text-foreground/85 placeholder:text-foreground/30 min-w-0 flex-1 bg-transparent text-[13px] outline-none",
           className
         )}
         {...props}
@@ -104,7 +141,7 @@ export const ThreadListRoot: FC<
   return (
     <ThreadListPrimitive.Root
       data-slot="aui_thread-list-root"
-      className={cn("flex flex-col gap-0.5", className)}
+      className={cn("flex flex-col gap-1.5", className)}
       {...props}
     />
   );
@@ -116,7 +153,7 @@ export const ThreadListItems: FC<
   return (
     <div
       data-slot="aui_thread-list-items"
-      className={cn("flex flex-col gap-0.5", className)}
+      className={cn("flex flex-col gap-1", className)}
       {...props}
     >
       <AuiIf condition={(s) => s.threads.isLoading}>
@@ -220,9 +257,9 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
     return (
       <div
         data-slot="aui_thread-list-empty"
-        className="text-muted-foreground px-2.5 py-4 text-sm"
+        className="text-foreground/30 px-2 py-4 text-center text-xs"
       >
-        没有匹配的对话
+        没有匹配「{query}」的对话
       </div>
     );
   }
@@ -241,7 +278,7 @@ const ThreadListItemGroups: FC<{ searchQuery?: string }> = ({
     <Fragment key={group.label}>
       <div
         data-slot="aui_thread-list-group-label"
-        className="text-muted-foreground px-2.5 pt-3 pb-1 text-xs font-medium"
+        className={cn(mono, "text-foreground/25 px-2 pt-2 pb-1")}
       >
         {group.label}
       </div>
@@ -267,7 +304,7 @@ export const ThreadListNew = forwardRef<
         variant="ghost"
         data-slot="aui_thread-list-new"
         className={cn(
-          "hover:bg-muted data-active:bg-muted h-8 justify-start gap-2 rounded-md px-2.5 text-sm font-normal tracking-normal normal-case",
+          "hover:bg-foreground/[0.03] data-active:bg-foreground/[0.05] h-8 justify-start gap-2 rounded-xl px-2.5 text-[13px] font-normal tracking-normal normal-case",
           className
         )}
         {...props}
@@ -329,7 +366,7 @@ export const ThreadListItem: FC = () => {
   return (
     <ThreadListItemPrimitive.Root
       data-slot="aui_thread-list-item"
-      className="group hover:bg-muted focus-visible:bg-muted data-active:bg-muted has-focus-visible:bg-muted has-data-[state=open]:bg-muted relative flex h-8 items-center rounded-md transition-colors focus-visible:outline-none"
+      className="group hover:bg-foreground/[0.03] focus-visible:bg-foreground/[0.03] data-active:bg-foreground/[0.05] has-focus-visible:bg-foreground/[0.05] has-data-[state=open]:bg-foreground/[0.05] relative flex min-h-10 items-center rounded-xl transition-colors focus-visible:outline-none"
     >
       {isRenaming ? (
         <ThreadListItemRename
@@ -342,18 +379,18 @@ export const ThreadListItem: FC = () => {
         <ThreadListItemPrimitive.Trigger
           ref={triggerRef}
           data-slot="aui_thread-list-item-trigger"
-          className="focus-visible:ring-ring/50 flex h-full min-w-0 flex-1 items-center rounded-md px-2.5 text-start text-sm outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 group-data-active:pe-9 focus-visible:ring-1"
+          className="flex min-h-10 min-w-0 flex-1 items-center gap-1.5 rounded-xl px-2 py-1.5 text-start outline-none group-hover:pe-9 group-has-focus-visible:pe-9 group-has-data-[state=open]:pe-9 group-data-active:pe-9"
         >
           {isRunning && (
             <Loader2Icon
               aria-hidden
               data-slot="aui_thread-list-item-running"
-              className="text-muted-foreground me-1.5 size-3.5 shrink-0 animate-spin"
+              className="text-foreground/35 size-3 shrink-0 animate-spin"
             />
           )}
           <span
             data-slot="aui_thread-list-item-title"
-            className="min-w-0 flex-1 truncate"
+            className="min-w-0 flex-1 truncate text-[13px]"
           >
             <ThreadListItemPrimitive.Title fallback="新对话" />
           </span>
@@ -412,7 +449,10 @@ const ThreadListItemRename: FC<{
       data-slot="aui_thread-list-item-rename"
       aria-label="重命名对话"
       value={value}
-      className="h-7 min-w-0 flex-1 px-2.5 pe-9 text-sm"
+      className={cn(
+        field,
+        "mx-1 h-7 min-w-0 flex-1 rounded-lg px-2.5 pe-9 text-[13px] outline-none"
+      )}
       onChange={(event) => setValue(event.target.value)}
       onBlur={() => commit(false)}
       onKeyDown={(event) => {
@@ -436,7 +476,7 @@ const ThreadListItemMore: FC<{ onRename: () => void }> = ({ onRename }) => {
           variant="ghost"
           size="icon"
           data-slot="aui_thread-list-item-more"
-          className="data-[state=open]:bg-accent absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 tracking-normal normal-case opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100"
+          className="data-[state=open]:bg-foreground/[0.06] hover:bg-foreground/[0.06] absolute end-1.5 top-1/2 size-6 -translate-y-1/2 p-0 tracking-normal normal-case opacity-0 group-hover:opacity-100 group-has-focus-visible:opacity-100 group-data-active:opacity-100 data-[state=open]:opacity-100"
         >
           <MoreHorizontalIcon className="size-3.5" />
           <span className="sr-only">更多</span>
@@ -485,7 +525,7 @@ const ThreadListArchived: FC = () => {
     <div data-slot="aui_thread-list-archived" className="mt-2">
       <div
         data-slot="aui_thread-list-group-label"
-        className="text-muted-foreground px-2.5 pt-3 pb-1 text-xs font-medium"
+        className={cn(mono, "text-foreground/25 px-2 pt-2 pb-1")}
       >
         已归档
       </div>
@@ -500,11 +540,11 @@ const ArchivedThreadListItem: FC = () => {
   return (
     <ThreadListItemPrimitive.Root
       data-slot="aui_thread-list-item"
-      className="group hover:bg-muted focus-visible:bg-muted data-active:bg-muted relative flex h-8 items-center rounded-md transition-colors focus-visible:outline-none"
+      className="group hover:bg-foreground/[0.03] focus-visible:bg-foreground/[0.03] data-active:bg-foreground/[0.05] relative flex min-h-10 items-center rounded-xl transition-colors focus-visible:outline-none"
     >
       <ThreadListItemPrimitive.Trigger
         data-slot="aui_thread-list-item-trigger"
-        className="flex h-full min-w-0 flex-1 items-center rounded-md px-2.5 text-start text-sm outline-none group-hover:pe-16"
+        className="flex min-h-10 min-w-0 flex-1 items-center rounded-xl px-2 py-1.5 text-start text-[13px] outline-none group-hover:pe-16"
       >
         <span
           data-slot="aui_thread-list-item-title"
